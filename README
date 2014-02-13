@@ -1,0 +1,19 @@
+# Open Data Map
+
+A prototype map to illustrate what we could do for the Open Data and STEEP projects.
+
+## Goals
+ * Really easy to use.
+ * Draw LSOAs/Government Office Regions/Postcodes or combinations of those on a map.
+ * Store some data on these regions in a simple name -> number format.
+ * Execute some functions on that data and colour regions accordingly.
+
+## Not-Goals
+We don't care about complex GIS queries (route / area calculations).
+
+## Technology
+We plan to display the map in D3 using vector tiles.
+
+We want to try to push a lot of the work out to the client side (that is, in the user's browser).
+
+Working from this example http://bl.ocks.org/mbostock/5616813.
