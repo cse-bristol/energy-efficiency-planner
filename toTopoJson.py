@@ -10,7 +10,7 @@ inDir = getenv('HOME') + "/Dropbox/CSE/Data"
 tempDir = "./temp"
 outDir = "./data"
 topoJson = "C:/node_modules/.bin/topojson.cmd"
-simplify = 0.2;
+simplify = 0.99;
 
 if not path.exists(tempDir):
     makedirs(tempDir)
@@ -29,7 +29,7 @@ for file in listdir(inDir):
 
             shpFilePath = tempDir + "/" + shpFile
             outFilePath = outDir + "/" + name + ".json"
-            call([topoJson, shpFilePath, '--simplify-proportion', str(simplify), '--out', outFilePath])
+            call([topoJson, shpFilePath, '--simplify-proportion', str(simplify), '--properties', '--out', outFilePath])
         except KeyError as e:
             print("Failed to convert to topojson: " + file + " error: " + e.message)
 
