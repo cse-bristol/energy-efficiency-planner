@@ -1,0 +1,16 @@
+{
+    "type" : "Topology",
+    "transform" : {
+	"scale" : [1, 1],
+	"translate" : [-2.5833, 51.4500]
+    },
+    "objects" : {
+	"example" : {
+	    "type" : "Polygon",
+	    "arcs" : [[0]]
+	}
+    },
+    "arcs" : [
+	[[0, 0], [0, 1], [1, 0], [0, -1], [-1, 0]]
+    ]
+}

@@ -2,51 +2,35 @@
 
 /*global d3, topojson*/
 
-var tileScale = 256;
-var width = Math.max(960, window.innerWidth) - 10;
-var height = Math.max(500, window.innerHeight) - 10;
+var width = window.innerWidth - 400;
+var height = window.innerHeight - 10;
 var startCoordinates = [-3.0, 54.0];
 var zoom = 15;
 
-var tiler = d3.geo.tile()
-	.size([width, height]);
-
 var projection = d3.geo.mercator()
-	.center(startCoordinates);
+    .center(startCoordinates);
 
 var zoomer = d3.behavior.zoom()
-	.scale(1 << zoom)
-	.translate([width / 2, height / 2]);
+    .scale(1 << zoom)
+    .translate([width / 2, height / 2]);
 
 var path = d3.geo.path()
-	.projection(projection);
+    .projection(projection);
 
-d3.select("body")
+d3.select("#map")
     .append("svg")
     .attr("width", width)
     .attr("height", height);
 
-d3.select("body")
+d3.select("#map")
     .call(zoomer);
-
-var roads = d3.select("svg").append("g")
-	.attr("id", "roads")
-	.attr("width", width)
-	.attr("height", height);
-
-var tileURL = function(d) {
-    var x = d[0];
-    var y = d[1];
-    var zoom = d[2];
-    return "http://tile.openstreetmap.us/vectiles-highroad/" + zoom + "/" + x + "/" + y + ".json";
-};
 
 var layers = d3.map({
     //"data/example.json": "example",
     "data/uk.json" : "subunits", // TODO remove thius and put in national level boundaries
-    //"data/Gov_Office_Region_DEC_2010_EN_Gen_Clip.json" : "Gov_Office_Region_DEC_2010_EN_Gen_Clip",
+    "data/Gov_Office_Region_DEC_2010_EN_Gen_Clip.json" : "Gov_Office_Region_DEC_2010_EN_Gen_Clip"
     //"data/County_Unitary_Auth_DEC_2012_EW_Gen_Clip.json" : "County_Unitary_Auth_DEC_2012_EW_Gen_Clip",
-    "data/Middle_Layer_SOA_2011_EW_Gen_Clip.json" : "Middle_Layer_SOA_2011_EW_Gen_Clip"
+    //"data/Middle_Layer_SOA_2011_EW_Gen_Clip.json" : "Middle_Layer_SOA_2011_EW_Gen_Clip"
     //"data/Lower_Layer_SOA_2011_EW_Gen_Clip.json" : "Lower_Layer_SOA_2011_EW_Gen_Clip"
     //"data/Wards_DEC_2012_GB_Gen_Clip.json" : "Wards_DEC_2012_GB_Gen_Clip"
 });
@@ -90,6 +74,25 @@ var colour = function(){
     };
 }();
 
+var select = function(event, index) {
+    var properties = d3.map(event.properties).entries();
+
+    var details = d3.select("#details ul");
+
+    var regionProperties = details
+        .selectAll("li")
+        .data(properties);
+
+    regionProperties.exit().remove();
+
+    regionProperties.enter()
+	.append("li")
+
+    regionProperties.html(function(property) {
+	return property.key + ": " + property.value;
+    });
+};
+
 var redraw = function() {
 
     projection.scale(zoomer.scale() / 2 / Math.PI)
@@ -97,12 +100,13 @@ var redraw = function() {
     
     loaded.forEach(function(layerID, topojsonShapes){
 	var paths = d3.select("g#" + layerID)
-		.selectAll("path")
-		.data(topojsonShapes);
+	    .selectAll("path")
+	    .data(topojsonShapes);
 	paths.enter()
 	    .append("path")
 	    .attr("d", path)
-	    .attr("fill", colour.byIndex);
+	    .attr("fill", colour.byIndex)
+	    .on("click", select);
 
 	paths.attr("d", path);
 
