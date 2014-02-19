@@ -6,10 +6,12 @@ from json import dumps
 
 from scipy.spatial import Voronoi
 from numpy import array
+from pyproj import transform, Proj
 
 # Depends on Python 3, scipy and numpy
 
-spatialReferenceSystem = "urn:ogc:def:crs:EPSG:27700"
+latLong = Proj("+init=EPSG:4326")
+osMap = Proj("+init=EPSG:27700")
 
 class PostCode:
     def __init__(self, code, east, north):
@@ -17,8 +19,24 @@ class PostCode:
         self.east = east
         self.north = north
 
+def jsonHead(f):
+    f.write('''{
+        "type": "FeatureCollection",
+        "crs": {
+            "type": "name",
+            "properties": {
+                "name" : "urn:ogc:def:crs:EPSG:27700"
+            }
+        },
 
-def geoJSON(voronoi):
+        "features": [
+    ''')
+    
+def jsonFoot(f):
+    f.write("]}")
+    
+    
+def json(voronoi, f, first=False):
     def feature(postcode, polygon):
         return {
             "type": "Feature",
@@ -34,29 +52,24 @@ def geoJSON(voronoi):
             }
         }
 
-    return dumps({
-        "type": "FeatureCollection",
-        "crs": {
-            "type": "name",
-            "properties": {
-                "name" : spatialReferenceSystem
-            }
-        },
+    for (postcode, polygon) in voronoi:
+        if first:
+            first = False
+            f.write(dumps(feature(postcode, polygon)))
+        else :
+            f.write("," + dumps(feature(postcode, polygon)))
 
-        "features": [feature(postcode, polygon) for postcode, polygon in voronoi.items()]
-    })
-
-        
-
+      
 def voronoi(postcodes, lsoa):
     "Coverts the postcodes contained within an LSOA into a lookup from postcode to a polygon of coordinates. See http://docs.scipy.org/doc/scipy/reference/tutorial/spatial.html"
 
     def polygon(region, points):
         def getPoint(points, p):
+            "Handles infinite points (badly at present), and recodes the point to use spherical lat/long coordinates."
             if p < 0:
-                return [0, 0] # TODO: handle points which represent infinity
+                return pyproj.transform(osMap, latLong, 0, 0)
             else:
-                return points[p].tolist()
+                return pyproj.transform(osMap, latLong, points[p][0], points[p][1])
 
         return [getPoint(points, p) for p in region]
             
@@ -66,7 +79,7 @@ def voronoi(postcodes, lsoa):
     try:
         v = Voronoi(points)
         vertices = v.vertices
-        return {p : polygon(r, vertices) for p, r in zip(postcodes, v.regions)}
+        return [(p, polygon(r, vertices)) for p, r in zip(postcodes, v.regions)]
     except IndexError:
         print("Failed " + str(points))
 
@@ -108,23 +121,7 @@ def extract(temp="./temp", archive="./data/raw/ONSPD_NOV_2013_csv.zip", data="Da
                 except ValueError as ex:
                     failed += 1
                     
-    print("Postcodes categorized by LSOA " + str(succeeded))
+    print(str(len(byLSOA.keys())) + " LSOAs containing " + str(succeeded) + " postcodes.")
     print("Postcodes failed due to missing northing or easting: " + str(failed))
 
-    rmtree(temp)
-
     return byLSOA
-
-byLSOA = extract()
-
-print("Tesselating postcode areas")
-i = 0
-for lsoa, postcodes in byLSOA.items():
-    if postcodes:
-        v = voronoi(postcodes, lsoa)
-        geoJSON(v)
-        i += 1
-else:
-        print("Skipping empty LSOA " + lsoa)
-
-print("Finished tesselating " + str(i) + " LSOAs")

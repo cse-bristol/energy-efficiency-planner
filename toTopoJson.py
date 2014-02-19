@@ -2,6 +2,9 @@ from os import listdir, path, makedirs, getenv, remove
 from zipfile import ZipFile
 from subprocess import call
 from shutil import rmtree
+from json import load
+
+import postcodes
 
 # Depends on topoJSON being installed, see: https://github.com/mbostock/topojson/wiki/Installation
 # This in turn depends on Python 2.7 being installed and on the path. Bleh.
@@ -10,12 +13,20 @@ from shutil import rmtree
 
 inDir = "./data/raw"
 tempDir = "./temp"
-outFile = "./data/merged.json"
+outDir = "./data"
+outFile = outDir + "/merged.json"
 topoJson = "C:/node_modules/.bin/topojson.cmd"
 ogr2ogr = "ogr2ogr"
 simplify = 0.5;
 
-latLong = "EPSG:4326"
+def sphericalGeoJSON(inputPath, geoJSONPath):
+    geoJSON(inputPath, geoJSONPath, "EPSG:4326")
+
+def GeoJSON(inputPath, geoJSONPath):
+    geoJSON(inputPath, geoJSONPath, "EPSG:27700") # OS Map
+
+def geoJSON(inputPath, geoJSONPath, targetSpatialReferenceSystem):
+    call([ogr2ogr, "-f", "GeoJSON", geoJSONPath, inputPath, "-t_srs", targetSpatialReferenceSystem])
 
 if not path.exists(tempDir):
     makedirs(tempDir)
@@ -23,7 +34,7 @@ if not path.exists(tempDir):
 if not path.exists(outDir):
     makedirs(outDir)
 
-geoJSON = []
+geoJSONFiles = []
 
 for file in listdir(inDir):
     if file.endswith(".zip"):
@@ -41,15 +52,46 @@ for file in listdir(inDir):
             if path.exists(geoJSONPath):
                 remove(geoJSONPath)
 
-            call([ogr2ogr, "-f", "GeoJSON", geoJSONPath, shpPath, "-t_srs", latLong])
-            geoJSON.append(geoJSONPath)
+            if name == "Lower_Layer_SOA_2011_EW_Gen_Clip":
+                print("Loading LSOA boundaries as OSMap format.")
+                flatGeoJSON(shpPath, geoJSONPath)
+
+                with open(geoJSONPath) as f:
+                    lsoas = load(f)
+
+                postcodesByLSOA = postcodes.extract(temp = tempDir)
+
+                # TODO match LSOAs to polygons
+
+                print("Creating tesselated postcode regions within LSOA boundaries.")
+                postcodeJSON = tempDir + "/postcodes.geojson"
+                with open(postcodeJSON, 'w') as f:
+                    i = 0
+    
+                    postcodes.jsonHead(f)
+                    for lsoa, pcdList in postcodesByLSOA.items():
+                        if pcdList:
+                            postcodes.json(postcodes.voronoi(pcdList, lsoa), f, first=(i==0))
+                            i += 1
+                        else:
+                            print("Skipping empty LSOA " + lsoa)
+                    postcodes.jsonFoot(f)
+
+                print("Converting postcode boundaries to spherical coordinates.")
+                geoJSONFiles.append(postcodeJSON)
+
+                # TODO modify the LSOAs and recode that as spherical too
+
+
+            else:
+                print("Converting shapefile to spherical coordinates " + shpPath)
+                sphericalGeoJSON(shpPath, geoJSONPath)
+                geoJSONFiles.append(geoJSONPath)
 
         except KeyError as e:
-            print("Failed to convert to topojson: " + file + " error: " + e.message)
+            print("Failed to convert to geojson: " + file + " error: " + str(e))
 
 
-
-
-call([topoJson, '--simplify-proportion', str(simplify), '--properties', '--out', outFile] + geoJSON)
+call([topoJson, '--simplify-proportion', str(simplify), '--properties', '--out', outFile] + geoJSONFiles)
 
 #rmtree(tempDir)

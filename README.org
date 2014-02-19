@@ -53,6 +53,15 @@ Tesselation + geojson output seems to do a few hundred a second, so assume it wo
 *** Load LSOA data
 We need to convert the LSOA shapefile to a geojson file projected using OS Map, so that we can use the boundaries.
 
+Find the code which we need (something like L9999999)
+
+Go through the collection and put all the features in a map.
+
+Make the changes to some of them.
+
+Turn the map back into a list and write it back out.
+
+
 *** Eliminate postcodes which aren't really in the LSOA
 These can't work.
 
@@ -83,3 +92,5 @@ This will allow the topojson to understand that the LSOAs and postcodes share so
 Once we've generated our geojson, we need to project it into the same format as the other geojson files.
 
 We can then include it when we topojson everything together at the end.
+
+
