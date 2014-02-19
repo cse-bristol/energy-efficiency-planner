@@ -10,7 +10,7 @@ from shutil import rmtree
 
 inDir = "./data/raw"
 tempDir = "./temp"
-outDir = "./data"
+outFile = "./data/merged.json"
 topoJson = "C:/node_modules/.bin/topojson.cmd"
 ogr2ogr = "ogr2ogr"
 simplify = 0.5;
@@ -23,27 +23,33 @@ if not path.exists(tempDir):
 if not path.exists(outDir):
     makedirs(outDir)
 
+geoJSON = []
+
 for file in listdir(inDir):
     if file.endswith(".zip"):
         zip = ZipFile(inDir + "/" + file, 'r')
         name, ext = path.splitext(file)
+
         try:
             shpFile = "zipfolder/" + name + ".shp"
             zip.getinfo(shpFile)
             zip.extractall(tempDir)
             
             shpPath = tempDir + "/" + shpFile
-            geoJSONPath = outDir + "/" + name + ".geojson"
-            topoJSONPath = outDir + "/" + name + ".json"
+            geoJSONPath = tempDir + "/" + name + ".geojson"
             
             if path.exists(geoJSONPath):
                 remove(geoJSONPath)
 
             call([ogr2ogr, "-f", "GeoJSON", geoJSONPath, shpPath, "-t_srs", latLong])
-            call([topoJson, geoJSONPath, '--simplify-proportion', str(simplify), '--properties', '--out', topoJSONPath])
+            geoJSON.append(geoJSONPath)
 
-            remove(geoJSONPath)
         except KeyError as e:
             print("Failed to convert to topojson: " + file + " error: " + e.message)
 
-rmtree(tempDir)
+
+
+
+call([topoJson, '--simplify-proportion', str(simplify), '--properties', '--out', outFile] + geoJSON)
+
+#rmtree(tempDir)

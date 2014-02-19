@@ -25,19 +25,21 @@ d3.select("#map")
 d3.select("#map")
     .call(zoomer);
 
+var m = "data/merged.json";
+
 var layers = d3.map({
-    //"data/example.json": "example",
-    "data/uk.json" : "subunits", // TODO remove thius and put in national level boundaries
-    "data/Gov_Office_Region_DEC_2010_EN_Gen_Clip.json" : "Gov_Office_Region_DEC_2010_EN_Gen_Clip"
-    //"data/County_Unitary_Auth_DEC_2012_EW_Gen_Clip.json" : "County_Unitary_Auth_DEC_2012_EW_Gen_Clip",
-    //"data/Middle_Layer_SOA_2011_EW_Gen_Clip.json" : "Middle_Layer_SOA_2011_EW_Gen_Clip"
-    //"data/Lower_Layer_SOA_2011_EW_Gen_Clip.json" : "Lower_Layer_SOA_2011_EW_Gen_Clip"
-    //"data/Wards_DEC_2012_GB_Gen_Clip.json" : "Wards_DEC_2012_GB_Gen_Clip"
+    //"example" : "data/example.json",
+    //"subunits" : "data/uk.json", // TODO remove thius and put in national level boundaries
+    //"Gov_Office_Region_DEC_2010_EN_Gen_Clip" : m,
+    //"County_Unitary_Auth_DEC_2012_EW_Gen_Clip" : m,
+    //"Middle_Layer_SOA_2011_EW_Gen_Clip" : m,
+    "Lower_Layer_SOA_2011_EW_Gen_Clip" : m,
+    //"Wards_DEC_2012_GB_Gen_Clip" : m
 });
 
 var loaded = d3.map();
 
-layers.forEach(function(filePath, layerID){
+layers.forEach(function(layerID, filePath){
     d3.json(filePath, function(error, data) {
 	if (error) {
 	    console.log("Couldn't load " + error);
@@ -56,7 +58,7 @@ layers.forEach(function(filePath, layerID){
     });
 });
 
-layers.forEach(function(filePath, layerID){
+layers.forEach(function(layerID, filePath){
     d3.select("svg").append("g")
 	.attr("id", layerID)
 	.attr("width", width)
@@ -114,4 +116,5 @@ var redraw = function() {
 };
 
 redraw();
+
 zoomer.on("zoom", redraw);
