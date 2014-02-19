@@ -1,0 +1,85 @@
+* Open Data Map
+
+A prototype map to illustrate what we could do for the Open Data and STEEP projects.
+
+** Running
+ * Clone this git repository.
+ * Run toTopoJson.py (dependencies listed in file).
+ * Serve the root folder using a web server (python -m SimpleHTTPModule 80).
+ * Open prototype.html in a browser.
+
+** Goals
+
+ * Draw LSOAs/Government Office Regions/Postcodes or combinations of those on a map.
+ * Store some data on these regions in a simple region-code -> number format.
+ * Execute some user-defined functions on that data and colour regions accordingly.
+ * Produce tables with cross-tabs.
+ * Share the results as a URL.
+
+** Not-Goals
+We don't care about complex GIS queries (route / area calculations).
+
+** Technology
+We are drawing the map in D3 using vectors and SVG.
+
+We want to try to push a lot of the work out to the client side (that is, in the user's browser).
+
+Working from this example http://bl.ocks.org/mbostock/5616813.
+
+** Data
+Data acquired from the ONS https://geoportal.statistics.gov.uk/
+
+** TODO Postcodes
+There is the Python file postcodes.py which should takes a zip of postcodes and makes up some boundaries for those postcodes based on their Easting and Northing and the LSOA which contains them. It is unfinished.
+
+*** DONE Tesselation
+We've used a Voronoi tesselation from Scipy on the postcodes.
+http://cgm.cs.mcgill.ca/~mcleish/644/Projects/DerekJohns/Sweep.htm
+http://docs.scipy.org/doc/scipy/reference/tutorial/spatial.html
+
+*** Performance
+There are about 35,000 LSOAs.
+30,000 LSOAs have 10 < postcodes < 100.
+Around 3000 LSOAs have 100 < postcodes < 500
+Approx. 100 LSOAs have 500 < postcodes.
+There's 1 unknown LSOA with a massive amount.
+
+Obviously I didn't add that up right, but these are rough.
+
+Smaller LSOAs do appear to have simpler geometries.
+
+Tesselation + geojson output seems to do a few hundred a second, so assume it would take a minute or two to run them all.
+
+*** Load LSOA data
+We need to convert the LSOA shapefile to a geojson file projected using OS Map, so that we can use the boundaries.
+
+*** Eliminate postcodes which aren't really in the LSOA
+These can't work.
+
+*** Intersect with LSOA boundary
+The output of the voronoi tesselation includes infinite points, which we need to eliminate. It may also generate finite points which are outside of the LSOA.
+
+For each ridge, we know which cell is to its left and right, and can therefore work out which direction the infinite point should be.
+
+A possible algorithm is the wall-crawl technique (also useful for exploring dungeons):
+ + Build truncated ridges R' and intersections I using the LSOA boundary B.
+ + Make a map of R' -> I.
+ + Make a map of cells C -> R'
+ + For each c in C, build a path as follows:
+  - Take a ridge r from R' which has the cell to its right.
+  - End of r, turn onto either another ridge or an arc.
+    - If there are multiple possible choices at a turn, there will be exactly one ridge which borders c.
+  - Follow round until we get back to r.
+
+**** Special cases
+For cases where there are 1 or 2 postcodes in an LSOA, we can take a simpler approach since we know the ridges will never intersect.
+
+*** Add intersections to LSOAs
+We have a list of intersections between postcodes and LSOAs. We need to add this to the LSOA geometry.
+
+This will allow the topojson to understand that the LSOAs and postcodes share some arcs.
+
+*** Convert to topojson
+Once we've generated our geojson, we need to project it into the same format as the other geojson files.
+
+We can then include it when we topojson everything together at the end.
