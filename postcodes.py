@@ -8,7 +8,7 @@ from scipy.spatial import Voronoi
 from numpy import array
 from pyproj import transform, Proj
 
-# Depends on Python 3, scipy and numpy
+# Depends on Python 3, scipy (0.12 or later), numpy and pyproj
 
 latLong = Proj("+init=EPSG:4326")
 osMap = Proj("+init=EPSG:27700")
@@ -67,9 +67,9 @@ def voronoi(postcodes, lsoa):
         def getPoint(points, p):
             "Handles infinite points (badly at present), and recodes the point to use spherical lat/long coordinates."
             if p < 0:
-                return pyproj.transform(osMap, latLong, 0, 0)
+                return transform(osMap, latLong, 0, 0)
             else:
-                return pyproj.transform(osMap, latLong, points[p][0], points[p][1])
+                return transform(osMap, latLong, points[p][0], points[p][1])
 
         return [getPoint(points, p) for p in region]
             

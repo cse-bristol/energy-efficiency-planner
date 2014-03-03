@@ -15,14 +15,14 @@ inDir = "./data/raw"
 tempDir = "./temp"
 outDir = "./data"
 outFile = outDir + "/merged.json"
-topoJson = "C:/node_modules/.bin/topojson.cmd"
+topoJson = "topojson"
 ogr2ogr = "ogr2ogr"
 simplify = 0.5;
 
 def sphericalGeoJSON(inputPath, geoJSONPath):
     geoJSON(inputPath, geoJSONPath, "EPSG:4326")
 
-def GeoJSON(inputPath, geoJSONPath):
+def flatGeoJSON(inputPath, geoJSONPath):
     geoJSON(inputPath, geoJSONPath, "EPSG:27700") # OS Map
 
 def geoJSON(inputPath, geoJSONPath, targetSpatialReferenceSystem):
@@ -77,10 +77,9 @@ for file in listdir(inDir):
                             print("Skipping empty LSOA " + lsoa)
                     postcodes.jsonFoot(f)
 
-                print("Converting postcode boundaries to spherical coordinates.")
                 geoJSONFiles.append(postcodeJSON)
 
-                # TODO modify the LSOAs and recode that as spherical too
+                # TODO modify the LSOAs and reproject them as spherical coordinates
 
 
             else:
@@ -91,7 +90,8 @@ for file in listdir(inDir):
         except KeyError as e:
             print("Failed to convert to geojson: " + file + " error: " + str(e))
 
-
+print("Combining geoJSON files and converting to topoJSON.")
 call([topoJson, '--simplify-proportion', str(simplify), '--properties', '--out', outFile] + geoJSONFiles)
 
-#rmtree(tempDir)
+print("Cleaning up temp directory.")
+rmtree(tempDir)
