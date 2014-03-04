@@ -13,12 +13,8 @@ import postcodes
 
 inDir = "./data/raw"
 tempDir = "./temp"
-<<<<<<< HEAD
 outDir = "./data"
 outFile = outDir + "/merged.json"
-=======
-outFile = "./data/merged.json"
->>>>>>> master
 topoJson = "topojson"
 ogr2ogr = "ogr2ogr"
 simplify = 0.5;
@@ -60,15 +56,10 @@ for file in listdir(inDir):
                 print("Loading LSOA boundaries as OSMap format.")
                 flatGeoJSON(shpPath, geoJSONPath)
 
-<<<<<<< HEAD
                 with open(geoJSONPath) as f:
                     lsoas = load(f)
 
                 postcodesByLSOA = postcodes.extract(temp = tempDir)
-=======
-        except KeyError as e:
-            print("Failed to convert to topojson: " + file + " error: " + str(e))
->>>>>>> master
 
                 # TODO match LSOAs to polygons
 
@@ -86,7 +77,8 @@ for file in listdir(inDir):
                             print("Skipping empty LSOA " + lsoa)
                     postcodes.jsonFoot(f)
 
-                geoJSONFiles.append(postcodeJSON)
+                # Currently not working: runs out of memory.
+                # geoJSONFiles.append(postcodeJSON)
 
                 # TODO modify the LSOAs and reproject them as spherical coordinates
 
@@ -102,8 +94,5 @@ for file in listdir(inDir):
 print("Combining geoJSON files and converting to topoJSON.")
 call([topoJson, '--simplify-proportion', str(simplify), '--properties', '--out', outFile] + geoJSONFiles)
 
-<<<<<<< HEAD
 print("Cleaning up temp directory.")
-=======
->>>>>>> master
 rmtree(tempDir)
