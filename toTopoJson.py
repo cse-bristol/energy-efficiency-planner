@@ -13,7 +13,7 @@ import postcodes
 
 inDir = "./data/raw"
 tempDir = "./temp"
-outDir = "./data"
+outDir = "./data/processed"
 outFile = outDir + "/merged.json"
 topoJson = "topojson"
 ogr2ogr = "ogr2ogr"

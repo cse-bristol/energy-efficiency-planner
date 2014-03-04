@@ -25,7 +25,7 @@ d3.select("#map")
 d3.select("#map")
     .call(zoomer);
 
-var m = "data/merged.json";
+var m = "data/processed/merged.json";
 
 var layers = d3.map({
     //"example" : "data/example.json",
