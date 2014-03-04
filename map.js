@@ -31,9 +31,9 @@ var layers = d3.map({
     //"example" : "data/example.json",
     //"subunits" : "data/uk.json", // TODO remove thius and put in national level boundaries
     //"Gov_Office_Region_DEC_2010_EN_Gen_Clip" : m,
-    //"County_Unitary_Auth_DEC_2012_EW_Gen_Clip" : m,
+    "County_Unitary_Auth_DEC_2012_EW_Gen_Clip" : m,
     //"Middle_Layer_SOA_2011_EW_Gen_Clip" : m,
-    "Lower_Layer_SOA_2011_EW_Gen_Clip" : m,
+    //"Lower_Layer_SOA_2011_EW_Gen_Clip" : m,
     //"Wards_DEC_2012_GB_Gen_Clip" : m
 });
 

@@ -11,7 +11,7 @@ from shutil import rmtree
 inDir = "./data/raw"
 tempDir = "./temp"
 outFile = "./data/merged.json"
-topoJson = "C:/node_modules/.bin/topojson.cmd"
+topoJson = "topojson"
 ogr2ogr = "ogr2ogr"
 simplify = 0.5;
 
@@ -20,8 +20,8 @@ latLong = "EPSG:4326"
 if not path.exists(tempDir):
     makedirs(tempDir)
 
-if not path.exists(outDir):
-    makedirs(outDir)
+if not path.exists('./data'):
+    makedirs('./data')
 
 geoJSON = []
 
@@ -45,11 +45,11 @@ for file in listdir(inDir):
             geoJSON.append(geoJSONPath)
 
         except KeyError as e:
-            print("Failed to convert to topojson: " + file + " error: " + e.message)
+            print("Failed to convert to topojson: " + file + " error: " + str(e))
 
 
 
 
 call([topoJson, '--simplify-proportion', str(simplify), '--properties', '--out', outFile] + geoJSON)
 
-#rmtree(tempDir)
+rmtree(tempDir)
