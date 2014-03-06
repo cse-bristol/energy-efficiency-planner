@@ -4,6 +4,7 @@ from subprocess import call, check_output
 from shutil import rmtree
 from itertools import chain
 from re import compile
+from json import dump
 
 import postcodes
 
@@ -17,6 +18,7 @@ import postcodes
 inDir = "./data/geometry"
 tempDir = "./temp"
 outDir = "./data/processed"
+manifestFile = outDir + "/manifest.json"
 outFile = outDir + "/merged.json"
 topoJson = "topojson"
 ogr2ogr = "ogr2ogr"
@@ -87,7 +89,10 @@ def loadgeometry(geometry, d):
             print("Handling geometry " + geometry + " as " + ext)
             return handlers[ext](geometry, d + "/" + f)
 
-
+def manifest(processed):
+    with open(manifestFile, 'w') as m:
+        dump({g : outFile for g in processed}, m)
+        
 
 if path.exists(tempDir):
     rmtree(tempDir)
@@ -105,6 +110,8 @@ if geoJSONFiles:
     call([topoJson, '--simplify-proportion', str(simplify), '--properties', '--out', outFile] + geoJSONFiles)
 else:
     print("Failed to import any geometries.")
+
+manifest(processed)
     
 print("Cleaning up temp directory.")
 rmtree(tempDir)
