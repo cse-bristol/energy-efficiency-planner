@@ -1,9 +1,25 @@
 path {
-  stroke: #444;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-  stroke-width: 0.5px;
-  pointer-events: all;
+    stroke: #444;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    stroke-width: 0.5px;
+    opacity: 0.6;
+}
+
+path:hover {
+    stroke-width: 1px;
+    stroke: #1A1;
+    opacity: 1.0;
+}
+
+path.selected {
+    stroke-width: 1px;
+    stroke: #11A;
+    opacity: 1.0;
+}
+
+path.selected:hover {
+    stroke: #1AA;
 }
 
 #map {

@@ -7,16 +7,17 @@ var height = window.innerHeight - 10;
 var templeMeads = [-2.5806295, 51.4496909];
 var startCoordinates = templeMeads;
 var zoom = 23;
+var date = 2013;
 
 var projection = d3.geo.mercator()
-    .center(startCoordinates);
+	.center(startCoordinates);
 
 var zoomer = d3.behavior.zoom()
-    .scale(1 << zoom)
-    .translate([width / 2, height / 2]);
+	.scale(1 << zoom)
+	.translate([width / 2, height / 2]);
 
 var path = d3.geo.path()
-    .projection(projection);
+	.projection(projection);
 
 d3.select("#map")
     .append("svg")
@@ -26,23 +27,50 @@ d3.select("#map")
 d3.select("#map")
     .call(zoomer);
 
-var layersByFile = d3.map({});
-var loaded = d3.map({});
+var layersByShapeFile = d3.map({});
+var properties = d3.map({});
+var shapes = d3.map({});
+var selection = d3.map({});
 
 var loadManifest = function(error, data) {
     if (error) {
 	console.log("Couldn't load manifest " + error);
     }
     
-    d3.map(data).entries().forEach(function(entry) {
-	if (layersByFile.has(entry.value)) {
-	    layersByFile.get(entry.value).append(entry.key);
+    var queueLoadLayer = function(file, layerID) {
+	if (layersByShapeFile.has(file)) {
+	    layersByShapeFile.get(file).push(layerID);
 	} else {
-	    layersByFile.set(entry.value, [entry.key]);
+	    layersByShapeFile.set(file, [layerID]);
 	}
+    };
+
+    var queueLoadData = function(file, layerID, prop) {
+	d3.tsv(file, function(error, rows) {
+	    if (!properties.has(layerID)) {
+		properties.set(layerID, d3.map({}));
+	    }
+
+	    properties.get(layerID).set(prop, rows);
+	});
+    };
+    
+    d3.map(data).entries().forEach(function(geometryLayer) {
+	var props = d3.map(geometryLayer.value);
+
+	props.entries().forEach(function(entry){
+	    var prop = entry.key;
+	    var file = entry.value;
+
+	    if (prop === "shape") {
+		queueLoadLayer(file, geometryLayer.key);
+	    } else {
+		queueLoadData(file, geometryLayer.key, prop);
+	    }
+	});
     });
 
-    layersByFile.forEach(function(file, layers){
+    layersByShapeFile.forEach(function(file, layers){
 	var loadFile = function(error, data) {
 	    if (error) {
 		console.log("Couldn't load file " + file + " " + error);
@@ -54,15 +82,15 @@ var loadManifest = function(error, data) {
 		    .attr("width", width)
 		    .attr("height", height);
 		
-		var shapes = data.objects[l + "_All_Phases"]; // HACK HACK HACK
-		var topojsonShapes = topojson.feature(data, shapes);
+		var s = data.objects[l];
+		var topojsonShapes = topojson.feature(data, s);
 		if (topojsonShapes.features) {
 		    topojsonShapes = topojsonShapes.features;
 		} else {
 		    topojsonShapes = [topojsonShapes];
 		}
 
-		loaded.set(l, topojsonShapes);
+		shapes.set(l, topojsonShapes);
 		redraw();
 	    });
 	};
@@ -82,23 +110,45 @@ var colour = function(){
     };
 }();
 
-var select = function(event, index) {
-    var properties = d3.map(event.properties).entries();
 
-    var details = d3.select("#details ul");
+var updateSelection = function() {
+    var details = d3.select("#details");
+    
+    var ul = details.selectAll("#details ul")
+	    .data(selection.values());
 
-    var regionProperties = details
-        .selectAll("li")
-        .data(properties);
+    ul.enter().append("ul");
+    ul.exit().remove();
 
-    regionProperties.exit().remove();
+    
+    var li = ul.selectAll("li")
+    	    .data(function(d) {
+    		return d;
+    	    });
 
-    regionProperties.enter()
-	.append("li");
-
-    regionProperties.html(function(property) {
-	return property.key + ": " + property.value;
+    li.enter().append("li");
+    li.exit().remove();
+    li.html(function(property) {
+    	return property.key + ": " + property.value;
     });
+};
+
+var select = function(event, index) {
+    var areaProp = d3.map(event.properties).entries();
+
+    var target = d3.select(this);
+    
+    var isSelected = target.classed("selected");
+
+    if (isSelected) {
+	target.classed("selected", false);
+	selection.remove(event.properties.Name);	
+    } else {
+	target.classed("selected", true);
+	selection.set(event.properties.Name, areaProp);
+    }
+
+    updateSelection();
 };
 
 var redraw = function() {
@@ -106,10 +156,10 @@ var redraw = function() {
     projection.scale(zoomer.scale() / 2 / Math.PI)
 	.translate(zoomer.translate());
     
-    loaded.forEach(function(layerID, topojsonShapes){
+    shapes.forEach(function(layerID, topojsonShapes){
 	var paths = d3.select("g#" + layerID)
-	    .selectAll("path")
-	    .data(topojsonShapes);
+		.selectAll("path")
+		.data(topojsonShapes);
 	paths.enter()
 	    .append("path")
 	    .attr("d", path)

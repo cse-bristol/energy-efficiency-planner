@@ -25,73 +25,64 @@ ogr2ogr = "ogr2ogr"
 ogrinfo = "ogrinfo"
 simplify = 0.5;
 
-def sphericalGeoJSON(inputPath, outPath, layer=None):
-    geoJSON(inputPath, outPath, layer, "EPSG:4326") # Lat and Long
+def sphericalGeoJSON(inputPath, outPath):
+    geoJSON(inputPath, outPath, "EPSG:4326") # Lat and Long
 
-def flatGeoJSON(inputPath, outPath, layer=None):
-    geoJSON(inputPath, outPath, layer, "EPSG:27700") # OS Map
+def flatGeoJSON(inputPath, outPath):
+    geoJSON(inputPath, outPath, "EPSG:27700") # OS Map
 
-def geoJSON(inputPath, outPath, layer, targetSpatialReferenceSystem):
+def geoJSON(inputPath, outPath, targetSpatialReferenceSystem):
     args = [ogr2ogr, "-t_srs", targetSpatialReferenceSystem, "-f", "GeoJSON", outPath, inputPath]
-
-    if layer:
-        args.append(layer)
-
     call(args)
 
-def handleZip(name, inFile):
+def handleZip(geometry, name, inFile):
     z = ZipFile(inFile, 'r')
 
-    extracted = tempdir + "/" + name
+    extracted = tempdir + "/" + geometry
     makedirs(extracted)
     z.extractall(extracted)
-    return loadgeometry(name, extracted)
+    return loadgeometry(geometry, extracted)
     
 
 ogrinfoPattern = compile(r"\d+: (.*) \(\w+\)")
-def handleShp(name, inFile):
-    def getLayers():
-        def parseLine(l):
-           m = ogrinfoPattern.match(l)
-           if m:
-               return m.group(1)
-
-        layers = check_output([ogrinfo, inFile]).decode().split('\n')
-        for l in layers:
-            parsed = parseLine(l)
-            if parsed:
-                yield parsed
-
-
-    def process(l):
-        outFile = tempDir + "/" + name + "_" + l + ".json"
-        sphericalGeoJSON(inFile, outFile, l)
-        return outFile
-        
-    return [process(l) for l in getLayers()]
-
-
-def handleGeoJSON(geometryName, inFile):
-    outFile = tempDir + "/" + geometryName + ".json"
+def handleShp(geometry, name, inFile):
+    outFile = tempDir + "/" + geometry + ".json"
     sphericalGeoJSON(inFile, outFile)
-    return [outFile]
+    return {"shape" : outFile}
+ 
+
+def handleGeoJSON(geometry, name, inFile):
+    outFile = tempDir + "/" + geometry + ".json"
+    sphericalGeoJSON(inFile, outFile)
+    return {"shape" : outFile}
+
+def handleTSV(geometry, name, inFile):
+    return {name : inFile}
 
 handlers = {
     ".zip": handleZip,
     ".shp": handleShp,
-    ".json": handleGeoJSON
+    ".json": handleGeoJSON,
+    ".tsv": handleTSV
 }
 
 def loadgeometry(geometry, d):
+    result = {}
     for f in listdir(d):
-        _, ext = path.splitext(f)
+        name, ext = path.splitext(f)
         if ext in handlers:
-            print("Handling geometry " + geometry + " as " + ext)
-            return handlers[ext](geometry, d + "/" + f)
+            print("Handling geometry " + geometry + " using " + ext)
+            result.update(handlers[ext](geometry, name, d + "/" + f))
+    return result
+
 
 def manifest(processed):
+    # Since we've merged all our geometry shapes into one topoJSON file, use that.
+    for p in processed.values():
+        p['shape'] = outFile
+
     with open(manifestFile, 'w') as m:
-        dump({g : outFile for g in processed}, m)
+        dump(processed, m)
         
 
 if path.exists(tempDir):
@@ -103,14 +94,15 @@ if not path.exists('./data'):
     makedirs('./data')
 
 processed = { g : loadgeometry(g, inDir + "/" + g) for g in listdir(inDir) }
-geoJSONFiles = list(chain(*processed.values()))
+shapes = [v["shape"] for v in processed.values()]
 
-if geoJSONFiles:
+if processed:
     print("Combining geoJSON files and converting to topoJSON.")
-    call([topoJson, '--simplify-proportion', str(simplify), '--properties', '--out', outFile] + geoJSONFiles)
+    call([topoJson, '--simplify-proportion', str(simplify), '--properties', '--out', outFile] + shapes)
 else:
     print("Failed to import any geometries.")
 
+print("Writing manifest of imported layers.")
 manifest(processed)
     
 print("Cleaning up temp directory.")
