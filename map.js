@@ -1,6 +1,6 @@
 "use strict";
 
-/*global d3, topojson*/
+/*global d3, topojson, OpenDataMap*/
 
 var width = window.innerWidth - 400;
 var height = window.innerHeight - 10;
@@ -27,10 +27,12 @@ d3.select("#map")
 d3.select("#map")
     .call(zoomer);
 
+var areaInfo = OpenDataMap.areaInfo(d3.select("#details"));
+var selection = OpenDataMap.selection(d3.select("#map svg"));
+
 var layersByShapeFile = d3.map({});
 var properties = d3.map({});
 var shapes = d3.map({});
-var selection = d3.map({});
 
 var loadManifest = function(error, data) {
     if (error) {
@@ -110,57 +112,20 @@ var colour = function(){
     };
 }();
 
-
-var updateSelection = function() {
-    var details = d3.select("#details");
-    
-    var ul = details.selectAll("#details ul")
-	    .data(selection.values());
-
-    ul.enter().append("ul");
-    ul.exit().remove();
-
-    
-    var li = ul.selectAll("li")
-    	    .data(function(d) {
-    		return d;
-    	    });
-
-    li.enter().append("li");
-    li.exit().remove();
-    li.html(function(property) {
-    	return property.key + ": " + property.value;
-    });
-};
-
-var select = function(event, index) {
-    var areaProp = d3.map(event.properties).entries();
-
-    var target = d3.select(this);
-    
-    var isSelected = target.classed("selected");
-
-    if (d3.event.shiftKey) {
-	if (isSelected) {
-	    target.classed("selected", false);
-	    selection.remove(event.properties.Name);
-	} else {
-	    target.classed("selected", true);
-	    selection.set(event.properties.Name, areaProp);
-	}
-    } else {
-	d3.selectAll("#map svg path")
-	    .classed("selected", false);
-	target.classed("selected", true);
-	selection = d3.map({});
-	selection.set(event.properties.Name, areaProp);
-    }
-    
-    updateSelection();
+/*
+ Given an event which comes from an element for which the data was set to a topojson shape.
+ Return a list of map entries which are the properties on that shape.
+ */
+var extractGeometryProperties = function(event) {
+    return d3.map(event.properties).entries();
 };
 
 var redraw = function() {
+    var drawInfoForSelection = function(selection) {
+	areaInfo.info(selection);
+    };
 
+    
     projection.scale(zoomer.scale() / 2 / Math.PI)
 	.translate(zoomer.translate());
     
@@ -172,7 +137,7 @@ var redraw = function() {
 	    .append("path")
 	    .attr("d", path)
 	    .attr("fill", colour.byIndex)
-	    .on("click", select);
+	    .on("click", selection.makeClickHandler(drawInfoForSelection, extractGeometryProperties));
 
 	paths.attr("d", path);
 
