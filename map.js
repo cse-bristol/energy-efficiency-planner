@@ -140,14 +140,22 @@ var select = function(event, index) {
     
     var isSelected = target.classed("selected");
 
-    if (isSelected) {
-	target.classed("selected", false);
-	selection.remove(event.properties.Name);	
+    if (d3.event.shiftKey) {
+	if (isSelected) {
+	    target.classed("selected", false);
+	    selection.remove(event.properties.Name);
+	} else {
+	    target.classed("selected", true);
+	    selection.set(event.properties.Name, areaProp);
+	}
     } else {
+	d3.selectAll("#map svg path")
+	    .classed("selected", false);
 	target.classed("selected", true);
+	selection = d3.map({});
 	selection.set(event.properties.Name, areaProp);
     }
-
+    
     updateSelection();
 };
 
