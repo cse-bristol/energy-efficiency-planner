@@ -25,7 +25,7 @@ OpenDataMap.selection = function(container) {
 	makeClickHandler : function(listener, dataFunction) {
 	    
 	    var onSelect = function(event, index) {
-		var target = d3.select(this);
+		var target = d3.select(d3.event.target);
 
 		var isSelected = target.classed("selected");
 		
