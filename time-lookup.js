@@ -12,7 +12,7 @@ if (!OpenDataMap) {
 OpenDataMap.timeLookup = function(timeMap) {
     var asYears = function(s) {
 	var year = parseInt(s);
-	if (year) {
+	if (year !== undefined) {
 	    return year;
 	} else {
 	    throw "Not a date " + s;
@@ -24,6 +24,9 @@ OpenDataMap.timeLookup = function(timeMap) {
     var module = {
 	lookup : function(time) {
 	    var i = d3.bisectLeft(dates, time);
+	    if (i >= dates.length) {
+		i = dates.length - 1;
+	    }
 	    return timeMap.get(dates[i]);
 	}
     };

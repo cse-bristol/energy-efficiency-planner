@@ -16,6 +16,22 @@ OpenDataMap.layer = function(name) {
     var headers = ["Name"];
     var data = d3.map({});
 
+    var getOrCreateProperty = function(prop) {
+	if (!data.has(prop)) {
+	    data.set(prop, d3.map({}));
+	    headers.push(prop);
+	}
+
+	return data.get(prop);
+    };
+
+    var addGeometryProperties = function(props) {
+	var name = props.get("Name");
+	props.entries().forEach(function(e){
+	    getOrCreateProperty(e.key).set(name, OpenDataMap.timeLookup(d3.map({0 : e.value})));
+	});
+    };
+
     var module = {
 	name : function() {
 	    return name;
@@ -30,6 +46,12 @@ OpenDataMap.layer = function(name) {
 		geometry = shapes;
 		callbacks.forEach(function(c){
 		    c(geometry);
+		});
+
+		shapes.forEach(function(s){
+		    addGeometryProperties(d3.map(s.properties));
+		    
+		    // {Name : thing, etc.}
 		});
 
 		return geometry;
@@ -73,12 +95,7 @@ OpenDataMap.layer = function(name) {
 	 rows is a list of maps, where each map contains a name of an object and years to values, e.g. [{"Name" : "my-geometry-object", 2013 : 1, 2014 : 2}]
 	 */
 	addProperty : function(prop, rows) {
-	    if (!data.has(prop)) {
-		data.set(prop, d3.map({}));
-		headers.push(prop);
-	    }
-
-	    var pData = data.get(prop);
+	    var pData = getOrCreateProperty(prop);
 	    rows.forEach(function(r){
 		var row = d3.map(r);
 		
