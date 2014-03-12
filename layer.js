@@ -14,7 +14,9 @@ OpenDataMap.layer = function(name) {
     var callbacks = [];
 
     var headers = ["Name"];
-    var data = d3.map({});
+    var data = d3.map({
+	"Name" : d3.map({})
+    });
 
     var getOrCreateProperty = function(prop) {
 	if (!data.has(prop)) {
