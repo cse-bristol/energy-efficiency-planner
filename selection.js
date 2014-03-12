@@ -50,6 +50,13 @@ OpenDataMap.selection = function(container) {
 		listener(selection.values());
 	    };
 	    return onSelect;
+	},
+
+	/*
+	 Returns the currently selected elements.
+	 */
+	current : function(){
+	    return selection.values();
 	}
     };
     

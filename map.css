@@ -1,3 +1,8 @@
+#map {
+    display: inline-block;
+    border-right: 1px solid grey;
+}
+
 path {
     stroke: #444;
     stroke-linejoin: round;
@@ -22,9 +27,19 @@ path.selected:hover {
     stroke: #1AA;
 }
 
-#map {
-    display: inline-block;
-    border: 1px solid grey;
+#time-control {
+    position: fixed;
+    width: 46%;
+    bottom: 2%;
+    left: 2%;
+}
+#time-control input {
+    width: 100%;
+}
+
+#time-control p {
+    width: 100%;
+    text-align: center;
 }
 
 #details {
