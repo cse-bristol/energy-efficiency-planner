@@ -6,39 +6,53 @@ if (!OpenDataMap) {
     var OpenDataMap = {};
 }
 
+
+// let's change this
+// instead, we'll make a table
+// the table will have some rows and columns
+
+
 /*
  Make an info panel for a polygon on the map.
  
  Call it with a container which it will make the panel inside.
  */
 OpenDataMap.areaInfo = function(container) {
+    var table = container.append("table");
+    var tHead = table.append("thead").append("tr");
+    var tBody = table.append("tbody");
+    
     var module = {
 
 	/* 
 	 Update the info with the given data.
-	 Data should be a list of lists of dictionary entries.
-	 [[{'key' : keyName, 'value' : value}]]
+	 Data should be a dictionary of dictionaries layer -> property -> value.
 	 */
-	info : function(data) {
-	    
-	    var ul = container.selectAll("ul")
-		    .data(data);
+	info : function(head, body) {
 
-	    ul.enter().append("ul");
-	    ul.exit().remove();
-	    
-	    var li = ul.selectAll("li")
-    		    .data(d3.identity);
+	    if (body.length > 0) {
+		
+		var h = tHead.selectAll("th").data(head);
+		h.exit().remove();
+		h.enter().append("th");
+		h.html(d3.identity);
 
-	    li.enter().append("li");
-	    li.exit().remove();
-	    li.html(function(property) {
-    		return property.key + ": " + property.value;
-	    });	    
+		
+		var tr = tBody.selectAll("tr").data(body);
+		tr.enter().append("tr");
+		tr.exit().remove();
+		var td = tr.selectAll("td").data(function(d, i){
+		    return d;
+		});
+
+		td.enter().append("td");
+		td.exit().remove();
+		td.html(d3.identity);
+	    }
 	}
 	
     };
 
-    module.info([]);
+    module.info([], []);
     return module;
 };

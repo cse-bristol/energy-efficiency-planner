@@ -48,19 +48,19 @@ OpenDataMap.paint = function(container, width, height, projection, zoom) {
 		zoomProjection();
 		
 		var l = svg.selectAll("g")
-			.data(dataSource().entries());
+			.data(dataSource());
 
 		l.enter().append("g")
 	    	    .attr("width", width)
 		    .attr("height", height)
 		    .attr("id", function(l) {
-			return l.key;
+			return l.name();
 		    });
 		
 		l.exit().remove();
 		var p = l.selectAll("path")
 			.data(function(l) {
-			    return l.value;
+			    return l.geometry();
 			});
 
 		p.enter().append("path");
@@ -74,7 +74,10 @@ OpenDataMap.paint = function(container, width, height, projection, zoom) {
 			    h(event, index);
 			});
 		    })
-		    .attr("d", path);
+		    .attr("d", path)
+		    .attr("id", function(d, i){
+			return d.properties.Name;
+		    });
 	    }
 	}
     };

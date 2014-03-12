@@ -24,14 +24,16 @@ path.selected:hover {
 
 #map {
     display: inline-block;
+    border: 1px solid grey;
 }
 
 #details {
     display: inline-block;
     vertical-align: top;
+    text-align: right;
 }
 
-ul {
-    border: 1px solid #111;
-    padding: 0.5em 1.5em;
+#details table thead tr th {
+    border: 1px solid grey;
 }
+

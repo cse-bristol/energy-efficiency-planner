@@ -17,12 +17,9 @@ OpenDataMap.selection = function(container) {
     var module = {
 	/*
 	  Makes a handler which will update the selection when it receives d3 events.
-
-	  The dataFunction will be used to extract data from the event.
-
-	  The listener will be called with the extracted data for the selection.
+	  The listener will be called with currently selected elements.
 	 */
-	makeClickHandler : function(listener, dataFunction) {
+	makeClickHandler : function(listener) {
 	    
 	    var onSelect = function(event, index) {
 		var target = d3.select(d3.event.target);
@@ -37,7 +34,7 @@ OpenDataMap.selection = function(container) {
 		    } else {
 			/* Select this element. */
 			target.classed("selected", true);
-			selection.set(event.properties.Name, dataFunction(event));
+			selection.set(event.properties.Name, target);
 		    }
 		} else {
 		    /* Clear existing selections. */
@@ -47,7 +44,7 @@ OpenDataMap.selection = function(container) {
 		    /* Select the element. */
 		    target.classed("selected", true);
 		    selection = d3.map({});
-		    selection.set(event.properties.Name, dataFunction(event));
+		    selection.set(event.properties.Name, target);
 		}
 
 		listener(selection.values());
