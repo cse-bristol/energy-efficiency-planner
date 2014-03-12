@@ -12,10 +12,10 @@ if (!OpenDataMap) {
 OpenDataMap.timeLookup = function(timeMap) {
     var asYears = function(s) {
 	var year = parseInt(s);
-	if (year !== undefined) {
-	    return year;
-	} else {
+	if (isNaN(year)) {
 	    throw "Not a date " + s;
+	} else {
+	    return year;
 	};
     };
     

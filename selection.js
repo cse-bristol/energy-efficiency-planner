@@ -13,28 +13,34 @@ if (!OpenDataMap) {
  */
 OpenDataMap.selection = function(container) {
     var selection = d3.map({});
+    var selectionChangedCallbacks = [];
     
     var module = {
 	/*
-	  Makes a handler which will update the selection when it receives d3 events.
-	  The listener will be called with currently selected elements.
+	  Updates the selection with the given d3 event.
 	 */
-	makeClickHandler : function(listener) {
+	clickHandler: function(event, index) {
 	    
 	    var onSelect = function(event, index) {
-		var target = d3.select(d3.event.target);
+		var targetElement = d3.event.target;
+		var target = d3.select(targetElement);
 
 		var isSelected = target.classed("selected");
+
+		var entering = [];
+		var leaving = [];
 		
 		if (d3.event.shiftKey) {
 		    if (isSelected) {
 			/* Deselect this element. */
 			target.classed("selected", false);
 			selection.remove(event.properties.Name);
+			leaving.push(targetElement);
 		    } else {
 			/* Select this element. */
 			target.classed("selected", true);
-			selection.set(event.properties.Name, target);
+			selection.set(event.properties.Name, targetElement);
+			entering.push(targetElement);
 		    }
 		} else {
 		    /* Clear existing selections. */
@@ -43,20 +49,39 @@ OpenDataMap.selection = function(container) {
 
 		    /* Select the element. */
 		    target.classed("selected", true);
+		    leaving = selection;
+		    
 		    selection = d3.map({});
-		    selection.set(event.properties.Name, target);
+		    selection.set(event.properties.Name, targetElement);
+		    
+		    if (isSelected) {
+			leaving.remove(targetElement); /* We're still in the selection. */
+		    } else {
+			entering.push(targetElement); /* We've been added to the selection. */
+		    }
 		}
 
-		listener(selection.values());
+		selectionChangedCallbacks.forEach(function(c){
+		    c(d3.selectAll(selection.values()),
+		      d3.selectAll(entering),
+		      d3.selectAll(leaving));
+		});
 	    };
 	    return onSelect;
+	},
+
+	/*
+	 The callback will be called with the arguments selection, entering, leaving whenever the selection changes.
+	 */
+	addCallback : function(callback) {
+	    selectionChangedCallbacks.push(callback);
 	},
 
 	/*
 	 Returns the currently selected elements.
 	 */
 	current : function(){
-	    return selection.values();
+	    return d3.selectAll(selection.values());
 	}
     };
     

@@ -21,6 +21,7 @@ OpenDataMap.areaInfo = function(container) {
     var table = container.append("table");
     var tHead = table.append("thead").append("tr");
     var tBody = table.append("tbody");
+    var clickHandlers = [];
     
     var module = {
 
@@ -35,7 +36,16 @@ OpenDataMap.areaInfo = function(container) {
 		var h = tHead.selectAll("th").data(head);
 		h.exit().remove();
 		h.enter().append("th");
-		h.html(d3.identity);
+		h.html(d3.identity)
+		    .on("click", function(event, index) {
+			var column = body.map(function(row){
+			    return row[index];
+			});
+			
+			clickHandlers.forEach(function(h){
+			    h(event, column);
+			});
+		    });
 
 		
 		var tr = tBody.selectAll("tr").data(body);
@@ -49,8 +59,11 @@ OpenDataMap.areaInfo = function(container) {
 		td.exit().remove();
 		td.html(d3.identity);
 	    }
+	},
+
+	addClickHandler : function(clickHandler) {
+	    clickHandlers.push(clickHandler);
 	}
-	
     };
 
     module.info([], []);

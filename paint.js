@@ -7,8 +7,6 @@ if (!OpenDataMap) {
 }
 
 OpenDataMap.paint = function(container, width, height, projection, zoom) {
-    var colours = d3.scale.category20();
-
     var zoomer = d3.behavior.zoom()
 	    .scale(1 << zoom)
 	    .translate([width / 2, height / 2]);
@@ -66,9 +64,6 @@ OpenDataMap.paint = function(container, width, height, projection, zoom) {
 		p.enter().append("path");
 		p.exit().remove();
 		p
-		    .attr("fill", function(data, index) {
-			return colours(index);
-		    })
 		    .on("click", function(event, index) {
 			clickHandlers.forEach(function(h){
 			    h(event, index);
