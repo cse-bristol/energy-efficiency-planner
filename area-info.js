@@ -7,11 +7,6 @@ if (!OpenDataMap) {
 }
 
 
-// let's change this
-// instead, we'll make a table
-// the table will have some rows and columns
-
-
 /*
  Make an info panel for a polygon on the map.
  
@@ -22,12 +17,21 @@ OpenDataMap.areaInfo = function(container) {
     var tHead = table.append("thead").append("tr");
     var tBody = table.append("tbody");
     var clickHandlers = [];
-    
+
+    var transpose = function(arr){
+	return arr[0].map(function(col, i) { 
+	    return arr.map(function(row) { 
+		return row[i];
+	    });
+	});
+    };
+ 
     var module = {
 
 	/* 
 	 Update the info with the given data.
-	 Data should be a dictionary of dictionaries layer -> property -> value.
+	 head should be a 1D array.
+	 body should be a 2D array.
 	 */
 	info : function(head, body) {
 
@@ -47,8 +51,7 @@ OpenDataMap.areaInfo = function(container) {
 			});
 		    });
 
-		
-		var tr = tBody.selectAll("tr").data(body);
+		var tr = tBody.selectAll("tr").data(transpose(body));
 		tr.enter().append("tr");
 		tr.exit().remove();
 		var td = tr.selectAll("td").data(function(d, i){

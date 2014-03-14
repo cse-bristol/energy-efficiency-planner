@@ -18,51 +18,41 @@ var paint = OpenDataMap.paint(d3.select("#map"), width, height, projection, zoom
 var colour = OpenDataMap.colour();
 var selection = OpenDataMap.selection(d3.select("#map svg"));
 var data = OpenDataMap.geometryData(loader, "data/processed/manifest.json");
+var worksheet = OpenDataMap.worksheet(data);
 
-/*
- Given a list of selected elements,
- Update area-info with the properties associated with those elements.
 
- TODO: this breaks if selections cover more than one layer. We should consider how selection of many layers works.
- */
-var selectionProperties = function(selected, entering, leaving) {
-
-    if (selected.length > 0) {
-	/* .node() takes its node from the first non-null item in the selection. */
-	var layerName = selected.node().parentNode.id;
-	var layer = data.layer(layerName);
-
-	
-	var names = [];
-
-	selected.each(function(e){
-	    names.push(e.properties.Name);
-	});
-
-	areaInfo.info(layer.propertyNames(), layer.propertiesMatrix(time.current(), names));	
-    } else {
-	areaInfo.info([], []);
-    }
+var colourMap = function(){
+    colour.paintProperty(worksheet.displayData(time.current()), selection.current());    
 };
-paint.addClickHandler(selection.clickHandler(selectionProperties));
-selection.addCallback(selectionProperties);
 
-selection.addCallback(function(selected, entering, leaving){
-    leaving.attr("fill", null);
-    colour.paintProperty(null, selected);
+var updatePropertiesPanel = function() {
+    areaInfo.info(worksheet.propertyNames(), worksheet.allData(time.current()));
+};
+
+/* When the user clicks on a geometry object, change the selection.
+*/
+paint.addClickHandler(selection.clickHandler());
+
+selection.addCallback(function(values, entering, leaving){
+    worksheet.selectionChanged(values, entering, leaving);
+    colour.unpaint(leaving);
+    colourMap();
+    updatePropertiesPanel();
 });
 
 areaInfo.addClickHandler(function(header, column){
-    colour.paintProperty(column, selection.current());
+    worksheet.displayProperty(header);
+    colourMap();
 });
 
 time.onChange(function(currentDate){
-    selectionProperties(selection.current());
+    colourMap();
+    updatePropertiesPanel();
 });
 
-
-
-
+/* When the manifest file has loaded, go and get some geometry. 
+ Redraw the map as the geometry comes in.  
+ */
 data.onManifestLoaded(function(){
     paint.setDataSource(data.layers);
     

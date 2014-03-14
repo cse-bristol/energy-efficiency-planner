@@ -7,10 +7,13 @@ if (!OpenDataMap) {
 }
 
 /*
- Stores the layers.
+ Given a manifest object, loads up geometry layers and flat files.
+ These may then be requested by layer name.
  */
 OpenDataMap.geometryData = function(loader, manifest) {
     var layersByName = d3.map({});
+    /* These are the OpenData.source objects which were loaded as a result of the manifest. */
+    var sourcesForLayers = d3.map({});
     var manifestCallbacks = [];
 
     d3.json(manifest, function(error, data){
@@ -19,10 +22,13 @@ OpenDataMap.geometryData = function(loader, manifest) {
 	}
 
 	d3.map(data).entries().forEach(function(l){
-	    var layer = OpenDataMap.layer(l.key);
+	    var layerName = l.key;
+	    var layer = OpenDataMap.layer(layerName);
+	    
 	    var props = d3.map(l.value);
+	    sourcesForLayers.set(layerName, []);
 
-	    layersByName.set(l.key, layer);
+	    layersByName.set(layerName, layer);
 	    
 	    props.entries().forEach(function(p){
 		var prop = p.key;
@@ -39,11 +45,15 @@ OpenDataMap.geometryData = function(loader, manifest) {
 			}
 
 			layer.geometry(topojsonShapes);
+			sourcesForLayers.get(layer.name()).push(
+			    OpenDataMap.source.fromGeometry(topojsonShapes));
 
 		    });
 		} else {
 		    loader.load(file, d3.tsv, function(rows){
-			layer.addProperty(prop, rows);
+			sourcesForLayers.get(layer.name()).push(
+			    OpenDataMap.source.fromTimeSeries(prop, rows, layer.name() + "/" + prop)
+			);
 		    });
 		}
 	    });
@@ -69,6 +79,12 @@ OpenDataMap.geometryData = function(loader, manifest) {
 	},
 	layer : function(layerName) {
 	    return layersByName.get(layerName);
+	},
+	/*
+	 Loads the default sources for a named layer.
+	 */
+	defaultSources : function(layerName) {
+	    return sourcesForLayers.get(layerName);
 	},
 	/*
 	 If the named layer has loaded, runs the callback against its shapefile immediately.

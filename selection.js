@@ -49,13 +49,15 @@ OpenDataMap.selection = function(container) {
 
 		    /* Select the element. */
 		    target.classed("selected", true);
-		    leaving = selection;
+		    leaving = selection.values();
 		    
 		    selection = d3.map({});
 		    selection.set(event.properties.Name, targetElement);
 		    
 		    if (isSelected) {
-			leaving.remove(targetElement); /* We're still in the selection. */
+			/* We're still in the selection. */
+			var i = leaving.indexOf(targetElement);
+			leaving.splice(i, 1);
 		    } else {
 			entering.push(targetElement); /* We've been added to the selection. */
 		    }

@@ -56,23 +56,30 @@ OpenDataMap.paint = function(container, width, height, projection, zoom) {
 		    });
 		
 		l.exit().remove();
-		var p = l.selectAll("path")
-			.data(function(l) {
-			    return l.geometry();
-			});
 
-		p.enter().append("path");
-		p.exit().remove();
-		p
-		    .on("click", function(event, index) {
-			clickHandlers.forEach(function(h){
-			    h(event, index);
-			});
-		    })
-		    .attr("d", path)
-		    .attr("id", function(d, i){
-			return d.properties.Name;
-		    });
+		l.each(function(parentDatum){
+		    var p = d3.select(this).selectAll("path")
+			    .data(function(l) {
+				return l.geometry();
+			    });
+
+		    p.enter().append("path");
+		    p.exit().remove();
+		    p
+			.on("click", function(event, index) {
+			    clickHandlers.forEach(function(h){
+				h(event, index);
+			    });
+			})
+			.attr("d", path)
+			.datum(function(d, i){
+			    d.layer = parentDatum.name();
+			    return d;
+			})
+			.attr("id", function(d, i){
+			    return d.properties.Name;
+			});		    
+		});
 	    }
 	}
     };
