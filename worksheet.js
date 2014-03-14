@@ -11,7 +11,7 @@ if (!OpenDataMap) {
 */
 OpenDataMap.worksheet = function(data) {
     var displayProperty = null;
-    var source = OpenDataMap.source.combined([OpenDataMap.source.empty()], "selected-sources");
+    var source = OpenDataMap.source.combined([], "selected-sources");
     var names = d3.set([]);
     var layersByName = d3.map({});
 
