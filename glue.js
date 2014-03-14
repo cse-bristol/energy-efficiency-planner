@@ -12,21 +12,25 @@ var projection = d3.geo.mercator()
 	.center(startCoordinates);
 
 var time = OpenDataMap.timeControl(d3.select("#time-control"), 2013, 2024, 2013);
-var areaInfo = OpenDataMap.areaInfo(d3.select("#details"));
 var loader = OpenDataMap.loader();
-var paint = OpenDataMap.paint(d3.select("#map"), width, height, projection, zoom);
-var colour = OpenDataMap.colour();
-var selection = OpenDataMap.selection(d3.select("#map svg"));
 var data = OpenDataMap.geometryData(loader, "data/processed/manifest.json");
+
+var paint = OpenDataMap.paint(d3.select("#map"), width, height, projection, zoom);
+var selection = OpenDataMap.selection(d3.select("#map svg"));
+
 var worksheet = OpenDataMap.worksheet(data);
+var areaInfo = OpenDataMap.areaInfo(d3.select("#results"));
+var colour = OpenDataMap.colour();
+var calculationsDisplay = OpenDataMap.calculationsDisplay(d3.select("#calculations"));
 
 
 var colourMap = function(){
     colour.paintProperty(worksheet.displayData(time.current()), selection.current());    
 };
 
-var updatePropertiesPanel = function() {
+var updateWorksheet = function() {
     areaInfo.info(worksheet.propertyNames(), worksheet.allData(time.current()));
+    calculationsDisplay.update(worksheet.sources());
 };
 
 /* When the user clicks on a geometry object, change the selection.
@@ -37,7 +41,7 @@ selection.addCallback(function(values, entering, leaving){
     worksheet.selectionChanged(values, entering, leaving);
     colour.unpaint(leaving);
     colourMap();
-    updatePropertiesPanel();
+    updateWorksheet();
 });
 
 areaInfo.addClickHandler(function(header, column){
@@ -47,7 +51,7 @@ areaInfo.addClickHandler(function(header, column){
 
 time.onChange(function(currentDate){
     colourMap();
-    updatePropertiesPanel();
+    updateWorksheet();
 });
 
 var selectLayer = function(layerName) {

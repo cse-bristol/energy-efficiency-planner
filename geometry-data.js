@@ -46,13 +46,13 @@ OpenDataMap.geometryData = function(loader, manifest) {
 
 			layer.geometry(topojsonShapes);
 			sourcesForLayers.get(layer.name()).push(
-			    OpenDataMap.source.fromGeometry(topojsonShapes));
+			    OpenDataMap.source.fromGeometry(topojsonShapes, layer.name() + ": geometry"));
 
 		    });
 		} else {
 		    loader.load(file, d3.tsv, function(rows){
 			sourcesForLayers.get(layer.name()).push(
-			    OpenDataMap.source.fromTimeSeries(prop, rows, layer.name() + "/" + prop)
+			    OpenDataMap.source.fromTimeSeries(prop, rows, layer.name() + ": " + prop)
 			);
 		    });
 		}

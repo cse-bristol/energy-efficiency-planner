@@ -54,8 +54,9 @@ OpenDataMap.worksheet = function(data) {
 		names.add(name);
 
 		var layer = getLayer(d);
-		if (!hasLayer(layer)) {
-		    layersByName.set(name, layer.name());
+		var needsLayerSources = !hasLayer(layer);
+		layersByName.set(name, layer.name());		
+		if (needsLayerSources) {
 		    addSources(data.defaultSources(layer.name()));		    
 		}
 	    });
@@ -86,6 +87,10 @@ OpenDataMap.worksheet = function(data) {
 	    } else {
 		return [];
 	    }
+	},
+
+	sources : function() {
+	    return source.sources();
 	}
     };
 };

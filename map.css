@@ -64,13 +64,36 @@ path.selected:hover {
     text-align: center;
 }
 
-#details {
+#worksheet {
     display: inline-block;
     vertical-align: top;
-    text-align: right;
+    height: 95vh;
+    overflow: auto;
+    width: 49%;
 }
 
-#details table thead tr th {
+#results table thead tr th {
     border: 1px solid grey;
     text-align: center;
+}
+
+#calculations ul {
+    padding-left: 0;
+}
+
+#calculations li {
+    list-style-type: none;
+    border: 1px grey dashed;
+    margin: 4px;
+    padding: 4px;
+    opacity: 0.9;
+}
+
+#calculations li.disabled {
+    opacity: 0.6;
+}
+
+#calculations li:hover {
+    opacity: 1.0;
+    border-style: solid;
 }
