@@ -45,10 +45,14 @@ OpenDataMap.timeLookup.series = function(timeMap) {
 };
 
 OpenDataMap.timeLookup.constant = function(datum) {
+    var val = (datum && datum.get) ?
+	    datum.get("constant") :
+	    datum;
+    
     return {
 	prototype: OpenDataMap.timeLookup,
 	lookup : function(time) {
-	    return datum;
+	    return val;
 	}
     };
 };

@@ -114,14 +114,19 @@ OpenDataMap.source.fromGeometry = function(shapes, name) {
 };
 
 /*
- Creates a source which is a single-property that changes over time.
+ Creates a source which is a single-property that may change over time.
  prop is the name of the property.
- rows is a list of maps, where each map contains a name of an object and years to values, e.g. [{"Name" : "my-geometry-object", 2013 : 1, 2014 : 2}]
+ rows is a list of maps
+ each row must have a Name property.
+ a row may have have either a constant property, or a series of dates to values
+ 
+ Example 1: [{"Name": "my-name", "constant": 5}]
+ Example 2: [{"Name": "my-name", 2013: 5, 2014: 6, 2015: 7}]
 */
-OpenDataMap.source.fromTimeSeries = function(prop, rows, name) {
+OpenDataMap.source.fromTable = function(prop, rows, name) {
     var names = [];
     var data = [];
-    
+
     rows.forEach(function(r){
 	var row = d3.map(r);
 	
@@ -130,8 +135,13 @@ OpenDataMap.source.fromTimeSeries = function(prop, rows, name) {
 	}
 
 	names.push(row.get("Name"));
-	row.remove("Name");
-	data.push(OpenDataMap.timeLookup.series(row));
+
+	if (row.has("constant")) {
+	    data.push(OpenDataMap.timeLookup.constant(row));
+	} else {
+	    row.remove("Name");
+	    data.push(OpenDataMap.timeLookup.series(row));
+	}	
     });
 
     return OpenDataMap.source.immutable([prop], names, [data], name);

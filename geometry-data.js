@@ -52,7 +52,7 @@ OpenDataMap.geometryData = function(loader, manifest) {
 		} else {
 		    loader.load(file, d3.tsv, function(rows){
 			sourcesForLayers.get(layer.name()).push(
-			    OpenDataMap.source.fromTimeSeries(prop, rows, layer.name() + ": " + prop)
+			    OpenDataMap.source.fromTable(prop, rows, layer.name() + ": " + prop)
 			);
 		    });
 		}
