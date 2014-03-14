@@ -14,62 +14,59 @@ if (!OpenDataMap) {
 OpenDataMap.selection = function(container) {
     var selection = d3.map({});
     var selectionChangedCallbacks = [];
-    
+
+    var changeSelection = function(d3Elements, isModification) {
+	var notAlreadySelected = d3Elements.filter(function(d, i){
+	    return !this.classList.contains("selected");
+	});
+	var alreadySelected = d3Elements.filter(function(d, i) {
+	    return this.classList.contains("selected");
+	});
+
+	var entering = [];
+	var leaving = [];
+
+	if (!isModification) {
+	    /* Remove elements which were previously selected, but weren't just clicked on. */
+	    selection.entries().forEach(function(e){
+		if (d3Elements[0].indexOf(e.value) < 0) {
+		    selection.remove(e.key);
+		    leaving.push(e.value);
+		}
+	    });
+	} else if (notAlreadySelected.empty()) {
+	    /* Deselect everything that was just clicked on. */
+	    alreadySelected.each(function(d, i){
+		leaving.push(this);
+		selection.remove(d.properties.Name);
+	    });
+	}
+
+	d3.selectAll(leaving).classed("selected", false);
+	
+	notAlreadySelected.classed("selected", true);
+	notAlreadySelected.each(function(d, i){
+	    entering.push(this);
+	    selection.set(d.properties.Name, this);
+	});
+	
+	selectionChangedCallbacks.forEach(function(c){
+	    c(selection.values(),
+	      entering,
+	      leaving);
+	});	
+    };
+
     var module = {
 	/*
-	  Updates the selection with the given d3 event.
+	 Updates the selection with the given d3 event.
 	 */
-	clickHandler: function(event, index) {
-	    
-	    var onSelect = function(event, index) {
-		var targetElement = d3.event.target;
-		var target = d3.select(targetElement);
+	clickHandler: function(data, index) {
+	    changeSelection(d3.select(d3.event.target), d3.event.shiftKey);
+	},
 
-		var isSelected = target.classed("selected");
-
-		var entering = [];
-		var leaving = [];
-		
-		if (d3.event.shiftKey) {
-		    if (isSelected) {
-			/* Deselect this element. */
-			target.classed("selected", false);
-			selection.remove(event.properties.Name);
-			leaving.push(targetElement);
-		    } else {
-			/* Select this element. */
-			target.classed("selected", true);
-			selection.set(event.properties.Name, targetElement);
-			entering.push(targetElement);
-		    }
-		} else {
-		    /* Clear existing selections. */
-		    container.selectAll(".selected")
-			.classed("selected", false);
-
-		    /* Select the element. */
-		    target.classed("selected", true);
-		    leaving = selection.values();
-		    
-		    selection = d3.map({});
-		    selection.set(event.properties.Name, targetElement);
-		    
-		    if (isSelected) {
-			/* We're still in the selection. */
-			var i = leaving.indexOf(targetElement);
-			leaving.splice(i, 1);
-		    } else {
-			entering.push(targetElement); /* We've been added to the selection. */
-		    }
-		}
-
-		selectionChangedCallbacks.forEach(function(c){
-		    c(d3.selectAll(selection.values()),
-		      d3.selectAll(entering),
-		      d3.selectAll(leaving));
-		});
-	    };
-	    return onSelect;
+	select: function(d3Elements, isModification) {
+	    changeSelection(d3Elements, isModification);
 	},
 
 	/*
@@ -83,7 +80,7 @@ OpenDataMap.selection = function(container) {
 	 Returns the currently selected elements.
 	 */
 	current : function(){
-	    return d3.selectAll(selection.values());
+	    return selection.values();
 	}
     };
     

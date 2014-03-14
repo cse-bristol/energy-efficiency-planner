@@ -36,7 +36,8 @@ OpenDataMap.worksheet = function(data) {
     
     return {
 	selectionChanged : function(values, entering, leaving) {
-	    leaving.each(function(d, i){
+	    leaving.forEach(function(e){
+		var d = d3.select(e).datum();
 		var name = d.properties.Name;
 		names.remove(name);
 
@@ -47,7 +48,8 @@ OpenDataMap.worksheet = function(data) {
 		}
 	    });
 
-	    entering.each(function(d, i) {
+	    entering.forEach(function(e) {
+		var d = d3.select(e).datum();
 		var name = d.properties.Name;
 		names.add(name);
 
@@ -57,6 +59,10 @@ OpenDataMap.worksheet = function(data) {
 		    addSources(data.defaultSources(layer.name()));		    
 		}
 	    });
+
+	    if (source.properties().indexOf(displayProperty) < 0) {
+		displayProperty = null;
+	    }
 	},
 
 	allData : function(time) {

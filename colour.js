@@ -24,7 +24,8 @@ OpenDataMap.colour = function() {
     var categorical = d3.scale.category20();
     
     var module = {
-	paintProperty : function(dataColumn, selection) {
+	paintProperty : function(dataColumn, elements) {
+	    var selection = d3.selectAll(elements);
 
 	    var colour = colourScale(dataColumn);
 
@@ -32,8 +33,8 @@ OpenDataMap.colour = function() {
 		return colour(dataColumn[i]);
 	    });
 	},
-	unpaint : function(selection) {
-	    selection.attr("fill", null);
+	unpaint : function(elements) {
+	    d3.selectAll(elements).attr("fill", null);
 	}
     };
     return module;

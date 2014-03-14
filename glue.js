@@ -31,7 +31,7 @@ var updatePropertiesPanel = function() {
 
 /* When the user clicks on a geometry object, change the selection.
 */
-paint.addClickHandler(selection.clickHandler());
+paint.addClickHandler(selection.clickHandler);
 
 selection.addCallback(function(values, entering, leaving){
     worksheet.selectionChanged(values, entering, leaving);
@@ -50,11 +50,22 @@ time.onChange(function(currentDate){
     updatePropertiesPanel();
 });
 
+var selectLayer = function(layerName) {
+    selection.select(
+	d3.select("#map")
+	    .select("svg")
+	    .select("g#" + layerName)
+	    .selectAll("path"),
+	d3.event.shiftKey);
+};
+
 /* When the manifest file has loaded, go and get some geometry. 
  Redraw the map as the geometry comes in.  
  */
 data.onManifestLoaded(function(){
     paint.setDataSource(data.layers);
+    var layerSelect = OpenDataMap.layerSelect(d3.select("#layer-select"), null, data.allLayerNames());
+    layerSelect.onClick(selectLayer);
     
     data.allLayerNames().forEach(function(l){
 	data.onLayerGeometryLoaded(l, function(shape){

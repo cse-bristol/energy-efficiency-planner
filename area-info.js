@@ -19,13 +19,17 @@ OpenDataMap.areaInfo = function(container) {
     var clickHandlers = [];
 
     var transpose = function(arr){
+	if (arr.length === 0) {
+	    return [];
+	}
+	
 	return arr[0].map(function(col, i) { 
 	    return arr.map(function(row) { 
 		return row[i];
 	    });
 	});
     };
- 
+    
     var module = {
 
 	/* 
@@ -35,33 +39,30 @@ OpenDataMap.areaInfo = function(container) {
 	 */
 	info : function(head, body) {
 
-	    if (body.length > 0) {
-		
-		var h = tHead.selectAll("th").data(head);
-		h.exit().remove();
-		h.enter().append("th");
-		h.html(d3.identity)
-		    .on("click", function(event, index) {
-			var column = body.map(function(row){
-			    return row[index];
-			});
-			
-			clickHandlers.forEach(function(h){
-			    h(event, column);
-			});
+	    var h = tHead.selectAll("th").data(head);
+	    h.exit().remove();
+	    h.enter().append("th");
+	    h.html(d3.identity)
+		.on("click", function(event, index) {
+		    var column = body.map(function(row){
+			return row[index];
 		    });
-
-		var tr = tBody.selectAll("tr").data(transpose(body));
-		tr.enter().append("tr");
-		tr.exit().remove();
-		var td = tr.selectAll("td").data(function(d, i){
-		    return d;
+		    
+		    clickHandlers.forEach(function(h){
+			h(event, column);
+		    });
 		});
 
-		td.enter().append("td");
-		td.exit().remove();
-		td.html(d3.identity);
-	    }
+	    var tr = tBody.selectAll("tr").data(transpose(body));
+	    tr.enter().append("tr");
+	    tr.exit().remove();
+	    var td = tr.selectAll("td").data(function(d, i){
+		return d;
+	    });
+
+	    td.enter().append("td");
+	    td.exit().remove();
+	    td.html(d3.identity);
 	},
 
 	addClickHandler : function(clickHandler) {
