@@ -7,18 +7,24 @@ if (!OpenDataMap) {
 }
 
 OpenDataMap.colour = function() {
-    var numeric = function(datum) {
-	return !datum || !isNaN(parseFloat(datum));
-    };
 
     var colourScale = function(data) {
-	if (data.every(numeric)) {
-	    return d3.scale.linear()
-		    .domain([d3.min(data), d3.max(data)])
-		    .range(["blue", "red"]);
-	} else {
-	    return d3.scale.category20();
+	var numeric = [];
+	var len = data.length;
+	for (var i = 0; i < len; i++) {
+	    var r = parseFloat(data[i]);
+	    if (data[i] && isNaN(r)) {
+		return d3.scale.category20();
+	    } else {
+		numeric.push(r);
+	    }
 	}
+	    
+	var min = Math.min(0, d3.min(numeric));
+	
+	return d3.scale.linear()
+	    .domain([min, d3.max(numeric)])
+	    .range(["blue", "red"]);
     };
 
     var categorical = d3.scale.category20();
