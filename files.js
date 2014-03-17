@@ -16,8 +16,28 @@ OpenDataMap.files = function(errors){
     
     var tsv = function(text, fileName) {
 	var data = d3.tsv.parse(text);
-
 	return OpenDataMap.source.fromTable(withoutExtension(fileName), data, fileName);
+    };
+    tsv.callbacks = sourceLoadCallbacks;
+
+    var csv = function(text, fileName) {
+	var data = d3.csv.parse(text);
+	return OpenDataMap.source.fromTable(withoutExtension(fileName), data, fileName);
+    };
+    csv.callbacks = sourceLoadCallbacks;
+    
+    var mimes = d3.map({
+	"text/tab-separated-values" : tsv,
+	"text/csv" : csv
+    });
+    var select = function(mime, filename) {
+	if (mimes.has(mime)) {
+	    return mimes.get(mime);
+	} else {
+	    return function(fileData, fileName) {
+		errors.warnUser("Unknown file type " + mime + " for file " + filename);
+	    };
+	}
     };
     
     return {
@@ -38,12 +58,11 @@ OpenDataMap.files = function(errors){
 		    var reader = new FileReader();
 		    var file = files[i];
 		    
-
-
 		    var success = function() {
-			var source = tsv(reader.result, file.name);
-			sourceLoadCallbacks.forEach(function(c){
-			    c(source);
+			var handler = select(file.type, file.name);
+			var result = handler(reader.result, file.name);
+			handler.callbacks.forEach(function(c){
+			    c(result);
 			});
 		    };
 		    
