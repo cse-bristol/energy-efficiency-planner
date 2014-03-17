@@ -97,3 +97,17 @@ path.selected:hover {
     opacity: 1.0;
     border-style: solid;
 }
+
+#errors {
+    position: fixed;
+    top: 5%;
+    left: 30%;
+    width: 20%;
+}
+
+.error {
+    border: 2px solid red;
+    color: red;
+    padding: 4px;
+    opacity: 0.8;
+}

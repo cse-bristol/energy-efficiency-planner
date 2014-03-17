@@ -9,7 +9,7 @@ if (!OpenDataMap) {
 /*
  Holds the names of the currently selected geometry, along with whichever sources are being used with it.
 */
-OpenDataMap.worksheet = function(data) {
+OpenDataMap.worksheet = function(data, errors) {
     var displayProperty = null;
     var source = OpenDataMap.source.combined([], "selected-sources");
     var names = d3.set([]);
@@ -25,6 +25,24 @@ OpenDataMap.worksheet = function(data) {
     };
 
     var addSources = function(newSources) {
+	var existing = d3.set(source.properties());
+	
+	newSources.forEach(function(s){
+	    var ok = s.properties().every(function(p){
+		if (existing.has(p)) {
+		    errors.warnUser("Could not load source " + s.name() + " because it provided a property which was already loaded: " + p  + ".");
+		    return false;
+		} else {
+		    existing.add(p);
+		    return true;
+		}
+	    });
+
+	    if (!ok) {
+		newSources.splice(newSources.indexOf(s), 1);
+	    }
+	});
+
 	source = OpenDataMap.source.combined(source.sources().concat(newSources), "selected-sources");
     };
 
@@ -91,6 +109,10 @@ OpenDataMap.worksheet = function(data) {
 
 	sources : function() {
 	    return source.sources();
+	},
+
+	addSource : function(newSource) {
+	    addSources([newSource]);
 	}
     };
 };

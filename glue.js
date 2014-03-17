@@ -11,6 +11,8 @@ var zoom = 23;
 var projection = d3.geo.mercator()
 	.center(startCoordinates);
 
+var errors = OpenDataMap.errors(d3.select("#errors"));
+
 var time = OpenDataMap.timeControl(d3.select("#time-control"), 2013, 2024, 2013);
 var loader = OpenDataMap.loader();
 var data = OpenDataMap.geometryData(loader, "data/processed/manifest.json");
@@ -18,7 +20,7 @@ var data = OpenDataMap.geometryData(loader, "data/processed/manifest.json");
 var paint = OpenDataMap.paint(d3.select("#map"), width, height, projection, zoom);
 var selection = OpenDataMap.selection(d3.select("#map svg"));
 
-var worksheet = OpenDataMap.worksheet(data);
+var worksheet = OpenDataMap.worksheet(data, errors);
 var areaInfo = OpenDataMap.areaInfo(d3.select("#results"));
 var colour = OpenDataMap.colour();
 var calculationsDisplay = OpenDataMap.calculationsDisplay(d3.select("#calculations"));
@@ -51,6 +53,13 @@ areaInfo.addClickHandler(function(header, column){
 
 time.onChange(function(currentDate){
     colourMap();
+    updateWorksheet();
+});
+
+var files = OpenDataMap.files(errors);
+files.drop(d3.select("body"), d3.select("#errors"));
+files.onSourceLoad(function(s){
+    worksheet.addSource(s);
     updateWorksheet();
 });
 
