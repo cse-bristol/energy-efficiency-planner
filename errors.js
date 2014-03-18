@@ -9,6 +9,8 @@ if (!OpenDataMap) {
 OpenDataMap.errors = function(container) {
     return {
 	warnUser : function(text) {
+	    console.warn(text);
+	    
 	    var errorMsg = container.append("div")
 		    .classed("error", true)
 		    .html(text);

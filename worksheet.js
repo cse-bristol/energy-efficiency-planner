@@ -9,7 +9,7 @@ if (!OpenDataMap) {
 /*
  Holds the names of the currently selected geometry, along with whichever sources are being used with it.
 */
-OpenDataMap.worksheet = function(data, errors) {
+OpenDataMap.worksheet = function(layers, errors) {
     var displayProperty = null;
     var source = OpenDataMap.source.combined([], "selected-sources");
     var names = d3.set([]);
@@ -17,13 +17,12 @@ OpenDataMap.worksheet = function(data, errors) {
 
     var callbacks = [];
 
-    var hasLayer = function(layer) {
+    var usesLayer = function(layer) {
 	return layersByName.values().indexOf(layer.name()) >= 0;
     };
 
-    var getLayer = function(d) {
-	var layerName = d.layer;
-	return data.layer(layerName);	
+    var getLayerForShape = function(d) {
+	return layers.get(d.layer);
     };
 
     var addSources = function(newSources) {
@@ -67,10 +66,10 @@ OpenDataMap.worksheet = function(data, errors) {
 		var name = d.properties.Name;
 		names.remove(name);
 
-		var layer = getLayer(d);
+		var layer = getLayerForShape(d);
 		layersByName.remove(name);
-		if(!hasLayer(layer)) {
-		    removeSources(data.defaultSources(layer.name()));
+		if(!usesLayer(layer)) {
+		    removeSources(layer.sources());
 		}
 	    });
 
@@ -79,11 +78,11 @@ OpenDataMap.worksheet = function(data, errors) {
 		var name = d.properties.Name;
 		names.add(name);
 
-		var layer = getLayer(d);
-		var needsLayerSources = !hasLayer(layer);
+		var layer = getLayerForShape(d);
+		var needsLayerSources = !usesLayer(layer);
 		layersByName.set(name, layer.name());		
 		if (needsLayerSources) {
-		    addSources(data.defaultSources(layer.name()));		    
+		    addSources(layer.sources());		    
 		}
 	    });
 

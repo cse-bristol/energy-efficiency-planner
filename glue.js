@@ -7,6 +7,7 @@ var height = window.innerHeight - 20;
 var templeMeads = [-2.5806295, 51.4496909];
 var startCoordinates = templeMeads;
 var zoom = 23;
+var manifestFile = "data/processed/manifest.json";
 
 var projection = d3.geo.mercator()
 	.center(startCoordinates);
@@ -15,20 +16,31 @@ var errors = OpenDataMap.errors(d3.select("#errors"));
 
 var time = OpenDataMap.timeControl(d3.select("#time-control"), 2013, 2024, 2013);
 var loader = OpenDataMap.loader();
-var data = OpenDataMap.geometryData(loader, "data/processed/manifest.json");
+var layers = OpenDataMap.layers();
+var geometries = OpenDataMap.geometries();
 
-var paint = OpenDataMap.paint(d3.select("#map"), width, height, projection, zoom);
+var paint = OpenDataMap.paint(d3.select("#map"), width, height, projection, zoom, layers.all);
+var layerSelect = OpenDataMap.layerSelect(d3.select("#layer-select"), layers);
 var selection = OpenDataMap.selection(d3.select("#map svg"));
 
-var worksheet = OpenDataMap.worksheet(data, errors);
-var areaInfo = OpenDataMap.areaInfo(d3.select("#results"));
+var worksheet = OpenDataMap.worksheet(layers, errors);
+var resultsTable = OpenDataMap.resultsTable(d3.select("#results"));
 var colour = OpenDataMap.colour();
 var calculationsDisplay = OpenDataMap.calculationsDisplay(d3.select("#calculations"));
 
-
-/* When the user clicks on a geometry object, change the selection.
-*/
+layers.layerCreated(paint.redrawAll);
 paint.addClickHandler(selection.clickHandler);
+
+/*
+ When we click on a layer in the list of layers,
+ get all of the shapes in that layer and select them.
+*/
+layerSelect.onClick(function(layerName) {
+    selection.select(
+	d3.select("#map svg g#" + layerName)
+	    .selectAll("path"),
+	d3.event.shiftKey);
+});
 
 selection.addCallback(function(values, entering, leaving){
     colour.unpaint(leaving);
@@ -39,36 +51,14 @@ var files = OpenDataMap.files(errors);
 files.drop(d3.select("body"), d3.select("#errors"));
 files.onSourceLoad(worksheet.addSource);
 
-areaInfo.addClickHandler(worksheet.displayProperty);
+resultsTable.headerClicked(worksheet.displayProperty);
 
 time.onChange(worksheet.timeChanged);
 
 worksheet.dataChanged(function(){
-    areaInfo.info(worksheet.propertyNames(), worksheet.allData(time.current()));
+    resultsTable.info(worksheet.propertyNames(), worksheet.allData(time.current()));
     calculationsDisplay.update(worksheet.sources());
     colour.paintProperty(worksheet.displayData(time.current()), selection.current());    
 });
 
-var selectLayer = function(layerName) {
-    selection.select(
-	d3.select("#map")
-	    .select("svg")
-	    .select("g#" + layerName)
-	    .selectAll("path"),
-	d3.event.shiftKey);
-};
-
-/* When the manifest file has loaded, go and get some geometry. 
- Redraw the map as the geometry comes in.  
- */
-data.onManifestLoaded(function(){
-    paint.setDataSource(data.layers);
-    var layerSelect = OpenDataMap.layerSelect(d3.select("#layer-select"), null, data.allLayerNames());
-    layerSelect.onClick(selectLayer);
-    
-    data.allLayerNames().forEach(function(l){
-	data.onLayerGeometryLoaded(l, function(shape){
-	    paint.redrawAll();
-	});
-    });
-});
+OpenDataMap.manifest(manifestFile, errors, loader, geometries, layers);

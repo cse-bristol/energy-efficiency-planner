@@ -12,7 +12,7 @@ if (!OpenDataMap) {
  
  Call it with a container which it will make the panel inside.
  */
-OpenDataMap.areaInfo = function(container) {
+OpenDataMap.resultsTable = function(container) {
     var table = container.append("table");
     var tHead = table.append("thead").append("tr");
     var tBody = table.append("tbody");
@@ -65,7 +65,7 @@ OpenDataMap.areaInfo = function(container) {
 	    td.html(d3.identity);
 	},
 
-	addClickHandler : function(clickHandler) {
+	headerClicked : function(clickHandler) {
 	    clickHandlers.push(clickHandler);
 	}
     };

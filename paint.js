@@ -6,7 +6,7 @@ if (!OpenDataMap) {
     var OpenDataMap = {};
 }
 
-OpenDataMap.paint = function(container, width, height, projection, zoom) {
+OpenDataMap.paint = function(container, width, height, projection, zoom, dataSource) {
     var zoomer = d3.behavior.zoom()
 	    .scale(1 << zoom)
 	    .translate([width / 2, height / 2]);
@@ -24,16 +24,8 @@ OpenDataMap.paint = function(container, width, height, projection, zoom) {
 	    .attr("height", height);
 
     var clickHandlers = [];
-    var dataSource = null;
     
     var module = {
-	/*
-	 Call this with a function which returns SOMETHING
-	 */
-	setDataSource : function(source) {
-	    dataSource = source;
-	},
-
 	/*
 	 Pass in a function to be called every time a geometry path on the map is clicked.
 	 */
@@ -41,46 +33,43 @@ OpenDataMap.paint = function(container, width, height, projection, zoom) {
 	    clickHandlers.push(clickHandler);
 	},
 	redrawAll : function() {
-	    if (dataSource) {
-		
-		zoomProjection();
-		
-		var l = svg.selectAll("g")
-			.data(dataSource());
+	    zoomProjection();
+	    
+	    var l = svg.selectAll("g")
+		    .data(dataSource);
 
-		l.enter().append("g")
-	    	    .attr("width", width)
-		    .attr("height", height)
-		    .attr("id", function(l) {
-			return l.name();
-		    });
-		
-		l.exit().remove();
-
-		l.each(function(parentDatum){
-		    var p = d3.select(this).selectAll("path")
-			    .data(function(l) {
-				return l.geometry();
-			    });
-
-		    p.enter().append("path");
-		    p.exit().remove();
-		    p
-			.on("click", function(event, index) {
-			    clickHandlers.forEach(function(h){
-				h(event, index);
-			    });
-			})
-			.attr("d", path)
-			.datum(function(d, i){
-			    d.layer = parentDatum.name();
-			    return d;
-			})
-			.attr("id", function(d, i){
-			    return d.properties.Name;
-			});		    
+	    l.enter().append("g")
+	    	.attr("width", width)
+		.attr("height", height)
+		.attr("id", function(l) {
+		    return l.name();
 		});
-	    }
+	    
+	    l.exit().remove();
+
+	    l.each(function(parentDatum){
+		var p = d3.select(this).selectAll("path")
+			.data(function(l) {
+			    return l.geometry();
+			});
+
+		p.enter().append("path");
+		p.exit().remove();
+		p
+		    .on("click", function(event, index) {
+			clickHandlers.forEach(function(h){
+			    h(event, index);
+			});
+		    })
+		    .attr("d", path)
+		    .datum(function(d, i){
+			d.layer = parentDatum.name();
+			return d;
+		    })
+		    .attr("id", function(d, i){
+			return d.properties.Name;
+		    });		    
+	    });
 	}
     };
     
