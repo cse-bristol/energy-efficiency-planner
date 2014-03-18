@@ -26,41 +26,27 @@ var colour = OpenDataMap.colour();
 var calculationsDisplay = OpenDataMap.calculationsDisplay(d3.select("#calculations"));
 
 
-var colourMap = function(){
-    colour.paintProperty(worksheet.displayData(time.current()), selection.current());    
-};
-
-var updateWorksheet = function() {
-    areaInfo.info(worksheet.propertyNames(), worksheet.allData(time.current()));
-    calculationsDisplay.update(worksheet.sources());
-};
-
 /* When the user clicks on a geometry object, change the selection.
 */
 paint.addClickHandler(selection.clickHandler);
 
 selection.addCallback(function(values, entering, leaving){
-    worksheet.selectionChanged(values, entering, leaving);
     colour.unpaint(leaving);
-    colourMap();
-    updateWorksheet();
-});
-
-areaInfo.addClickHandler(function(header, column){
-    worksheet.displayProperty(header);
-    colourMap();
-});
-
-time.onChange(function(currentDate){
-    colourMap();
-    updateWorksheet();
+    worksheet.selectionChanged(values, entering, leaving);
 });
 
 var files = OpenDataMap.files(errors);
 files.drop(d3.select("body"), d3.select("#errors"));
-files.onSourceLoad(function(s){
-    worksheet.addSource(s);
-    updateWorksheet();
+files.onSourceLoad(worksheet.addSource);
+
+areaInfo.addClickHandler(worksheet.displayProperty);
+
+time.onChange(worksheet.timeChanged);
+
+worksheet.dataChanged(function(){
+    areaInfo.info(worksheet.propertyNames(), worksheet.allData(time.current()));
+    calculationsDisplay.update(worksheet.sources());
+    colour.paintProperty(worksheet.displayData(time.current()), selection.current());    
 });
 
 var selectLayer = function(layerName) {

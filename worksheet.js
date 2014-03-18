@@ -15,6 +15,8 @@ OpenDataMap.worksheet = function(data, errors) {
     var names = d3.set([]);
     var layersByName = d3.map({});
 
+    var callbacks = [];
+
     var hasLayer = function(layer) {
 	return layersByName.values().indexOf(layer.name()) >= 0;
     };
@@ -51,6 +53,12 @@ OpenDataMap.worksheet = function(data, errors) {
 	    return oldSources.indexOf(s) < 0;
 	}), "selected-sources");
     };
+
+    var changed = function() {
+	callbacks.forEach(function(c){
+	    c();
+	});
+    };
     
     return {
 	selectionChanged : function(values, entering, leaving) {
@@ -82,6 +90,8 @@ OpenDataMap.worksheet = function(data, errors) {
 	    if (source.properties().indexOf(displayProperty) < 0) {
 		displayProperty = null;
 	    }
+
+	    changed();
 	},
 
 	allData : function(time) {
@@ -95,6 +105,7 @@ OpenDataMap.worksheet = function(data, errors) {
 	displayProperty : function(property) {
 	    if (property) {
 		displayProperty = property;
+		changed();
 	    }
 	    return displayProperty;
 	},
@@ -113,6 +124,21 @@ OpenDataMap.worksheet = function(data, errors) {
 
 	addSource : function(newSource) {
 	    addSources([newSource]);
+	    changed();
+	},
+
+	/*
+	 Register a callback which will be fired when the data changes.
+	 */
+	dataChanged : function(callback) {
+	    callbacks.push(callback);
+	},
+
+	/*
+	 Notifies the worksheet that the current date and time has changed.
+	 */
+	timeChanged : function(time) {
+	    changed();
 	}
     };
 };
