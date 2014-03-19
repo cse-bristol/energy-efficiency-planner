@@ -6,7 +6,7 @@ if (!OpenDataMap) {
     var OpenDataMap = {};
 }
 
-OpenDataMap.layers = function() {
+OpenDataMap.layers = function(errors) {
     var layers = d3.map([]);
     var callbacks = [];
     
@@ -50,6 +50,10 @@ OpenDataMap.layers = function() {
 		}
 	    };
 
+	    if (layers.has(l.name())) {
+		errors.warnUser("Layer with name " + l.name() + " already exists, and will be replaced.");
+	    }
+	    
 	    layers.set(l.name(), l);
 
 	    callbacks.forEach(function(c){

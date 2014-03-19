@@ -21,6 +21,23 @@ OpenDataMap.geometries = function() {
 		return [topojsonShapes];
 	    }
 	},
+	
+	manyFromTopoJSON : function(layerName, data){
+	    var result = d3.map({});
+	    
+	    d3.map(data.objects).entries().forEach(function(e){
+		var name = e.key;
+		var s = e.value;
+		var topojsonShapes = topojson.feature(data, s);
+		if (topojsonShapes.features) {
+		    result.set(name, topojsonShapes.features);
+		} else {
+		    result.set(name, [topojsonShapes]);
+		}
+	    });
+
+	    return result;
+	},	
 	fromGeoJSON : function(data) {
 	    throw "Not implemented";
 	},

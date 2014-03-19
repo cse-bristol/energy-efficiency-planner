@@ -16,8 +16,9 @@ var errors = OpenDataMap.errors(d3.select("#errors"));
 
 var time = OpenDataMap.timeControl(d3.select("#time-control"), 2013, 2024, 2013);
 var loader = OpenDataMap.loader();
-var layers = OpenDataMap.layers();
+var layers = OpenDataMap.layers(errors);
 var geometries = OpenDataMap.geometries();
+var files = OpenDataMap.files(errors, geometries, layers);
 
 var paint = OpenDataMap.paint(d3.select("#map"), width, height, projection, zoom, layers.all);
 var layerSelect = OpenDataMap.layerSelect(d3.select("#layer-select"), layers);
@@ -47,7 +48,6 @@ selection.addCallback(function(values, entering, leaving){
     worksheet.selectionChanged(values, entering, leaving);
 });
 
-var files = OpenDataMap.files(errors);
 files.drop(d3.select("body"), d3.select("#errors"));
 files.onSourceLoad(worksheet.addSource);
 
