@@ -144,8 +144,19 @@ OpenDataMap.file.handlers = function(errors, geometries, layers, sources) {
 	}),
 	dbf: singleText("dbf", null, function(filename, text){
 	    errors.warnUser("Cannot load a dbf file by itself. Please import .dbf and .shp files together: " + filename);
-	})
+	}),
 	
+	fallback : function() {
+	    var h = {
+		tryHandle : function(files) {
+		    files.forEach(function(f){
+			errors.warnUser("Can't load file " + f.name + " with " + (f.type ? f.type : "unknown") + " type.");
+		    });
+		}
+	    };
+	    all.push(h);
+	    return h;
+	}()
     };
 };
 
