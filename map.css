@@ -41,6 +41,7 @@ path.selected:hover {
     list-style-type: none;
     border: 1px grey dashed;
     padding: 4px;
+    margin: 4px;
     opacity: 0.7;
 }
 
@@ -75,6 +76,23 @@ path.selected:hover {
 #results table thead tr th {
     border: 1px solid grey;
     text-align: center;
+}
+
+#results table thead tr th {
+    border: 1px solid grey;
+    text-align: center;
+}
+
+#results table thead tr th:hover {
+    background-color: LightSlateGray;
+}
+
+#results table tbody tr:hover {
+    background-color: LightSteelBlue;
+}
+
+#results table tbody tr td:hover {
+    background-color: LightSlateGray;
 }
 
 #calculations ul {

@@ -1,6 +1,6 @@
 "use strict";
 
-/*global d3, topojson, OpenDataMap */
+/*global d3, topojson, Shapefile, DBF, OpenDataMap */
 
 if (!OpenDataMap) {
     var OpenDataMap = {};
@@ -21,8 +21,7 @@ OpenDataMap.geometries = function() {
 		return [topojsonShapes];
 	    }
 	},
-	
-	manyFromTopoJSON : function(layerName, data){
+	manyFromTopoJSON : function(data){
 	    var result = d3.map({});
 	    
 	    d3.map(data.objects).entries().forEach(function(e){
@@ -39,10 +38,13 @@ OpenDataMap.geometries = function() {
 	    return result;
 	},	
 	fromGeoJSON : function(data) {
-	    throw "Not implemented";
+	    return data.features;
 	},
-	fromShapeFile : function(data) {
-	    throw "Not implemented";
+	fromShapefile : function(shapeData, dbfData) {
+	    var s = Shapefile(shapeData);
+	    var d = DBF(dbfData);
+	    s.addDBFDataToGeoJSON(d); 
+	    return s.geojson.features;
 	}
     };
 };

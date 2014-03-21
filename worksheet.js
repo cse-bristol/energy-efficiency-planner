@@ -26,25 +26,11 @@ OpenDataMap.worksheet = function(layers, errors) {
     };
 
     var addSources = function(newSources) {
-	var existing = d3.set(source.properties());
-	
-	newSources.forEach(function(s){
-	    var ok = s.properties().every(function(p){
-		if (existing.has(p)) {
-		    errors.warnUser("Could not load source " + s.name() + " because it provided a property which was already loaded: " + p  + ".");
-		    return false;
-		} else {
-		    existing.add(p);
-		    return true;
-		}
-	    });
-
-	    if (!ok) {
-		newSources.splice(newSources.indexOf(s), 1);
-	    }
+	var missing = newSources.filter(function(s){
+	    return source.sources().indexOf(s) < 0;
 	});
-
-	source = OpenDataMap.source.combined(source.sources().concat(newSources), "selected-sources");
+	
+	source = OpenDataMap.source.combined(source.sources().concat(missing), "selected-sources");
     };
 
     var removeSources = function(oldSources) {
