@@ -70,7 +70,7 @@ path.selected:hover {
     vertical-align: top;
     height: 95vh;
     overflow: auto;
-    width: 49%;
+    width: 48%;
 }
 
 #results table thead tr th {

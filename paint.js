@@ -68,7 +68,7 @@ OpenDataMap.paint = function(container, width, height, projection, zoom, dataSou
 		    })
 		    .attr("id", function(d, i){
 			return d.properties.Name;
-		    });		    
+		    });
 	    });
 	}
     };

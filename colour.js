@@ -36,7 +36,8 @@ OpenDataMap.colour = function() {
 	    var colour = colourScale(dataColumn);
 
 	    selection.attr("fill", function(d, i){
-		return colour(dataColumn[i]);
+		var datum = dataColumn[i];
+		return datum ? colour(dataColumn[i]) : null;
 	    });
 	},
 	unpaint : function(elements) {

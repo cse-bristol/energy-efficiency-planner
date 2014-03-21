@@ -9,6 +9,64 @@ if (!OpenDataMap) {
 OpenDataMap.layers = function(errors) {
     var layers = d3.map([]);
     var callbacks = [];
+
+    var fixGeometryNames = function(geometry) {
+	var chooseNameProp = function (keys) {
+	    var candidates = keys.filter(function(k){
+		if (k.toLowerCase() === "name") {
+		    return true;
+		} else if (k.toLowerCase() === "id") {
+		    return true;
+		} else {
+		    return false;
+		}
+	    });
+	    if (candidates.length > 0) {
+		return candidates[0];
+	    }
+
+	    candidates = keys.filter(function(k){
+		if (k.toLowerCase().indexOf("name") >= 0) {
+		    return true;
+		} else if (k.toLowerCase().indexOf("id") >= 0) {
+		    return true;
+		} else {
+		    return false;
+		}
+	    });
+
+	    if (candidates.length > 0) {
+		return candidates[0];
+	    }
+
+	    return null;
+	};
+
+	if (geometry.every(function(shape){
+	    return shape.properties.Name;
+	})
+	    || geometry.length === 0) {
+	    return; // No fix required.
+	}
+
+	var candidates = Object.keys(geometry[0].properties);
+	geometry.forEach(function(shape){
+	    var keys = Object.keys(shape.properties);
+	    candidates = candidates.filter(function(c){
+		return keys.indexOf(c) >= 0;
+	    });
+	});
+	
+	var nameProp = chooseNameProp(candidates);
+
+	if (nameProp) {
+	    geometry.forEach(function(shape){
+		shape.properties.Name = shape.properties[nameProp];
+	    });
+	} else {
+	    throw "Could not import layer because it did not have a suitable name or id property.";
+	}
+    };
     
     return {
 	all : function() {
@@ -22,6 +80,8 @@ OpenDataMap.layers = function(errors) {
 	},
 	create : function(name, geometry) {
 	    var sources = [];
+	    fixGeometryNames(geometry);
+	    
 	    sources.push(OpenDataMap.source.fromGeometry(geometry, name + ": geometry"));
 	    
 	    var l = {
