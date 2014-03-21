@@ -6,7 +6,7 @@ if (!OpenDataMap) {
     var OpenDataMap = {};
 }
 
-OpenDataMap.manifest = function(file, errors, loader, geometry, layers) {
+OpenDataMap.manifest = function(file, errors, loader, geometry, layers, sources) {
 
     loader.load(file, d3.json, function(data, error) {
 	if (error) {
@@ -44,7 +44,7 @@ OpenDataMap.manifest = function(file, errors, loader, geometry, layers) {
 			    }
 
 			    layer.addSource(
-				OpenDataMap.source.fromTable(prop, data, layerName + ": " + prop)
+				sources.fromTable(prop, data, layerName + ": " + prop)
 			    );
 			});
 		    };

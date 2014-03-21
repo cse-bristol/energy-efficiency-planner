@@ -9,9 +9,9 @@ if (!OpenDataMap) {
 /*
  Holds the names of the currently selected geometry, along with whichever sources are being used with it.
 */
-OpenDataMap.worksheet = function(layers, errors) {
+OpenDataMap.worksheet = function(layers, sources, errors) {
     var displayProperty = null;
-    var source = OpenDataMap.source.combined([], "selected-sources");
+    var source = sources.combined([], "selected-sources");
     var names = d3.set([]);
     var layersByName = d3.map({});
 
@@ -30,11 +30,11 @@ OpenDataMap.worksheet = function(layers, errors) {
 	    return source.sources().indexOf(s) < 0;
 	});
 	
-	source = OpenDataMap.source.combined(source.sources().concat(missing), "selected-sources");
+	source = sources.combined(source.sources().concat(missing), "selected-sources");
     };
 
     var removeSources = function(oldSources) {
-	source = OpenDataMap.source.combined(source.sources().filter(function(s){
+	source = sources.combined(source.sources().filter(function(s){
 	    return oldSources.indexOf(s) < 0;
 	}), "selected-sources");
     };

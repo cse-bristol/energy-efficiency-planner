@@ -116,7 +116,7 @@ path.selected:hover {
     border-style: solid;
 }
 
-#errors {
+#messages {
     position: fixed;
     top: 5%;
     left: 30%;
@@ -126,6 +126,13 @@ path.selected:hover {
 .error {
     border: 2px solid red;
     color: red;
+    padding: 4px;
+    opacity: 0.8;
+}
+
+.info {
+    border: 2px solid green;
+    color: green;
     padding: 4px;
     opacity: 0.8;
 }

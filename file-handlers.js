@@ -10,7 +10,7 @@ if (!OpenDataMap.file) {
     OpenDataMap.file = {};
 }
 
-OpenDataMap.file.handlers = function(errors, geometries, layers) {
+OpenDataMap.file.handlers = function(errors, geometries, layers, sources) {
     var all = [];
     var newSourceCallbacks = [];
 
@@ -62,7 +62,7 @@ OpenDataMap.file.handlers = function(errors, geometries, layers) {
     var singleTable = function(extension, mime, parser){
 	return singleText(extension, mime, function(filename, text){
 	    var data = parser(text);
-	    var s = OpenDataMap.source.fromTable(withoutExtension(filename), data, filename);
+	    var s = sources.fromTable(withoutExtension(filename), data, filename);
 	    newSourceCallbacks.forEach(function(c){
 		c(s);
 	    });

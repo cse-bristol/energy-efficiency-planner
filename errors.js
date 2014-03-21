@@ -7,7 +7,23 @@ if (!OpenDataMap) {
 }
 
 OpenDataMap.errors = function(container) {
+    var fadeOut = function(selection) {
+	selection.transition()
+	    .delay(5000)
+	    .style("opacity", "0.000001")
+	    .remove();
+    };
+    
     return {
+	informUser : function(text) {
+	    console.log(text);
+	    
+	    var infoMsg = container.append("div")
+		    .classed("info", true)
+		    .html(text);
+
+	    fadeOut(infoMsg);
+	},
 	warnUser : function(text) {
 	    console.warn(text);
 	    
@@ -15,10 +31,7 @@ OpenDataMap.errors = function(container) {
 		    .classed("error", true)
 		    .html(text);
 
-	    errorMsg.transition()
-		.delay(5000)
-		.style("opacity", "0.000001")
-		.remove();
+	    fadeOut(errorMsg);
 	}
     };
 };

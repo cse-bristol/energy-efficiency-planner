@@ -6,7 +6,7 @@ if (!OpenDataMap) {
     var OpenDataMap = {};
 }
 
-OpenDataMap.layers = function(errors) {
+OpenDataMap.layers = function(errors, sources) {
     var layers = d3.map([]);
     var callbacks = [];
 
@@ -63,6 +63,8 @@ OpenDataMap.layers = function(errors) {
 	    geometry.forEach(function(shape){
 		shape.properties.Name = shape.properties[nameProp];
 	    });
+	    errors.informUser("No 'Name' property found. Using " + nameProp + " instead.");
+
 	} else {
 	    throw "Could not import layer because it did not have a suitable name or id property.";
 	}
@@ -79,10 +81,10 @@ OpenDataMap.layers = function(errors) {
 	    return layers.get(name);
 	},
 	create : function(name, geometry) {
-	    var sources = [];
+	    var layerSources = [];
 	    fixGeometryNames(geometry);
 	    
-	    sources.push(OpenDataMap.source.fromGeometry(geometry, name + ": geometry"));
+	    layerSources.push(sources.fromGeometry(geometry, name + ": geometry"));
 	    
 	    var l = {
 
@@ -95,11 +97,11 @@ OpenDataMap.layers = function(errors) {
 		},
 
 		addSource : function(s) {
-		    sources.push(s);
+		    layerSources.push(s);
 		},
 
 		sources : function() {
-		    return sources;
+		    return layerSources;
 		},
 
 		/*
