@@ -9,7 +9,7 @@ if (!OpenDataMap) {
 OpenDataMap.paint = function(container, width, height, projection, zoom, dataSource) {
     var zoomer = d3.behavior.zoom()
 	    .scale(1 << zoom)
-	    .translate([width / 2, height / 2]);
+	    .translate([width() / 2, height() / 2]);
 
     var zoomProjection = function() {
 	projection.scale(zoomer.scale() / 2 / Math.PI)
@@ -20,8 +20,8 @@ OpenDataMap.paint = function(container, width, height, projection, zoom, dataSou
 	    .projection(projection);
     
     var svg = container.append("svg")
-            .attr("width", width)
-	    .attr("height", height);
+            .attr("width", width())
+	    .attr("height", height());
 
     var clickHandlers = [];
     
@@ -34,13 +34,17 @@ OpenDataMap.paint = function(container, width, height, projection, zoom, dataSou
 	},
 	redrawAll : function() {
 	    zoomProjection();
+
+	    svg
+		.attr("width", width())
+		.attr("height", height());
 	    
 	    var l = svg.selectAll("g")
 		    .data(dataSource);
 
 	    l.enter().append("g")
-	    	.attr("width", width)
-		.attr("height", height)
+	    	.attr("width", width())
+		.attr("height", height())
 		.attr("id", function(l) {
 		    return l.name();
 		});

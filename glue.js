@@ -2,8 +2,12 @@
 
 /*global d3, topojson, OpenDataMap*/
 
-var width = window.innerWidth / 2;
-var height = window.innerHeight - 20;
+var width = function(){
+    return window.innerWidth / 2;
+};
+var height = function(){
+    return window.innerHeight - 20;
+};
 var templeMeads = [-2.5806295, 51.4496909];
 var startCoordinates = templeMeads;
 var zoom = 23;
@@ -61,3 +65,7 @@ worksheet.dataChanged(function(){
 });
 
 OpenDataMap.manifest(manifestFile, errors, loader, geometries, layers);
+
+window.onresize = function() {
+    paint.redrawAll();
+};
