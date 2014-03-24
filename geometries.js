@@ -44,7 +44,7 @@ OpenDataMap.geometries = function() {
 	    var s = Shapefile(shapeData);
 	    var d = DBF(dbfData);
 	    s.addDBFDataToGeoJSON(d); 
-	    return s.geojson.features;
+	    return s.geojson;
 	}
     };
 };

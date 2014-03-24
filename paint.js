@@ -32,6 +32,22 @@ OpenDataMap.paint = function(container, width, height, projection, zoom, dataSou
 	addClickHandler : function(clickHandler) {
 	    clickHandlers.push(clickHandler);
 	},
+	panAndZoom : function(boundingbox) {
+	    var x1 = boundingbox[0],
+		y1 = boundingbox[1],
+		x2 = boundingbox[2],
+		y2 = boundingbox[3];
+
+	    var boxSize = Math.max(
+		Math.abs(x1 - x2),
+	        Math.abs(y1 - y2));
+
+	    var zoomFudge = 200000;
+	    zoomer
+		.scale(zoomFudge / boxSize);
+
+	    module.redrawAll();
+	},
 	redrawAll : function() {
 	    zoomProjection();
 

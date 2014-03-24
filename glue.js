@@ -34,6 +34,11 @@ var colour = OpenDataMap.colour();
 var calculationsDisplay = OpenDataMap.calculationsDisplay(d3.select("#calculations"));
 
 layers.layerCreated(paint.redrawAll);
+layers.layerCreated(function(l){
+    if (l.boundingbox()) {
+	paint.panAndZoom(l.boundingbox());
+    }
+});
 paint.addClickHandler(selection.clickHandler);
 
 window.onresize = function() {

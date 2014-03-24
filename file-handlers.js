@@ -92,12 +92,12 @@ OpenDataMap.file.handlers = function(errors, geometries, layers, sources) {
 		    [{file: shp, binary: true},
 		     {file: dbf, binary: true}],
 		    function(files){
-			var shape = geometries.fromShapefile(
+			var geojson = geometries.fromShapefile(
 			    files.get(shp.name),
 			    files.get(dbf.name));
 			
 			var name = withoutExtension(shp.name);
-			layers.create(name, shape);
+			layers.create(name, geojson.features, geojson.bbox);
 		    }
 		);
 	    };
@@ -152,6 +152,7 @@ OpenDataMap.file.handlers = function(errors, geometries, layers, sources) {
 		    files.forEach(function(f){
 			errors.warnUser("Can't load file " + f.name + " with " + (f.type ? f.type : "unknown") + " type.");
 		    });
+		    return [];
 		}
 	    };
 	    all.push(h);

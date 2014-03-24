@@ -80,7 +80,7 @@ OpenDataMap.layers = function(errors, sources) {
 	get : function(name) {
 	    return layers.get(name);
 	},
-	create : function(name, geometry) {
+	create : function(name, geometry, boundingbox) {
 	    var layerSources = [];
 	    fixGeometryNames(geometry);
 	    
@@ -90,6 +90,10 @@ OpenDataMap.layers = function(errors, sources) {
 
 		name : function() {
 		    return name;
+		},
+
+		boundingbox : function() {
+		    return boundingbox;
 		},
 
 		geometry : function(hapes) {
