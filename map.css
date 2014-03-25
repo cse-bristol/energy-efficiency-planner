@@ -1,6 +1,23 @@
-#map {
-    display: inline-block;
+body {
+    margin: 0;
+    padding: 0;
+}
+
+#left-pane {
     border-right: 1px solid grey;
+    display: inline-block;
+    width: 50vw;
+    height: 100vh;
+}
+
+#map {
+    width: 50vw;
+    height: 100vh;
+}
+
+svg#overlay {
+    width: 50vw;
+    height: 100vh;
 }
 
 path {
@@ -29,8 +46,8 @@ path.selected:hover {
 
 #layer-select {
     position: fixed;
-    top: 2%;
-    left: 2%;
+    top: 0;
+    left: 50px;
 }
 
 #layer-select ul {
@@ -39,10 +56,11 @@ path.selected:hover {
 
 #layer-select li {
     list-style-type: none;
-    border: 1px grey dashed;
+    border: 2px black dashed;
     padding: 4px;
     margin: 4px;
     opacity: 0.7;
+    background-color: gray;
 }
 
 #layer-select li:hover {
@@ -52,9 +70,9 @@ path.selected:hover {
 
 #time-control {
     position: fixed;
-    width: 46%;
-    bottom: 2%;
-    left: 2%;
+    width: 47vw;
+    bottom: 20px;
+    left: 2vw;
 }
 #time-control input {
     width: 100%;

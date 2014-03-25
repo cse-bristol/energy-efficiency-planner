@@ -6,23 +6,10 @@ if (!OpenDataMap) {
     var OpenDataMap = {};
 }
 
-OpenDataMap.paint = function(container, width, height, projection, zoom, dataSource) {
-    var zoomer = d3.behavior.zoom()
-	    .scale(1 << zoom)
-	    .translate([width() / 2, height() / 2]);
-
-    var zoomProjection = function() {
-	projection.scale(zoomer.scale() / 2 / Math.PI)
-	    .translate(zoomer.translate());
-    };
-
+OpenDataMap.paint = function(container, projection, dataSource) {
     var path = d3.geo.path()
 	    .projection(projection);
     
-    var svg = container.append("svg")
-            .attr("width", width())
-	    .attr("height", height());
-
     var clickHandlers = [];
     
     var module = {
@@ -43,24 +30,15 @@ OpenDataMap.paint = function(container, width, height, projection, zoom, dataSou
 	        Math.abs(y1 - y2));
 
 	    var zoomFudge = 200000;
-	    zoomer
-		.scale(zoomFudge / boxSize);
 
 	    module.redrawAll();
 	},
 	redrawAll : function() {
-	    zoomProjection();
-
-	    svg
-		.attr("width", width())
-		.attr("height", height());
-	    
-	    var l = svg.selectAll("g")
+	    var l = container.selectAll("g")
 		    .data(dataSource);
 
 	    l.enter().append("g")
-	    	.attr("width", width())
-		.attr("height", height())
+		.classed("leaflet-zoom-hide", true)
 		.attr("id", function(l) {
 		    return l.name();
 		});
@@ -73,29 +51,25 @@ OpenDataMap.paint = function(container, width, height, projection, zoom, dataSou
 			    return l.geometry();
 			});
 
-		p.enter().append("path");
-		p.exit().remove();
-		p
+		p.enter().append("path")
 		    .on("click", function(event, index) {
 			clickHandlers.forEach(function(h){
 			    h(event, index);
 			});
 		    })
-		    .attr("d", path)
 		    .datum(function(d, i){
 			d.layer = parentDatum.name();
 			return d;
 		    })
 		    .attr("id", function(d, i){
 			return d.properties.Name;
-		    });
+		    });		
+		p.exit().remove();
+		p.attr("d", path);
 	    });
 	}
     };
     
-    container.call(zoomer);
-    zoomer.on("zoom", module.redrawAll);
-
     return module;
 };
 

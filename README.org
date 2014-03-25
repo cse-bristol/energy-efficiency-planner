@@ -1,35 +1,35 @@
 * Open Data Map
 
-A prototype map to illustrate what we could do for the Open Data and STEEP projects.
+ 1. Import shapes onto a map by dragging and dropping geoJSON, topoJSON or Shapefile, along with data describing attributes of those shapes as tsv.
+ 2. Manipulate the data using simple formulae and lookup tables, or by writing very small computer programs.
+ 3. Colour the map using the data.
+ 4. Share the results as a web page or pdf.
+ 5. Build upon other people's shared work.
 
 ** Running
- * Clone this git repository.
- * Run toTopoJson.py (dependencies listed in file).
- * Serve the root folder using a web server (python -m SimpleHTTPModule 80).
- * Open prototype.html in a browser.
-
-** Goals
-
- * Draw LSOAs/Government Office Regions/Postcodes or combinations of those on a map.
- * Store some data on these regions in a simple region-code -> number format.
- * Execute some user-defined functions on that data and colour regions accordingly.
- * Produce tables with cross-tabs.
- * Share the results as a URL.
-
-** Not-Goals
-We don't care about complex GIS queries (route / area calculations).
-
-** Technology
+  * Clone this git repository.
+  * git submodule update
+  * Build leaflet.js (TODO: make this step less annoying)
+    * Install node.js (http://nodejs.org/ or sudo aptitude install nodejs)
+    * sudo npm install -g jake
+    * sudo npm install -g jshint
+    * sudo npm install -g uglify-js
+    * cd /lib/leaflet
+    * jake build
+    * cd ../..
+  * Run toTopoJson.py (dependencies listed in file).
+  * Serve the root folder using a web server (python -m SimpleHTTPModule 80).
+  * Open prototype.html in a browser.
+    
+* Technology
 We are drawing the map in D3 using vectors and SVG.
 
 We want to try to push a lot of the work out to the client side (that is, in the user's browser).
 
 Working from this example http://bl.ocks.org/mbostock/5616813.
 
-** Data
-Data acquired from the ONS https://geoportal.statistics.gov.uk/
 
-** TODO Postcodes
+* TODO Postcodes
 There is the Python file postcodes.py which should takes a zip of postcodes and makes up some boundaries for those postcodes based on their Easting and Northing and the LSOA which contains them. It is unfinished.
 
 *** DONE Tesselation
