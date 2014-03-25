@@ -10,10 +10,11 @@ if (!OpenDataMap) {
  Given a container, provides a time slider which lets the user set the current year.
 */
 OpenDataMap.timeControl = function(container, min, max, start) {
-    var display = container.append("p")
+    var display = container.append("h1")
 	    .html(start);
     
-    var slider = container.append("input")
+    var slider = container.append("div")
+	    .append("input")
 	    .attr("type", "range")
 	    .attr("min", min)
 	    .attr("max", max)

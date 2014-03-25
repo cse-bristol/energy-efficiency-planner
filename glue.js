@@ -31,7 +31,7 @@ var Esri_WorldShadedRelief = L.tileLayer('http://server.arcgisonline.com/ArcGIS/
 
 
 var map = new L.Map("map")
-	.addLayer(osmLayer)
+	.addLayer(Stamen_TonerBackground)
 	.setView(templeMeads, zoom);
 
 var overlay = d3.select(map.getPanes().overlayPane)
@@ -43,8 +43,7 @@ L.control.layers(
 	"OpenStreetMap" : osmLayer,
 	"Toner" : Stamen_TonerBackground,
 	"ESRI Relief": Esri_WorldShadedRelief
-    },
-    {"Shapes" : overlay})
+    })
     .addTo(map);
 
 var projectPoint = function(x, y) {

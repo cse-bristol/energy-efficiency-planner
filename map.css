@@ -12,12 +12,14 @@ body {
 
 #map {
     width: 50vw;
-    height: 100vh;
+    height: 99vh;
 }
 
 svg#overlay {
     width: 50vw;
-    height: 100vh;
+    height: 99vh;
+    -webkit-transform-origin-x: 0;
+    -webkit-transform-origin-y: 0;
 }
 
 path {
@@ -59,8 +61,8 @@ path.selected:hover {
     border: 2px black dashed;
     padding: 4px;
     margin: 4px;
-    opacity: 0.7;
-    background-color: gray;
+    opacity: 0.8;
+    background-color: orange;
 }
 
 #layer-select li:hover {
@@ -71,16 +73,35 @@ path.selected:hover {
 #time-control {
     position: fixed;
     width: 47vw;
-    bottom: 20px;
+    bottom: 25px;
     left: 2vw;
+    pointer-events: none;
 }
-#time-control input {
+
+#time-control div {
+    background-color: orange;
+    border: 2px dashed black;
+    padding-right: 10px;
+    opacity: 0.7;
+    pointer-events: auto;
+}
+
+#time-control div:hover {
+    border-style: solid;
+    opacity: 0.9;
+}
+
+#time-control div input {
     width: 100%;
 }
 
-#time-control p {
-    width: 100%;
+#time-control h1 {
+    padding: 4px;
+    width: 2em;
     text-align: center;
+    background-color: orange;
+    border: 2px solid black;
+    opacity: 0.9;
 }
 
 #worksheet {
