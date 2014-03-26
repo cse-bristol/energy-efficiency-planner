@@ -16,10 +16,8 @@ body {
 }
 
 svg#overlay {
-    width: 50vw;
-    height: 99vh;
-    -webkit-transform-origin-x: 0;
-    -webkit-transform-origin-y: 0;
+    width: 100vw;
+    height: 100vh;
 }
 
 path {
@@ -97,7 +95,7 @@ path.selected:hover {
 
 #time-control h1 {
     padding: 4px;
-    width: 2em;
+    width: 3em;
     text-align: center;
     background-color: orange;
     border: 2px solid black;
