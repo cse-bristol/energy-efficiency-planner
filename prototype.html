@@ -6,16 +6,6 @@
     <link rel="stylesheet" type="text/css" href="map.css">
     <link rel="stylesheet" type="text/css" href="lib/leaflet/dist/leaflet.css">
     
-    <script src="lib/d3/d3.min.js"></script>
-    <script src="lib/d3-plugins/geo/tile/tile.js"></script>
-    <script src="lib/d3/lib/colorbrewer/colorbrewer.js"></script>
-    <script src="lib/topojson/topojson.js"></script>
-    <script src="lib/leaflet/dist/leaflet.js"></script>
-
-    <script src="lib/js-shapefile-to-geojson/stream.js"></script>
-    <script src="lib/js-shapefile-to-geojson/shapefile.js"></script>
-    <script src="lib/js-shapefile-to-geojson/dbf.js"></script>
-
   </head>
 
   <body>
@@ -32,8 +22,24 @@
       <div id="status"></div>
     </div>
 
-    <script src="d3-extensions.js"></script>
+    <!-- libraries -->
+    <script src="lib/d3/d3.min.js"></script>
+    <script src="lib/d3-plugins/geo/tile/tile.js"></script>
+    <script src="lib/d3/lib/colorbrewer/colorbrewer.js"></script>
+    <script src="lib/topojson/topojson.js"></script>
+    <script src="lib/leaflet/dist/leaflet.js"></script>
+    <script src="lib/proj4js/dist/proj4.js"></script>
 
+    <!-- this library modified heavily for our purposes -->
+    <script src="lib/js-shapefile-to-geojson/stream.js"></script>
+    <script src="lib/js-shapefile-to-geojson/shapefile.js"></script>
+    <script src="lib/js-shapefile-to-geojson/dbf.js"></script>    
+
+    <!-- our extensions to libraries -->
+    <script src="d3-extensions.js"></script>
+    <script src="projection-defs.js"></script>
+
+    <!-- our code -->
     <script src="errors.js"></script>
 
     <script src="file-handlers.js"></script>

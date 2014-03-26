@@ -78,15 +78,35 @@ OpenDataMap.file.handlers = function(errors, geometries, layers, sources) {
 	    });
 	}),
 
-	shpWithDbf : function() {
-	    var makeBatch = function(shp, dbf) {
+	shapefiles : function() {
+	    var makeBatch = function(shp, dbf, prj) {
+		var files = [
+		    {file: shp, binary: true},
+		    {file: dbf, binary: true}];
+
+		if (prj) {
+		    files.push({file: prj, binary: false});
+		}
+		
 		return OpenDataMap.file.batch(
-		    [{file: shp, binary: true},
-		     {file: dbf, binary: true}],
+		    files,
 		    function(files){
-			var geojson = geometries.fromShapefile(
-			    files.get(shp.name),
-			    files.get(dbf.name));
+			var geojson;
+			
+			if (prj) {
+
+			    geojson = geometries.fromShapefile(
+				files.get(shp.name),
+				files.get(dbf.name),
+				files.get(prj.name));
+			    
+			} else {
+			    errors.informUser("Imported a .shp file without a .prj file. Assuming it uses the WGS84 coordinate system.");
+			    
+			    geojson = geometries.fromShapefile(
+				files.get(shp.name),
+				files.get(dbf.name));
+			}
 			
 			var name = withoutExtension(shp.name);
 			layers.create(name, geojson.features, geojson.bbox);
@@ -98,26 +118,48 @@ OpenDataMap.file.handlers = function(errors, geometries, layers, sources) {
 		tryHandle : function(files) {
 		    var shp = d3.map({});
 		    var dbf = d3.map({});
+		    var prj = d3.map({});
 
 		    files.forEach(function(f){
 			var ext = getExtension(f.name);
+			var name = withoutExtension(f.name);
 			if(ext === "shp") {
-			    shp.set(withoutExtension(f.name), f);
+			    shp.set(name, f);
 			} else if (ext === "dbf") {
-			    dbf.set(withoutExtension(f.name), f);
+			    dbf.set(name, f);
+			} else if (ext === "prj") {
+			    prj.set(name, f);
 			}
 		    });
 
-		    if (shp.length === 1 && dbf.length === 1) {
+		    if (shp.size() === 1 && dbf.size() === 1 &&
+		       (prj.size() < 2)) {
 			/* In the case that we've got one of each type of file,
 			 don't bother trying to match up the filenames. */
-			return[makeBatch(shp.entries[0].value, dbf.entries[0].value)];
+			if (prj.size() === 1) {
+			    return[makeBatch(
+				shp.entries()[0].value,
+				dbf.entries()[0].value,
+				prj.entries()[0].value)];
+			} else {
+			    return[makeBatch(
+				shp.entries()[0].value,
+				dbf.entries()[0].value)];
+			}
+
 		    } else {
 			var batches = [];
 			shp.entries().forEach(function(e){
 			    var shpName = e.key;
 			    if (dbf.has(shpName)) {
-				batches.push(makeBatch(e.value, dbf.get(shpName)));
+				if (prj.has(shpName)) {
+				    batches.push(makeBatch(
+					e.value,
+					dbf.get(shpName),
+					prj.get(shpName)));
+				} else {
+				    batches.push(makeBatch(e.value, dbf.get(shpName)));
+				}
 			    }
 			});
 			return batches;
@@ -137,6 +179,9 @@ OpenDataMap.file.handlers = function(errors, geometries, layers, sources) {
 	dbf: singleText("dbf", null, function(filename, text){
 	    errors.warnUser("Cannot load a dbf file by itself. Please import .dbf and .shp files together: " + filename);
 	}),
+	prj: singleText("prj", null, function(filename, text){
+	    errors.warnUser("Cannot load a prj file by itself. Please import .prj, .dbf and .shp files together: " + filename);
+	}),	
 	
 	fallback : function() {
 	    var h = {

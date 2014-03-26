@@ -25,13 +25,13 @@ var Stamen_TonerBackground = L.tileLayer('http://{s}.tile.stamen.com/toner-backg
     maxZoom: 20
 });
 var Esri_WorldShadedRelief = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}', {
-	attribution: 'Tiles &copy; Esri &mdash; Source: Esri',
-	maxZoom: 13
+    attribution: 'Tiles &copy; Esri &mdash; Source: Esri',
+    maxZoom: 13
 });
 
 
 var map = new L.Map("map")
-	.addLayer(Stamen_TonerBackground)
+	.addLayer(osmLayer)
 	.setView(templeMeads, zoom);
 
 var overlay = d3.select(map.getPanes().overlayPane)
@@ -74,7 +74,7 @@ var log2 = function(n) {
     
 };
 var zoomToLayer = function(l) {
-        if (l.boundingbox()) {
+    if (l.boundingbox()) {
 	var x1 = l.boundingbox()[0],
 	    y1 = l.boundingbox()[1],
 	    x2 = l.boundingbox()[2],
@@ -84,7 +84,10 @@ var zoomToLayer = function(l) {
 	    Math.abs(x1 - x2),
 	    Math.abs(y1 - y2));
 
-	var newZoom = log2(360 / boxSize) + 1.5; 
+	var newZoom = Math.round(
+	    log2(360 / boxSize) + 1.5);
+	console.log("new zoom " + newZoom);
+	console.log("new bounds " + [(y1 + y2) / 2, (x1 + x2) / 2]);
 	
 	map.setView(
 	    L.latLng(
@@ -105,7 +108,7 @@ map.on("viewreset", paint.redrawAll);
 /*
  When we click on a layer in the list of layers,
  get all of the shapes in that layer and select them.
-*/
+ */
 layerSelect.onClick(function(layerName){
     if (!d3.event.shiftKey) {
 	zoomToLayer(layers.get(layerName));
