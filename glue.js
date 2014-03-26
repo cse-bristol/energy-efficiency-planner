@@ -71,8 +71,8 @@ var log2 = function(n) {
     return Math.log(n) / Math.LN2;
     
 };
-layers.layerCreated(function(l){
-    if (l.boundingbox()) {
+var zoomToLayer = function(l) {
+        if (l.boundingbox()) {
 	var x1 = l.boundingbox()[0],
 	    y1 = l.boundingbox()[1],
 	    x2 = l.boundingbox()[2],
@@ -90,7 +90,9 @@ layers.layerCreated(function(l){
 		(x1 + x2) / 2),	    
 	    newZoom);
     }
-
+};
+layers.layerCreated(function(l){
+    zoomToLayer(l);
     selection.select(getLayerObjects(l.name()), false);
 });
 paint.addClickHandler(selection.clickHandler);
@@ -102,6 +104,9 @@ map.on("viewreset", paint.redrawAll);
  get all of the shapes in that layer and select them.
 */
 layerSelect.onClick(function(layerName){
+    if (!d3.event.shiftKey) {
+	zoomToLayer(layers.get(layerName));
+    }
     selection.select(getLayerObjects(layerName), d3.event.shiftKey);
 });
 
