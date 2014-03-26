@@ -61,30 +61,48 @@ var resultsTable = OpenDataMap.resultsTable(d3.select("#results"));
 var colour = OpenDataMap.colour();
 var calculationsDisplay = OpenDataMap.calculationsDisplay(d3.select("#calculations"));
 
+var getLayerObjects = function(layerName) {
+    return d3.select("#map svg g#" + layerName)
+	.selectAll("path");
+};
+
 layers.layerCreated(paint.redrawAll);
+var log2 = function(n) {
+    return Math.log(n) / Math.LN2;
+    
+};
 layers.layerCreated(function(l){
     if (l.boundingbox()) {
-	paint.panAndZoom(l.boundingbox());
+	var x1 = l.boundingbox()[0],
+	    y1 = l.boundingbox()[1],
+	    x2 = l.boundingbox()[2],
+	    y2 = l.boundingbox()[3];
+
+	var boxSize = Math.max(
+	    Math.abs(x1 - x2),
+	    Math.abs(y1 - y2));
+
+	var newZoom = log2(360 / boxSize) + 1.5; 
+	
+	map.setView(
+	    L.latLng(
+		(y1 + y2) / 2,
+		(x1 + x2) / 2),	    
+	    newZoom);
     }
+
+    selection.select(getLayerObjects(l.name()), false);
 });
 paint.addClickHandler(selection.clickHandler);
 
-
-window.onresize = function() {
-    
-    paint.redrawAll();
-};
 map.on("viewreset", paint.redrawAll);
 
 /*
  When we click on a layer in the list of layers,
  get all of the shapes in that layer and select them.
 */
-layerSelect.onClick(function(layerName) {
-    selection.select(
-	d3.select("#map svg g#" + layerName)
-	    .selectAll("path"),
-	d3.event.shiftKey);
+layerSelect.onClick(function(layerName){
+    selection.select(getLayerObjects(layerName), d3.event.shiftKey);
 });
 
 selection.addCallback(function(values, entering, leaving){

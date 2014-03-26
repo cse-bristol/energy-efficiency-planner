@@ -157,9 +157,9 @@ path.selected:hover {
 
 #messages {
     position: fixed;
-    top: 5%;
-    left: 30%;
-    width: 20%;
+    top: 10px;
+    left: 25vw;
+    width: 20vw;
 }
 
 .error {
