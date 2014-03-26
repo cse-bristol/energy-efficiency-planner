@@ -21,10 +21,12 @@ OpenDataMap.colour = function() {
 	}
 	    
 	var min = Math.min(0, d3.min(numeric));
+	var max = Math.max(0, d3.max(numeric));
 	
-	return d3.scale.quantize()
-	    .domain([min, d3.max(numeric)])
-	    .range(colorbrewer.Oranges[9]);
+	return d3.scale.linear()
+	    .domain([min, max])
+	    .range(["blue", "red"])
+	    .interpolate(d3.interpolateLab);
     };
 
     var categorical = d3.scale.category20();
