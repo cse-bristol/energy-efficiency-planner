@@ -61,6 +61,8 @@ var resultsTable = OpenDataMap.resultsTable(d3.select("#results"));
 var colour = OpenDataMap.colour();
 var calculationsDisplay = OpenDataMap.calculationsDisplay(d3.select("#calculations"));
 
+sources.onSourceLoad(worksheet.addSource);
+
 var getLayerObjects = function(layerName) {
     return d3.select("#map svg g#" + layerName)
 	.selectAll("path");
@@ -91,6 +93,7 @@ var zoomToLayer = function(l) {
 	    newZoom);
     }
 };
+
 layers.layerCreated(function(l){
     zoomToLayer(l);
     selection.select(getLayerObjects(l.name()), false);
@@ -116,7 +119,6 @@ selection.addCallback(function(values, entering, leaving){
 });
 
 OpenDataMap.file.drop(d3.select("body"), d3.select("#errors"), handlers.all);
-handlers.onSourceLoad(worksheet.addSource);
 
 resultsTable.headerClicked(worksheet.displayProperty);
 

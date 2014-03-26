@@ -7,6 +7,13 @@ if (!OpenDataMap) {
 }
 
 OpenDataMap.sources = function(errors) {
+    var newSourceCallbacks = [];
+    var sourceLoaded = function(s) {
+	newSourceCallbacks.forEach(function(c){
+	    c(s);
+	});
+    };
+    
     /*
      A source is a table of data.
      It has a list of names.
@@ -35,7 +42,7 @@ OpenDataMap.sources = function(errors) {
     }();
 
     var immutable = function(myProps, myNames, myData, name) {
-	return {
+	var result = {
 	    prototype : OpenDataMap.source,
 	    properties : function() {
 		return myProps;
@@ -69,9 +76,15 @@ OpenDataMap.sources = function(errors) {
 		// no-op
 	    }
 	};
+	sourceLoaded(result);
+	return result;
     };
 
     return {
+	onSourceLoad : function(callback) {
+	    newSourceCallbacks.push(callback);
+	},
+	
 	empty : function() {
 	    return immutable([], [], [], "empty");
 	},
@@ -149,6 +162,8 @@ OpenDataMap.sources = function(errors) {
 	/*
 	 Creates a source which combines a number of other sources.
 	 These sources must not overlap: for a given property and a given name, there must only be one source which provides a value.
+
+	 Creating a combined source does not trigger onSourceLoad callbacks.
 
 	 TODO: support for mutable sources.
 	 */

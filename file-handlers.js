@@ -12,7 +12,6 @@ if (!OpenDataMap.file) {
 
 OpenDataMap.file.handlers = function(errors, geometries, layers, sources) {
     var all = [];
-    var newSourceCallbacks = [];
 
     var withoutExtension = function(filename) {
 	return filename.replace(/\..*$/, '');
@@ -62,19 +61,12 @@ OpenDataMap.file.handlers = function(errors, geometries, layers, sources) {
     var singleTable = function(extension, mime, parser){
 	return singleText(extension, mime, function(filename, text){
 	    var data = parser(text);
-	    var s = sources.fromTable(withoutExtension(filename), data, filename);
-	    newSourceCallbacks.forEach(function(c){
-		c(s);
-	    });
+	    sources.fromTable(withoutExtension(filename), data, filename);
 	});
     };
 
     return {
 	all : all,
-
-	onSourceLoad : function(callback) {
-	    newSourceCallbacks.push(callback);
-	},
 
 	tsv : singleTable("tsv", "test/tab-separated-values", d3.tsv.parse),
 	csv : singleTable("csv", "text/csv", d3.csv.parse),
