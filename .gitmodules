@@ -13,3 +13,6 @@
 [submodule "lib/leaflet"]
 	path = lib/leaflet
 	url = git@github.com:Leaflet/Leaflet.git
+[submodule "lib/proj4js"]
+	path = lib/proj4js
+	url = git@github.com:proj4js/proj4js.git
