@@ -33,6 +33,8 @@ OpenDataMap.file.drop = function(container, errors, handlers){
 	
 	var files = toArray(d3.event.dataTransfer.files);
 
+	errors.informUser("Loading files...");
+
 	handlers.forEach(function(h){
 	    var batches = h.tryHandle(files);
 	    batches.forEach(function(b){

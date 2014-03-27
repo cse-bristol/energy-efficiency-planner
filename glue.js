@@ -29,7 +29,6 @@ var Esri_WorldShadedRelief = L.tileLayer('http://server.arcgisonline.com/ArcGIS/
     maxZoom: 13
 });
 
-
 var map = new L.Map("map")
 	.addLayer(osmLayer)
 	.setView(templeMeads, zoom);
@@ -121,7 +120,7 @@ selection.addCallback(function(values, entering, leaving){
     worksheet.selectionChanged(values, entering, leaving);
 });
 
-OpenDataMap.file.drop(d3.select("body"), d3.select("#errors"), handlers.all);
+OpenDataMap.file.drop(d3.select("body"), errors, handlers.all);
 
 resultsTable.headerClicked(worksheet.displayProperty);
 
