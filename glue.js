@@ -28,6 +28,12 @@ var Esri_WorldShadedRelief = L.tileLayer('http://server.arcgisonline.com/ArcGIS/
     attribution: 'Tiles &copy; Esri &mdash; Source: Esri',
     maxZoom: 13
 });
+var nationalHeatMap = L.tileLayer('http://test-tiles.0d9303a4.cdn.memsites.com/Total%20Heat%20Density/Z{z}/{y}/{x}.png', {
+    attribution: '<a href="http://tools.decc.gov.uk/nationalheatmap/">National Heat Map</a>,',
+    minZoom: 2,
+    maxZoom: 17
+});
+
 
 var map = new L.Map("map")
 	.addLayer(osmLayer)
@@ -39,9 +45,12 @@ var overlay = d3.select(map.getPanes().overlayPane)
 
 L.control.layers(
     {
-	"OpenStreetMap" : osmLayer,
-	"Toner" : Stamen_TonerBackground,
+	"Open Street Map" : osmLayer,
+	"Stamen Toner" : Stamen_TonerBackground,
 	"ESRI Relief": Esri_WorldShadedRelief
+    },
+    {
+	"National Heat Map" : nationalHeatMap
     })
     .addTo(map);
 
