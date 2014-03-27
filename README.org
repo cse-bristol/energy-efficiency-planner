@@ -7,7 +7,8 @@
  5. Build upon other people's shared work.
 
 ** Running
-  * Clone this git repository.
+  * Clone this git repository, then change directory to its root.
+  * git submodule init
   * git submodule update
   * Build leaflet.js (TODO: make this step less annoying)
     * Install node.js (http://nodejs.org/ or sudo aptitude install nodejs)
@@ -17,9 +18,9 @@
     * cd /lib/leaflet
     * jake build
     * cd ../..
-  * Run toTopoJson.py (dependencies listed in file).
-  * Serve the root folder using a web server (python -m SimpleHTTPModule 80).
-  * Open prototype.html in a browser.
+  * python3 toTopoJson.py (dependencies listed in file).
+  * sudo python3 -m http.server 80 &
+  * Open prototype.html in a browser (TODO: change to index.html).
     
 * Technology
 We are drawing the map in D3 using vectors and SVG.
@@ -93,4 +94,4 @@ Once we've generated our geojson, we need to project it into the same format as 
 
 We can then include it when we topojson everything together at the end.
 
-
+gi
