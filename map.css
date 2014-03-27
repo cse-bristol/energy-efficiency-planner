@@ -16,8 +16,11 @@ body {
 }
 
 svg#overlay {
-    width: 100vw;
-    height: 100vh;
+    /* Not working in webkit browser */
+    clip: auto;
+    overflow: visible;
+    width: 200vw;
+    height: 200vh;
 }
 
 path {
