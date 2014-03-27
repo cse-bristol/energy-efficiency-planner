@@ -43,6 +43,10 @@ var overlay = d3.select(map.getPanes().overlayPane)
 	.append("svg")
 	.attr("id", "overlay");
 
+map.addControl(new L.Control.OSMGeocoder({
+    email: "research@cse.org.uk"
+}));
+
 L.control.layers(
     {
 	"Open Street Map" : osmLayer,
