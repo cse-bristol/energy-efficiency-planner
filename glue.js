@@ -2,8 +2,8 @@
 
 /*global d3, L, OpenDataMap*/
 
-var templeMeads = [51.4496909, -2.580629];
-var zoom = 15;
+var startCoordinates = [0, 0];
+var zoom = 2;
 var manifestFile = "data/processed/manifest.json";
 
 var errors = OpenDataMap.errors(d3.select("#messages"));
@@ -37,7 +37,7 @@ var nationalHeatMap = L.tileLayer('http://test-tiles.0d9303a4.cdn.memsites.com/T
 
 var map = new L.Map("map")
 	.addLayer(osmLayer)
-	.setView(templeMeads, zoom);
+	.setView(startCoordinates, zoom);
 
 var overlay = d3.select(map.getPanes().overlayPane)
 	.append("svg")
