@@ -17,6 +17,28 @@ OpenDataMap.layers = function(errors, sources) {
 	});
     };
 
+    var incrementName = function(n) {
+	var accum = function(n, acc) {
+	    if (n.length === 0) {
+		return acc + "A";
+	    } 
+
+	    var len = n.length;
+	    var head = n.slice(0, len - 1);
+	    var tail = n[len - 1];
+
+	    if (tail === "Z") {
+		return accum(head, "A" + acc);
+	    } else {
+		var codeNow = tail.charCodeAt(0);
+		var replacement = String.fromCharCode(codeNow + 1);
+		return head + replacement + acc;
+	    }
+	};
+
+	return accum(n, "");
+    };
+
     var fixGeometryNames = function(geometry) {
 	var chooseNameProp = function (keys) {
 	    var candidates = keys.filter(function(k){
@@ -73,7 +95,12 @@ OpenDataMap.layers = function(errors, sources) {
 	    errors.informUser("No 'Name' property found. Using " + nameProp + " instead.");
 
 	} else {
-	    throw "Could not import layer because it did not have a suitable name or id property.";
+	    var name = "A";
+	    geometry.forEach(function(shape){
+		shape.properties.Name = name;
+		name = incrementName(name);
+	    });
+	    errors.informUser("No 'Name' property found. Inventing names for each shape.");
 	}
     };
     
