@@ -47,7 +47,7 @@ map.addControl(new L.Control.OSMGeocoder({
     email: "research@cse.org.uk"
 }));
 
-L.control.layers(
+var layersControl = L.control.layers(
     {
 	"Open Street Map" : osmLayer,
 	"Stamen Toner" : Stamen_TonerBackground,
@@ -55,8 +55,12 @@ L.control.layers(
     },
     {
 	"National Heat Map" : nationalHeatMap
-    })
-    .addTo(map);
+    });
+
+layersControl.addTo(map);
+layers.layerCreated(function(l){
+    layersControl.addOverlay(l, l.name());
+});
 
 var projectPoint = function(x, y) {
     var point = map.latLngToLayerPoint(new L.LatLng(y, x));
@@ -64,8 +68,15 @@ var projectPoint = function(x, y) {
 };
 var transform = d3.geo.transform({point: projectPoint});
 
-var paint = OpenDataMap.paint(overlay, transform, layers.all);
+var sortedByZ = function() {
+    return layers.enabled().slice(0).sort(function(a, b){
+	return a.options.zIndex - b.options.zIndex;
+    });
+};
+
+var paint = OpenDataMap.paint(overlay, transform, sortedByZ);
 var layerSelect = OpenDataMap.layerSelect(d3.select("#layer-select"), layers);
+
 var selection = OpenDataMap.selection(overlay);
 
 var worksheet = OpenDataMap.worksheet(layers, sources, errors);
@@ -80,7 +91,15 @@ var getLayerObjects = function(layerName) {
 	.selectAll("path");
 };
 
+layers.layerChanged(function(l){
+    /* Must happen before repainting. */
+    if (!l.enabled) {
+	selection.deselect(getLayerObjects(l.name()));
+    }
+});
 layers.layerCreated(paint.redrawAll);
+layers.layerChanged(paint.redrawAll);
+
 var log2 = function(n) {
     return Math.log(n) / Math.LN2;
     
@@ -144,7 +163,3 @@ worksheet.dataChanged(function(){
     calculationsDisplay.update(worksheet.sources());
     colour.paintProperty(worksheet.displayData(time.current()), selection.current());    
 });
-
-OpenDataMap.manifest(manifestFile, errors, loader, geometries, layers, sources);
-
-

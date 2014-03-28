@@ -69,6 +69,26 @@ OpenDataMap.selection = function(container) {
 	    changeSelection(d3Elements, isModification);
 	},
 
+	deselect : function(d3Elements) {
+	    var leaving = [];
+	    
+	    var alreadySelected = d3Elements.filter(function(d, i) {
+		return this.classList.contains("selected");
+	    });
+
+	    alreadySelected.classed("selected", false);
+	    alreadySelected.each(function(d, i){
+		selection.remove(d.properties.name);
+		leaving.push(this);
+	    });
+	    
+	    selectionChangedCallbacks.forEach(function(c){
+		c(selection.values(),
+		  [],
+		  leaving);
+	    });
+	},
+
 	/*
 	 The callback will be called with the arguments selection, entering, leaving whenever the selection changes.
 	 */

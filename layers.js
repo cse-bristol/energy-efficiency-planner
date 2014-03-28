@@ -8,7 +8,14 @@ if (!OpenDataMap) {
 
 OpenDataMap.layers = function(errors, sources) {
     var layers = d3.map([]);
-    var callbacks = [];
+    var createCallbacks = [];
+    var changeCallbacks = [];
+
+    var layerChanged = function(l) {
+	changeCallbacks.forEach(function(c){
+	    c(l);
+	});
+    };
 
     var fixGeometryNames = function(geometry) {
 	var chooseNameProp = function (keys) {
@@ -71,8 +78,10 @@ OpenDataMap.layers = function(errors, sources) {
     };
     
     return {
-	all : function() {
-	    return layers.values();
+	enabled : function() {
+	    return layers.values().filter(function(l){
+		return l.enabled;
+	    });
 	},
 	names : function() {
 	    return layers.keys();
@@ -82,17 +91,17 @@ OpenDataMap.layers = function(errors, sources) {
 	},
 	create : function(name, geometry, boundingbox) {
 	    var layerSources = [];
+
 	    fixGeometryNames(geometry);
 	    
 	    layerSources.push(sources.fromGeometry(geometry, name + ": geometry"));
 	    
 	    var l = {
-
 		name : function() {
 		    return name;
 		},
 
-		boundingbox : function() {
+ 		boundingbox : function() {
 		    return boundingbox;
 		},
 
@@ -108,12 +117,37 @@ OpenDataMap.layers = function(errors, sources) {
 		    return layerSources;
 		},
 
-		/*
-		 Returns whether or not this layer has finished loading its geometry.
+		enabled : true,
+
+		/* 
+		 Functions below here are for compatibility with leaflet.js layers.
 		 */
-		loaded : function() {
-		    return !!geometry;
-		}
+		options : {
+		    zIndex : 0,
+		    opacity : 0.9
+		},
+		
+		setOpacity : function(o) {
+		    l.options.opacity = o;
+		    layerChanged(l);
+		},
+		
+		setZIndex : function(z) {
+		    l.options.zIndex = z;
+		    layerChanged(l);
+		},
+
+		onAdd : function() {
+		    l.enabled = true;
+		    layerChanged(l);
+		},
+
+		onRemove : function() {
+		    l.enabled = false;
+		    layerChanged(l);
+		},
+
+		overlay : true	
 	    };
 
 	    if (layers.has(l.name())) {
@@ -122,7 +156,7 @@ OpenDataMap.layers = function(errors, sources) {
 	    
 	    layers.set(l.name(), l);
 
-	    callbacks.forEach(function(c){
+	    createCallbacks.forEach(function(c){
 		c(l);
 	    });
 	    
@@ -133,7 +167,14 @@ OpenDataMap.layers = function(errors, sources) {
 	 It will be passed the layer as an argument.
 	 */
 	layerCreated : function(callback) {
-	    callbacks.push(callback);
+	    createCallbacks.push(callback);
+	},
+
+	/*
+	 Callbacks passed here will be called with a layer every time some aspect of its physical display changes (opacity, z-index, enabled).
+	 */
+	layerChanged : function(callback) {
+	    changeCallbacks.push(callback);
 	}
     };
 };

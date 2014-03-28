@@ -25,6 +25,9 @@ OpenDataMap.paint = function(container, projection, dataSource) {
 
 	    l.enter().append("g")
 		.classed("leaflet-zoom-hide", true)
+		.style("opacity", function(l){
+		    return l.options.opacity;
+		})
 		.attr("id", function(l) {
 		    return l.name();
 		});
