@@ -41,27 +41,26 @@ OpenDataMap.layers = function(errors, sources) {
 
     var fixGeometryNames = function(geometry) {
 	var chooseNameProp = function (keys) {
+	    var nameProperties = [
+		"name",
+		"nome",
+		"nombre",
+		"id"
+	    ];
+	    
 	    var candidates = keys.filter(function(k){
-		if (k.toLowerCase() === "name") {
-		    return true;
-		} else if (k.toLowerCase() === "id") {
-		    return true;
-		} else {
-		    return false;
-		}
+		return !nameProperties.every(function(p){
+		    return k.toLowerCase() !== p;
+		});
 	    });
 	    if (candidates.length > 0) {
 		return candidates[0];
 	    }
 
 	    candidates = keys.filter(function(k){
-		if (k.toLowerCase().indexOf("name") >= 0) {
-		    return true;
-		} else if (k.toLowerCase().indexOf("id") >= 0) {
-		    return true;
-		} else {
-		    return false;
-		}
+		return !nameProperties.every(function(p){
+		    return k.toLowerCase().indexOf(p) < 0;
+		});
 	    });
 
 	    if (candidates.length > 0) {
