@@ -19,6 +19,6 @@
 [submodule "lib/leaflet-control-osm-geocoder"]
 	path = lib/leaflet-control-osm-geocoder
 	url = git@github.com:k4r573n/leaflet-control-osm-geocoder.git
-[submodule "lib/Leaflet.Control.Layers.Opacity"]
-	path = lib/Leaflet.Control.Layers.Opacity
+[submodule "lib/leaflet-opacity"]
+	path = lib/leaflet-opacity
 	url = git@github.com:cse-bristol/Leaflet.Control.Layers.Opacity.git

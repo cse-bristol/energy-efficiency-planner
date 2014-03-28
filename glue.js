@@ -47,7 +47,7 @@ map.addControl(new L.Control.OSMGeocoder({
     email: "research@cse.org.uk"
 }));
 
-var layersControl = L.control.layers(
+var layersControl = new L.Control.Layers.Opacity(
     {
 	"Open Street Map" : osmLayer,
 	"Stamen Toner" : Stamen_TonerBackground,
@@ -75,6 +75,7 @@ var sortedByZ = function() {
 };
 
 var paint = OpenDataMap.paint(overlay, transform, sortedByZ);
+layersControl.opacityChanged(paint.redrawAll);
 var layerSelect = OpenDataMap.layerSelect(d3.select("#layer-select"), layers);
 
 var selection = OpenDataMap.selection(overlay);

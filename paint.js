@@ -25,14 +25,15 @@ OpenDataMap.paint = function(container, projection, dataSource) {
 
 	    l.enter().append("g")
 		.classed("leaflet-zoom-hide", true)
-		.style("opacity", function(l){
-		    return l.options.opacity;
-		})
 		.attr("id", function(l) {
 		    return l.name();
 		});
 	    
 	    l.exit().remove();
+
+	    l.style("opacity", function(l){
+		return l.options.opacity;
+	    });
 
 	    l.each(function(parentDatum){
 		var p = d3.select(this).selectAll("path")
