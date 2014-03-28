@@ -17,6 +17,7 @@ body {
 
 svg#overlay {
     /* Not working in webkit browser */
+    
     clip: auto;
     overflow: visible;
     width: 200vw;
@@ -168,6 +169,7 @@ path.selected:hover {
     color: red;
     padding: 4px;
     opacity: 0.8;
+    background-color: #C0C0C0;
 }
 
 .info {
@@ -175,4 +177,5 @@ path.selected:hover {
     color: green;
     padding: 4px;
     opacity: 0.8;
+    background-color: #C0C0C0;
 }
