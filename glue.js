@@ -59,6 +59,7 @@ var layersControl = new L.Control.Layers.Opacity(
 
 layersControl.addTo(map);
 layers.layerCreated(function(l){
+    map.addLayer(l);
     layersControl.addOverlay(l, l.name());
 });
 
