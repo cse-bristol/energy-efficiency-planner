@@ -22,7 +22,7 @@ OpenDataMap.worksheet = function(layers, sources, errors) {
     };
 
     var getLayerForShape = function(d) {
-	return layers.get(d.layer);
+	return d.layer;
     };
 
     var addSources = function(newSources) {
@@ -49,7 +49,7 @@ OpenDataMap.worksheet = function(layers, sources, errors) {
 	selectionChanged : function(values, entering, leaving) {
 	    leaving.forEach(function(e){
 		var d = d3.select(e).datum();
-		var name = d.properties.Name;
+		var name = d.key;
 		names.remove(name);
 
 		var layer = getLayerForShape(d);
@@ -61,7 +61,7 @@ OpenDataMap.worksheet = function(layers, sources, errors) {
 
 	    entering.forEach(function(e) {
 		var d = d3.select(e).datum();
-		var name = d.properties.Name;
+		var name = d.key;
 		names.add(name);
 
 		var layer = getLayerForShape(d);

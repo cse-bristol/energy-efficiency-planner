@@ -46,14 +46,8 @@ OpenDataMap.paint = function(container, projection, dataSource) {
 			clickHandlers.forEach(function(h){
 			    h(event, index);
 			});
-		    })
-		    .datum(function(d, i){
-			d.layer = parentDatum.name();
-			return d;
-		    })
-		    .attr("id", function(d, i){
-			return d.properties.Name;
-		    });		
+		    });
+		
 		p.exit().remove();
 		p.attr("d", path);
 	    });

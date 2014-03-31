@@ -26,10 +26,10 @@ OpenDataMap.sources = function(errors) {
 	    properties : function() {
 		throw "Not implemented";
 	    },
-	    names : function() {
+	    ids : function() {
 		throw "Not implemented";
 	    },
-	    data : function(properties, names, time) {
+	    data : function(properties, ids, time) {
 		throw "Not implemented";
 	    },
 	    name : function() {
@@ -41,16 +41,16 @@ OpenDataMap.sources = function(errors) {
 	};
     }();
 
-    var immutable = function(myProps, myNames, myData, name) {
+    var immutable = function(myProps, myIds, layer, myData, name) {
 	var result = {
 	    prototype : OpenDataMap.source,
 	    properties : function() {
 		return myProps;
 	    },
-	    names : function() {
-		return myNames;
+	    ids : function() {
+		return myIds;
 	    },
-	    data : function(properties, names, time) {
+	    data : function(properties, ids, time) {
 		return properties.map(function(p){
 		    var i = myProps.indexOf(p);
 
@@ -58,11 +58,11 @@ OpenDataMap.sources = function(errors) {
 			throw "Unknown property " + p;
 		    }
 		    
-		    return names.map(function(n){
-			var j = myNames.indexOf(n);
+		    return ids.map(function(id){
+			var j = myIds.indexOf(id);
 
 			if (j < 0) {
-			    throw "Unknown name " + n;
+			    throw "Unknown id " + id;
 			}
 
 			return myData[i][j].lookup(time);
@@ -93,13 +93,23 @@ OpenDataMap.sources = function(errors) {
 	 We will use the non-geometric properties to populate our source.
 	 */
 	fromGeometry : function(shapes, name) {
-	    var headers = ["Name"];
+	    var headers = ["layer", "id"];
 	    var headerSet = d3.set(headers);
 
-	    var names = [];
+	    var ids = [];
 
 	    var shapeProperties = shapes.map(function(s){
-		return d3.map(s.properties);
+		var props = d3.map(s.properties);
+		props.set("layer", s.layer.name());
+
+		if (s.id === undefined) {
+		    throw "Imported shape did not have an id property " + s;
+		}
+
+		props.set("id", s.id);
+
+		ids.push(s.id);
+		return props;
 	    });
 
 	    shapeProperties.forEach(function(s){
@@ -109,12 +119,6 @@ OpenDataMap.sources = function(errors) {
 			headers.push(k);
 		    }
 		});
-
-		if (!s.has("Name")) {
-		    throw "Imported shape did not have a Name property " + s;
-		}
-
-		names.push(s.get("Name"));
 	    });
 
 	    var data = headers.map(function(h){
@@ -124,30 +128,30 @@ OpenDataMap.sources = function(errors) {
 		});
 	    });
 	    
-	    return immutable(headers, names, data, name);
+	    return immutable(headers, ids, data, name);
 	},
 	/*
 	 Creates a source which is a single-property that may change over time.
 	 prop is the name of the property.
 	 rows is a list of maps
-	 each row must have a Name property.
+	 each row must have an id property.
 	 a row may have have either a constant property, or a series of dates to values
 	 
 	 Example 1: [{"Name": "my-name", "constant": 5}]
 	 Example 2: [{"Name": "my-name", 2013: 5, 2014: 6, 2015: 7}]
 	 */
 	fromTable : function(prop, rows, name) {
-	    var names = [];
+	    var ids = [];
 	    var data = [];
 
 	    rows.forEach(function(r){
 		var row = d3.map(r);
 		
-		if (!row.has("Name")) {
-		    throw "Row was missing name for property " + prop;
+		if (!row.has("id")) {
+		    throw "Row was missing id for property " + prop;
 		}
 
-		names.push(row.get("Name"));
+		ids.push(row.key);
 
 		if (row.has("constant")) {
 		    data.push(OpenDataMap.timeLookup.constant(row));
@@ -157,7 +161,7 @@ OpenDataMap.sources = function(errors) {
 		}	
 	    });
 
-	    return immutable([prop], names, [data], name);
+	    return immutable([prop], ids, [data], name);
 	},
 	/*
 	 Creates a source which combines a number of other sources.
@@ -193,17 +197,17 @@ OpenDataMap.sources = function(errors) {
 
 		    sources.forEach(function(s){
 			addSource(propertiesCache, s.properties(), s);
-			addSource(namesCache, s.names(), s);
+			addSource(namesCache, s.ids(), s);
 		    });
 		}
 	    };
 	    
 	    return {
 		prototype: source,
-		names : function() {
+		ids : function() {
 		    var result = [];
 		    sources.forEach(function(s){
-			result = result.concat(s.names());
+			result = result.concat(s.ids());
 		    });
 		    return result;
 		},
@@ -214,7 +218,7 @@ OpenDataMap.sources = function(errors) {
 		    });
 		    return result;
 		},
-		data : function(properties, names, time) {
+		data : function(properties, ids, time) {
 		    ensureCache();
 		    
 		    return properties.map(function(p){
@@ -224,12 +228,12 @@ OpenDataMap.sources = function(errors) {
 
 			var propertySources = propertiesCache.get(p);
 
-			return names.map(function(n){
-			    if (!namesCache.has(n)) {
-				throw "Unknown name " + n;
+			return ids.map(function(i){
+			    if (!namesCache.has(i)) {
+				throw "Unknown id " + i;
 			    }
 
-			    var acceptable = namesCache.get(n).filter(function(s){
+			    var acceptable = namesCache.get(i).filter(function(s){
 				return propertySources.indexOf(s) >= 0;
 			    });
 
@@ -238,10 +242,10 @@ OpenDataMap.sources = function(errors) {
 				return "";
 			    } else {
 				if (len > 1) {
-				    errors.warnUser("Combined source " + name + " found too many sources supplying property " + p + " for name + " + n + ": " + acceptable);
+				    errors.warnUser("Combined source " + name + " found too many sources supplying property " + p + " for id + " + i + ": " + acceptable);
 				}
 				var source = lookupSource(acceptable[0]);
-				    return source.data([p], [n], time)[0][0];				
+				    return source.data([p], [i], time)[0][0];				
 			    }
 			});
 		    });

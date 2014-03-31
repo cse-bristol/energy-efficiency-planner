@@ -38,7 +38,7 @@ OpenDataMap.selection = function(container) {
 	    /* Deselect everything that was just clicked on. */
 	    alreadySelected.each(function(d, i){
 		leaving.push(this);
-		selection.remove(d.properties.Name);
+		selection.remove(d.key);
 	    });
 	}
 
@@ -47,7 +47,7 @@ OpenDataMap.selection = function(container) {
 	notAlreadySelected.classed("selected", true);
 	notAlreadySelected.each(function(d, i){
 	    entering.push(this);
-	    selection.set(d.properties.Name, this);
+	    selection.set(d.key, this);
 	});
 	
 	selectionChangedCallbacks.forEach(function(c){
@@ -78,7 +78,7 @@ OpenDataMap.selection = function(container) {
 
 	    alreadySelected.classed("selected", false);
 	    alreadySelected.each(function(d, i){
-		selection.remove(d.properties.name);
+		selection.remove(d.key);
 		leaving.push(this);
 	    });
 	    

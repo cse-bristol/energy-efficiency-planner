@@ -42,10 +42,10 @@ OpenDataMap.layers = function(errors, sources) {
     var fixGeometryNames = function(geometry) {
 	var chooseNameProp = function (keys) {
 	    var nameProperties = [
+		"id",
 		"name",
 		"nome",
-		"nombre",
-		"id"
+		"nombre"
 	    ];
 	    
 	    var candidates = keys.filter(function(k){
@@ -70,11 +70,9 @@ OpenDataMap.layers = function(errors, sources) {
 	    return null;
 	};
 
-	if (geometry.every(function(shape){
-	    return shape.properties.Name;
-	})
-	    || geometry.length === 0) {
-	    return; // No fix required.
+	if (geometry.length === 0) {
+	    errors.warnUser("Tried to Import a geometry layer which contained no shapes.");
+	    return;
 	}
 
 	var candidates = Object.keys(geometry[0].properties);
@@ -89,17 +87,17 @@ OpenDataMap.layers = function(errors, sources) {
 
 	if (nameProp) {
 	    geometry.forEach(function(shape){
-		shape.properties.Name = shape.properties[nameProp];
+		shape.id = shape.properties[nameProp];
 	    });
-	    errors.informUser("No 'Name' property found. Using " + nameProp + " instead.");
+	    errors.informUser("Using " + nameProp + " as id property.");
 
 	} else {
-	    var name = "A";
+	    var id = "A";
 	    geometry.forEach(function(shape){
-		shape.properties.Name = name;
-		name = incrementName(name);
+		shape.id = id;
+		id = incrementName(id);
 	    });
-	    errors.informUser("No 'Name' property found. Inventing names for each shape.");
+	    errors.informUser("No 'id' property found. Inventing names for each shape.");
 	}
     };
     
@@ -119,9 +117,7 @@ OpenDataMap.layers = function(errors, sources) {
 	    var layerSources = [];
 
 	    fixGeometryNames(geometry);
-	    
-	    layerSources.push(sources.fromGeometry(geometry, name + ": geometry"));
-	    
+
 	    var l = {
 		name : function() {
 		    return name;
@@ -131,7 +127,7 @@ OpenDataMap.layers = function(errors, sources) {
 		    return boundingbox;
 		},
 
-		geometry : function(hapes) {
+		geometry : function() {
 		    return geometry;
 		},
 
@@ -174,7 +170,14 @@ OpenDataMap.layers = function(errors, sources) {
 		},
 
 		overlay : true	
-	    };
+	    };	    
+
+	    geometry.forEach(function(g){
+		g.layer = l;
+		g.key = name + "/" + g.id;
+	    });
+	    
+	    layerSources.push(sources.fromGeometry(geometry, name + ": geometry"));
 
 	    if (layers.has(l.name())) {
 		errors.warnUser("Layer with name " + l.name() + " already exists, and will be replaced.");
