@@ -20,11 +20,8 @@ OpenDataMap.colour = function() {
 	    }
 	}
 	    
-	var min = Math.min(0, d3.min(numeric));
-	var max = Math.max(0, d3.max(numeric));
-	
 	return d3.scale.linear()
-	    .domain([min, max])
+	    .domain([d3.min(numeric), d3.max(numeric)])
 	    .range(["blue", "red"])
 	    .interpolate(d3.interpolateLab);
     };
