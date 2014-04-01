@@ -86,8 +86,18 @@ OpenDataMap.layers = function(errors, sources) {
 	var nameProp = chooseNameProp(candidates);
 
 	if (nameProp) {
+	    var ids = d3.set({});
+	    
 	    geometry.forEach(function(shape){
-		shape.id = shape.properties[nameProp];
+		var id = shape.properties[nameProp];
+
+		while (ids.has(id)) {
+		    /* Prevent duplicate names. */
+		    id = incrementName(id);
+		}
+
+		ids.add(id);
+		shape.id = id;
 	    });
 	    errors.informUser("Using " + nameProp + " as id property.");
 
