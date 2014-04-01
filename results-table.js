@@ -30,6 +30,28 @@ OpenDataMap.resultsTable = function(container) {
 	});
     };
 
+    var sort = function(head, body, ordering) {
+	var indices = ordering.properties.map(function(p){
+	    return head.indexOf(p);
+	});
+
+	var len = indices.length;
+	body.sort(function(a, b){
+	    for (var i = 0; i < len; i++) {
+		var direction = ordering.reverse[i] ? -1 : 1;
+		var j = indices[i];
+		if (a[j] > b[j]) {
+		    return 1 * direction;
+		} else if (a[j] < b[j]) {
+		    return -1 * direction;
+		} else {
+		    // No-op, we'll carry on looping.
+		}
+	    }
+	    return 0;
+	});
+    };
+
     var withRounding = function(maybeNumber) {
 	var n = parseFloat(maybeNumber);
 	if (isNaN(n) || !isFinite(maybeNumber)) {
@@ -46,7 +68,9 @@ OpenDataMap.resultsTable = function(container) {
 	 head should be a 1D array.
 	 body should be a 2D array.
 	 */
-	info : function(head, body) {
+	info : function(head, body, ordering) {
+	    var data = transpose(body);
+	    sort(head, data, ordering);
 
 	    var h = tHead.selectAll("th").data(head);
 	    h.exit().remove();
@@ -61,8 +85,19 @@ OpenDataMap.resultsTable = function(container) {
 			h(event, column);
 		    });
 		});
+	    h.each(function(d, i){
+		var j = ordering.properties.indexOf(d);
+		this.sorted = (j >= 0);
+		this.reverse = ordering.reverse[j];
+	    })
+	    .classed("sorted", function(d, i){
+		return this.sorted;
+	    })
+	    .classed("reverse", function(d, i){
+		return this.reverse;
+	    });
 
-	    var tr = tBody.selectAll("tr").data(transpose(body));
+	    var tr = tBody.selectAll("tr").data(data);
 	    tr.enter().append("tr");
 	    tr.exit().remove();
 	    var td = tr.selectAll("td").data(function(d, i){
@@ -79,6 +114,6 @@ OpenDataMap.resultsTable = function(container) {
 	}
     };
 
-    module.info([], []);
+    module.info([], [], {properties: [], reverse: []});
     return module;
 };

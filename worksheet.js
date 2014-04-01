@@ -10,7 +10,9 @@ if (!OpenDataMap) {
  Holds the names of the currently selected geometry, along with whichever sources are being used with it.
 */
 OpenDataMap.worksheet = function(layers, sources, errors) {
-    var displayProperty = null;
+    var sortProperties = [];
+    var reverseSort = [];
+
     var source = sources.combined([], "selected-sources");
     var names = d3.set([]);
     var layersByName = d3.map({});
@@ -72,32 +74,59 @@ OpenDataMap.worksheet = function(layers, sources, errors) {
 		}
 	    });
 
-	    if (source.properties().indexOf(displayProperty) < 0) {
-		displayProperty = null;
-	    }
+	    var keepProperties = source.properties();
+	    sortProperties = sortProperties.filter(function(property){
+		return keepProperties.indexOf(property) >= 0;
+
+	    });
 
 	    changed();
 	},
 
 	allData : function(time) {
-	    return source.data(source.properties(), names.values(), time);
+	    var data = source.data(source.properties(), names.values(), time);
+	    return data;
 	},
 
 	propertyNames : function() {
 	    return source.properties();
 	},
 
-	displayProperty : function(property) {
-	    if (property) {
-		displayProperty = property;
+	sortProperty : function(property, additional) {
+		var i = sortProperties.indexOf(property);
+		if (i >= 0) {
+		    if (additional) {
+			/* reverse this property */
+			reverseSort[i] = !reverseSort[i];
+		    } else {
+			/* sort on just this property, reversed  */
+			sortProperties = [property];
+			reverseSort = [!reverseSort[i]];
+		    }
+		} else {
+		    if (additional) {
+			/* add new property with normal sort  */
+			sortProperties.push(property);
+			reverseSort.push(false);
+		    } else {
+			/* sort on just this property */
+			sortProperties = [property];
+			reverseSort = [false];
+		    }
+		}
 		changed();
-	    }
-	    return displayProperty;
+	},
+
+	getSortProperties : function() {
+	    return {
+		"properties" : sortProperties, 
+		"reverse" : reverseSort
+	    };
 	},
 
 	displayData : function(time) {
-	    if (displayProperty) {
-		return source.data([displayProperty], names.values(), time)[0];
+	    if (sortProperties.length > 0) {
+		return source.data([sortProperties[0]], names.values(), time)[0];
 	    } else {
 		return [];
 	    }

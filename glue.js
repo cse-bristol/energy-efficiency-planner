@@ -155,12 +155,14 @@ selection.addCallback(function(values, entering, leaving){
 
 OpenDataMap.file.drop(d3.select("body"), errors, handlers.all);
 
-resultsTable.headerClicked(worksheet.displayProperty);
+resultsTable.headerClicked(function(h){
+    worksheet.sortProperty(h, d3.event.shiftKey);
+});
 
 time.onChange(worksheet.timeChanged);
 
 worksheet.dataChanged(function(){
-    resultsTable.info(worksheet.propertyNames(), worksheet.allData(time.current()));
+    resultsTable.info(worksheet.propertyNames(), worksheet.allData(time.current()), worksheet.getSortProperties());
     calculationsDisplay.update(worksheet.sources());
     colour.paintProperty(worksheet.displayData(time.current()), selection.current());    
 });

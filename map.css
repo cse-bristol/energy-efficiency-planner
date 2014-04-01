@@ -121,11 +121,21 @@ path.selected:hover {
 
 #results table thead tr th, #results table tbody tr td {
     border-bottom: 1px solid gray;    
-    padding: 0.1em 0.4em 0.1em 0.4em;
+    padding: 0.1em 0.6em 0.1em 1.2em;
     max-width: 15em;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+th.sorted {
+    background-repeat:no-repeat;
+    background-image:url('img/down.svg');
+}
+
+th.reverse {
+    background-repeat:no-repeat;
+    background-image:url('img/up.svg');
 }
 
 #results table thead tr th:hover {
