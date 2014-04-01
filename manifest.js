@@ -44,8 +44,7 @@ OpenDataMap.manifest = function(file, errors, loader, geometry, layers, sources)
 			    }
 
 			    layer.addSource(
-				sources.fromTable(prop, data, layerName + ": " + prop)
-			    );
+				sources.fromTable(prop, data, layerName + ": " + prop, layer));
 			});
 		    };
 		});

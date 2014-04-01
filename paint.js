@@ -8,26 +8,23 @@ if (!OpenDataMap) {
 
 OpenDataMap.paint = function(container, projection, dataSource) {
     var path = d3.geo.path()
-	    .projection(projection);
+	.projection(projection);
     
     var clickHandlers = [];
     
     var module = {
 	/*
-	 Pass in a function to be called every time a geometry path on the map is clicked.
-	 */
+	  Pass in a function to be called every time a geometry path on the map is clicked.
+	*/
 	addClickHandler : function(clickHandler) {
 	    clickHandlers.push(clickHandler);
 	},
 	redrawAll : function() {
 	    var l = container.selectAll("g")
-		    .data(dataSource);
+		.data(dataSource);
 
 	    l.enter().append("g")
-		.classed("leaflet-zoom-hide", true)
-		.attr("id", function(l) {
-		    return l.name();
-		});
+		.classed("leaflet-zoom-hide", true);
 	    
 	    l.exit().remove();
 
@@ -35,11 +32,15 @@ OpenDataMap.paint = function(container, projection, dataSource) {
 		return l.options.opacity;
 	    });
 
+	    l.attr("id", function(l) {
+		return l.name();
+	    });
+
 	    l.each(function(parentDatum){
 		var p = d3.select(this).selectAll("path")
-			.data(function(l) {
-			    return l.geometry();
-			});
+		    .data(function(l) {
+			return l.geometry();
+		    });
 
 		p.enter().append("path")
 		    .on("click", function(event, index) {

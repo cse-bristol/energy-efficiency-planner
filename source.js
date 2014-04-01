@@ -29,7 +29,7 @@ OpenDataMap.sources = function(errors) {
 	    ids : function() {
 		throw "Not implemented";
 	    },
-	    data : function(properties, ids, time) {
+	    data : function(properties, keys, time) {
 		throw "Not implemented";
 	    },
 	    name : function() {
@@ -41,7 +41,7 @@ OpenDataMap.sources = function(errors) {
 	};
     }();
 
-    var immutable = function(myProps, myIds, layer, myData, name) {
+    var immutable = function(myProps, myIds, myLayer, myData, name) {
 	var result = {
 	    prototype : OpenDataMap.source,
 	    properties : function() {
@@ -50,7 +50,10 @@ OpenDataMap.sources = function(errors) {
 	    ids : function() {
 		return myIds;
 	    },
-	    data : function(properties, ids, time) {
+	    layer : function() {
+		return myLayer;
+	    },
+	    data : function(properties, keys, time) {
 		return properties.map(function(p){
 		    var i = myProps.indexOf(p);
 
@@ -58,7 +61,14 @@ OpenDataMap.sources = function(errors) {
 			throw "Unknown property " + p;
 		    }
 		    
-		    return ids.map(function(id){
+		    return keys.map(function(key){
+			var layerName = key.split("/")[0],
+			    id = key.split("/")[1];
+
+			if (myLayer && myLayer.name() !== layerName) {
+			    throw "Requested data for layer " + layerName + ", from source " + name + " which only provides data for layer " + myLayer.name();
+			}
+			
 			var j = myIds.indexOf(id);
 
 			if (j < 0) {
@@ -92,7 +102,8 @@ OpenDataMap.sources = function(errors) {
 	 Shapes is a deserialized geoJSON representation of some feature.
 	 We will use the non-geometric properties to populate our source.
 	 */
-	fromGeometry : function(shapes, name) {
+	fromGeometry : function(shapes, layer) {
+	    var name = layer.name() + ": geometry";
 	    var headers = ["layer", "id"];
 	    var headerSet = d3.set(headers);
 
@@ -128,7 +139,7 @@ OpenDataMap.sources = function(errors) {
 		});
 	    });
 	    
-	    return immutable(headers, ids, data, name);
+	    return immutable(headers, ids, layer, data, name);
 	},
 	/*
 	 Creates a source which is a single-property that may change over time.
@@ -136,11 +147,13 @@ OpenDataMap.sources = function(errors) {
 	 rows is a list of maps
 	 each row must have an id property.
 	 a row may have have either a constant property, or a series of dates to values
+
+	 layer is an optional layer made with OpenDataMap.layers.create(). It restricts this table to only providing data for that layer.
 	 
 	 Example 1: [{"Name": "my-name", "constant": 5}]
 	 Example 2: [{"Name": "my-name", 2013: 5, 2014: 6, 2015: 7}]
 	 */
-	fromTable : function(prop, rows, name) {
+	fromTable : function(prop, rows, name, layer) {
 	    var ids = [];
 	    var data = [];
 
@@ -156,12 +169,12 @@ OpenDataMap.sources = function(errors) {
 		if (row.has("constant")) {
 		    data.push(OpenDataMap.timeLookup.constant(row));
 		} else {
-		    row.remove("Name");
+		    row.remove("id");
 		    data.push(OpenDataMap.timeLookup.series(row));
 		}	
 	    });
 
-	    return immutable([prop], ids, [data], name);
+	    return immutable([prop], ids, layer, [data], name);
 	},
 	/*
 	 Creates a source which combines a number of other sources.
@@ -172,8 +185,12 @@ OpenDataMap.sources = function(errors) {
 	 TODO: support for mutable sources.
 	 */
 	combined : function(sources, name) {
-	    var propertiesCache = null;
-	    var namesCache = null;
+	    /*
+	     * Keys are id + layer. We'll try to look those up first, then fall back to just ids.
+	     */
+	    var propertiesCache = null,
+		keysCache = null,
+		idsCache = null;
 
 	    var lookupSource = function(sourceName) {
 		return sources.filter(function(s){
@@ -193,11 +210,19 @@ OpenDataMap.sources = function(errors) {
 		
 		if (!propertiesCache) {
 		    propertiesCache = d3.map({});
-		    namesCache = d3.map({});
+		    keysCache = d3.map({});
+		    idsCache = d3.map({});
 
 		    sources.forEach(function(s){
 			addSource(propertiesCache, s.properties(), s);
-			addSource(namesCache, s.ids(), s);
+			if (s.layer()) {
+			    var l = s.layer().name();
+			    addSource(keysCache, s.ids().map(function(id){
+				return l + "/" + id;
+			    }), s);
+			} else {
+			    addSource(idsCache, s.ids(), s);
+			}
 		    });
 		}
 	    };
@@ -218,7 +243,23 @@ OpenDataMap.sources = function(errors) {
 		    });
 		    return result;
 		},
-		data : function(properties, ids, time) {
+		data : function(properties, keys, time) {
+		    var tryFindSource = function(cache, key, propertySources) {
+			if (cache.has(key)) {
+			    var found = cache.get(key).filter(function(s){
+				return propertySources.indexOf(s) >= 0;
+			    });
+
+			    if (found.length > 0) {
+				return lookupSource(found[0]);
+			    } else {
+				return null;
+			    }
+			} else {
+			    return null;
+			}
+		    };
+
 		    ensureCache();
 		    
 		    return properties.map(function(p){
@@ -228,25 +269,16 @@ OpenDataMap.sources = function(errors) {
 
 			var propertySources = propertiesCache.get(p);
 
-			return ids.map(function(i){
-			    if (!namesCache.has(i)) {
-				throw "Unknown id " + i;
-			    }
+			return keys.map(function(key){
+			    var id = key.split("/")[1];
+			    var source = tryFindSource(keysCache, key, propertySources)
+				    || tryFindSource(idsCache, id, propertySources);
 
-			    var acceptable = namesCache.get(i).filter(function(s){
-				return propertySources.indexOf(s) >= 0;
-			    });
-
-			    var len = acceptable.length;
-			    if (len == 0) {
+			    if (!source) {
 				return "";
-			    } else {
-				if (len > 1) {
-				    errors.warnUser("Combined source " + name + " found too many sources supplying property " + p + " for id + " + i + ": " + acceptable);
-				}
-				var source = lookupSource(acceptable[0]);
-				    return source.data([p], [i], time)[0][0];				
 			    }
+
+			    return source.data([p], [key], time)[0][0];
 			});
 		    });
 		},

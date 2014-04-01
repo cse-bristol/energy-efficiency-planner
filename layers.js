@@ -187,7 +187,7 @@ OpenDataMap.layers = function(errors, sources) {
 		g.key = name + "/" + g.id;
 	    });
 	    
-	    layerSources.push(sources.fromGeometry(geometry, name + ": geometry"));
+	    layerSources.push(sources.fromGeometry(geometry, l));
 
 	    if (layers.has(l.name())) {
 		errors.warnUser("Layer with name " + l.name() + " already exists, and will be replaced.");

@@ -93,14 +93,17 @@ var getLayerObjects = function(layerName) {
 	.selectAll("path");
 };
 
+layers.layerCreated(function(l){
+    paint.redrawAll();
+    zoomToLayer(l);
+    selection.select(getLayerObjects(l.name()), false);
+});
 layers.layerChanged(function(l){
-    /* Must happen before repainting. */
     if (!l.enabled) {
 	selection.deselect(getLayerObjects(l.name()));
     }
+    paint.redrawAll();
 });
-layers.layerCreated(paint.redrawAll);
-layers.layerChanged(paint.redrawAll);
 
 var log2 = function(n) {
     return Math.log(n) / Math.LN2;
@@ -130,10 +133,6 @@ var zoomToLayer = function(l) {
     }
 };
 
-layers.layerCreated(function(l){
-    zoomToLayer(l);
-    selection.select(getLayerObjects(l.name()), false);
-});
 paint.addClickHandler(selection.clickHandler);
 
 map.on("viewreset", paint.redrawAll);
