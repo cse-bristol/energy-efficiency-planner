@@ -29,6 +29,15 @@ OpenDataMap.resultsTable = function(container) {
 	    });
 	});
     };
+
+    var withRounding = function(maybeNumber) {
+	var n = parseFloat(maybeNumber);
+	if (isNaN(n) || !isFinite(maybeNumber)) {
+	    return maybeNumber;
+	} else {
+	    return +n.toFixed(2);
+	}
+    };
     
     var module = {
 
@@ -62,7 +71,7 @@ OpenDataMap.resultsTable = function(container) {
 
 	    td.enter().append("td");
 	    td.exit().remove();
-	    td.html(d3.identity);
+	    td.html(withRounding);
 	},
 
 	headerClicked : function(clickHandler) {
