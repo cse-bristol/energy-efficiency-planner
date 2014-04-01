@@ -158,6 +158,10 @@ OpenDataMap.file.drop(d3.select("body"), errors, handlers.all);
 resultsTable.headerClicked(function(h){
     worksheet.sortProperty(h, d3.event.shiftKey);
 });
+resultsTable.rowClicked(function(head, row){
+    var shape = d3.select("g#" + row[0] + " path#" + row[1]);
+    selection.select(shape, d3.event.shiftKey);
+});
 
 time.onChange(worksheet.timeChanged);
 

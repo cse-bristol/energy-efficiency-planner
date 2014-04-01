@@ -16,7 +16,8 @@ OpenDataMap.resultsTable = function(container) {
     var table = container.append("table");
     var tHead = table.append("thead").append("tr");
     var tBody = table.append("tbody");
-    var clickHandlers = [];
+    var rowHandlers = [];
+    var headHandlers = [];
 
     var transpose = function(arr){
 	if (arr.length === 0) {
@@ -81,7 +82,7 @@ OpenDataMap.resultsTable = function(container) {
 			return row[index];
 		    });
 		    
-		    clickHandlers.forEach(function(h){
+		    headHandlers.forEach(function(h){
 			h(event, column);
 		    });
 		});
@@ -90,16 +91,22 @@ OpenDataMap.resultsTable = function(container) {
 		this.sorted = (j >= 0);
 		this.reverse = ordering.reverse[j];
 	    })
-	    .classed("sorted", function(d, i){
-		return this.sorted;
-	    })
-	    .classed("reverse", function(d, i){
-		return this.reverse;
-	    });
+		.classed("sorted", function(d, i){
+		    return this.sorted;
+		})
+		.classed("reverse", function(d, i){
+		    return this.reverse;
+		});
 
 	    var tr = tBody.selectAll("tr").data(data);
 	    tr.enter().append("tr");
 	    tr.exit().remove();
+	    tr.on("click", function(event, index){
+		rowHandlers.forEach(function(h){
+		    h(head, event);
+		});
+	    });
+
 	    var td = tr.selectAll("td").data(function(d, i){
 		return d;
 	    });
@@ -109,8 +116,12 @@ OpenDataMap.resultsTable = function(container) {
 	    td.html(withRounding);
 	},
 
-	headerClicked : function(clickHandler) {
-	    clickHandlers.push(clickHandler);
+	headerClicked : function(callback) {
+	    headHandlers.push(callback);
+	},
+
+	rowClicked : function(callback) {
+	    rowHandlers.push(callback);
 	}
     };
 

@@ -50,7 +50,10 @@ OpenDataMap.paint = function(container, projection, dataSource) {
 		    });
 		
 		p.exit().remove();
-		p.attr("d", path);
+		p.attr("d", path)
+		.attr("id", function(d, i){
+		    return d.id;
+		});
 	    });
 	}
     };

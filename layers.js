@@ -17,6 +17,11 @@ OpenDataMap.layers = function(errors, sources) {
 	});
     };
 
+    var stripRegex = new RegExp(" ", "g");
+    var stripSpaces = function(s) {
+	return s.replace(stripRegex, "_");
+    };
+
     var incrementName = function(n) {
 	var accum = function(n, acc) {
 	    if (n.length === 0) {
@@ -89,7 +94,7 @@ OpenDataMap.layers = function(errors, sources) {
 	    var ids = d3.set({});
 	    
 	    geometry.forEach(function(shape){
-		var id = shape.properties[nameProp];
+		var id = stripSpaces(shape.properties[nameProp]);
 
 		while (ids.has(id)) {
 		    /* Prevent duplicate names. */
@@ -123,7 +128,8 @@ OpenDataMap.layers = function(errors, sources) {
 	get : function(name) {
 	    return layers.get(name);
 	},
-	create : function(name, geometry, boundingbox) {
+	create : function(namePreference, geometry, boundingbox) {
+	    var name = stripSpaces(namePreference);
 	    var layerSources = [];
 
 	    fixGeometryNames(geometry);
