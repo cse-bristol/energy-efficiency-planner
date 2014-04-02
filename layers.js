@@ -10,6 +10,7 @@ OpenDataMap.layers = function(errors, sources) {
     var layers = d3.map([]);
     var createCallbacks = [];
     var changeCallbacks = [];
+    var removeCallbacks = [];
 
     var layerChanged = function(l) {
 	changeCallbacks.forEach(function(c){
@@ -207,6 +208,17 @@ OpenDataMap.layers = function(errors, sources) {
 	    
 	    return l;
 	},
+
+	remove : function(layer) {
+	    if(layer && layer.name && layers.has(layer.name())) {
+		layers.remove(layer.name());
+
+		removeCallbacks.forEach(function(c){
+		    c(layer);
+		});
+	    }
+	},
+
 	/*
 	 callback is a function which will be called every time a new layer is created.
 	 It will be passed the layer as an argument.
@@ -220,6 +232,10 @@ OpenDataMap.layers = function(errors, sources) {
 	 */
 	layerChanged : function(callback) {
 	    changeCallbacks.push(callback);
+	},
+
+	layerRemoved : function(callback) {
+	    removeCallbacks.push(callback);
 	}
     };
 };

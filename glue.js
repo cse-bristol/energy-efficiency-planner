@@ -39,6 +39,10 @@ var map = new L.Map("map")
 	.addLayer(osmLayer)
 	.setView(startCoordinates, zoom);
 
+map.on('layerremove', function(event){
+    layers.remove(event.layer);
+});
+
 var overlay = d3.select(map.getPanes().overlayPane)
 	.append("svg")
 	.attr("id", "overlay");
@@ -47,7 +51,10 @@ map.addControl(new L.Control.OSMGeocoder({
     email: "research@cse.org.uk"
 }));
 
-var layersControl = new L.Control.Layers.Opacity(
+var layerOpacity = L.Control.Layers.Opacity();
+var layerOrder = L.Control.Layers.Order();
+var layerDelete = L.Control.Layers.Delete(map);
+var layersControl = new L.Control.Layers.Extensible(
     {
 	"Open Street Map" : osmLayer,
 	"Stamen Toner" : Stamen_TonerBackground,
@@ -55,6 +62,11 @@ var layersControl = new L.Control.Layers.Opacity(
     },
     {
 	"National Heat Map" : nationalHeatMap
+    },
+    {
+	hooks : [layerDelete, layerOpacity],
+	baseHooks : [],
+	overlayHooks : [layerOrder]
     });
 
 layersControl.addTo(map);
@@ -76,7 +88,9 @@ var sortedByZ = function() {
 };
 
 var paint = OpenDataMap.paint(overlay, transform, sortedByZ);
-layersControl.opacityChanged(paint.redrawAll);
+layerOpacity.opacityChanged(paint.redrawAll);
+layerOrder.orderChanged(paint.redrawAll);
+
 var layerSelect = OpenDataMap.layerSelect(d3.select("#layer-select"), layers);
 
 var selection = OpenDataMap.selection(overlay);
@@ -103,6 +117,10 @@ layers.layerChanged(function(l){
     if (!l.enabled) {
 	selection.deselect(getLayerObjects(l.name()));
     }
+    paint.redrawAll();
+});
+layers.layerRemoved(function(l){
+    selection.deselect(getLayerObjects(l.name()));    
     paint.redrawAll();
 });
 
