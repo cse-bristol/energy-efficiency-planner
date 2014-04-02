@@ -108,9 +108,11 @@ path.selected:hover {
 #worksheet {
     position: fixed;
     top: 20px;
-    left: 50vw;
-    max-height: 95vh;
-    max-width: 45vw;
+    left: 49vw;
+    max-height: 93vh;
+    min-height: 40px;
+    max-width: 46vw;
+    min-width: 40px;
     overflow: auto;
     background-color: #F0F0F0;
     opacity: 0.8;
@@ -119,7 +121,7 @@ path.selected:hover {
 }
 
 #worksheet:hover {
-    opacity: 1.0;
+    opacity: 0.9;
 }
 
 #results table {

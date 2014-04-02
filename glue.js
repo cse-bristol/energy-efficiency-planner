@@ -172,17 +172,7 @@ worksheet.dataChanged(function(){
     colour.paintProperty(worksheet.displayData(time.current()), selection.current());    
 });
 
-var drag = d3.behavior.drag()
-	.origin(function(d){
-	    var el = d3.select(this);
-	    return {
-		"x" : parseInt(el.style("left")),
-		"y" : parseInt(el.style("top"))
-	    };
-	})
-	.on("drag", function(d){
-	    d3.select(this)
-		.style("top", d3.event.y + "px")
-		.style("left", d3.event.x + "px");
-	});
-d3.select("#worksheet").call(drag);
+
+d3.select("#worksheet")
+    .call(OpenDataMap.floatingDialogue().drag)
+    .call(OpenDataMap.floatingDialogue().resize);
