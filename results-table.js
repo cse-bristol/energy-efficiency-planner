@@ -31,6 +31,15 @@ OpenDataMap.resultsTable = function(container) {
 	});
     };
 
+    var maybeNumber = function(n) {
+	var num = parseFloat(n);
+	if (isNaN(num) || !isFinite(n)) {
+	    return n;
+	} else {
+	    return num;
+	}
+    };
+
     var sort = function(head, body, ordering) {
 	var indices = ordering.properties.map(function(p){
 	    return head.indexOf(p);
@@ -41,9 +50,12 @@ OpenDataMap.resultsTable = function(container) {
 	    for (var i = 0; i < len; i++) {
 		var direction = ordering.reverse[i] ? -1 : 1;
 		var j = indices[i];
-		if (a[j] > b[j]) {
+		var first = maybeNumber(a[j]);
+		var second = maybeNumber(b[j]);
+		
+		if (first > second) {
 		    return 1 * direction;
-		} else if (a[j] < b[j]) {
+		} else if (first < second) {
 		    return -1 * direction;
 		} else {
 		    // No-op, we'll carry on looping.
