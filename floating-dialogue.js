@@ -22,6 +22,19 @@ OpenDataMap.floatingDialogue = function() {
 		    .style("left", d3.event.x + "px");
 	    }),
 
+	close : function(container) {
+	    container.append("span")
+		.style("font-size", "large")
+		.style("position", "absolute")
+		.style("top", "5px")
+		.style("right", "5px")
+		.style("opacity", "0.6")
+		.html("❌")
+		.on("click", function(d, i){
+		    container.style("display", "none");
+		});
+	},
+
 	resize : function(container) {
 	    var dragHandle = d3.behavior.drag()
 		    .origin(function(d){
@@ -48,4 +61,4 @@ OpenDataMap.floatingDialogue = function() {
 		.call(dragHandle);
 	}
     };
-};
+}();

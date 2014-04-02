@@ -174,5 +174,6 @@ worksheet.dataChanged(function(){
 
 
 d3.select("#worksheet")
-    .call(OpenDataMap.floatingDialogue().drag)
-    .call(OpenDataMap.floatingDialogue().resize);
+    .call(OpenDataMap.floatingDialogue.drag)
+    .call(OpenDataMap.floatingDialogue.resize);
+//    .call(OpenDataMap.floatingDialogue.close);
