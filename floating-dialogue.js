@@ -43,6 +43,7 @@ OpenDataMap.floatingDialogue = function() {
 		.style("position", "absolute")
 		.style("bottom", "5px")
 		.style("right", "5px")
+		.style("opacity", "0.6")
 		.html("⇲")
 		.call(dragHandle);
 	}
