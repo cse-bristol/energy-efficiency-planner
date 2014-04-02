@@ -164,7 +164,7 @@ OpenDataMap.sources = function(errors) {
 		    throw "Row was missing id for property " + prop;
 		}
 
-		ids.push(row.key);
+		ids.push(row.get("id"));
 
 		if (row.has("constant")) {
 		    data.push(OpenDataMap.timeLookup.constant(row));
