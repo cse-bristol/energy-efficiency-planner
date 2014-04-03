@@ -28,6 +28,9 @@ var Esri_WorldShadedRelief = L.tileLayer('http://server.arcgisonline.com/ArcGIS/
     attribution: 'Tiles &copy; Esri &mdash; Source: Esri',
     maxZoom: 13
 });
+var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+});
 var nationalHeatMap = L.tileLayer('http://test-tiles.0d9303a4.cdn.memsites.com/Total%20Heat%20Density/Z{z}/{y}/{x}.png', {
     attribution: '<a href="http://tools.decc.gov.uk/nationalheatmap/">National Heat Map</a>,',
     minZoom: 2,
@@ -58,7 +61,8 @@ var layersControl = new L.Control.Layers.Extensible(
     {
 	"Open Street Map" : osmLayer,
 	"Stamen Toner" : Stamen_TonerBackground,
-	"ESRI Relief": Esri_WorldShadedRelief
+	"ESRI Relief": Esri_WorldShadedRelief,
+	"ESRI World Imagery" : Esri_WorldImagery
     },
     {
 	"National Heat Map" : nationalHeatMap
@@ -89,7 +93,11 @@ var sortedByZ = function() {
 
 var paint = OpenDataMap.paint(overlay, transform, sortedByZ);
 layerOpacity.opacityChanged(paint.redrawAll);
-layerOrder.orderChanged(paint.redrawAll);
+
+layerOrder.orderChanged(function(){
+    layerOrder.orderChanged(paint.redrawAll);
+    colour.paintProperty(worksheet.displayData(time.current()), selection.current());
+});
 
 var layerSelect = OpenDataMap.layerSelect(d3.select("#layer-select"), layers);
 
@@ -187,7 +195,7 @@ time.onChange(worksheet.timeChanged);
 worksheet.dataChanged(function(){
     resultsTable.info(worksheet.propertyNames(), worksheet.allData(time.current()), worksheet.getSortProperties());
     calculationsDisplay.update(worksheet.sources());
-    colour.paintProperty(worksheet.displayData(time.current()), selection.current());    
+    colour.paintProperty(worksheet.displayData(time.current()), selection.current());
 });
 
 
