@@ -13,6 +13,15 @@ OpenDataMap.sources = function(errors) {
 	    c(s);
 	});
     };
+
+    var makeKey = function(keyStr) {
+	var parts = keyStr.split("/");
+	
+	return {
+	    layer: parts[0],
+	    id: parts.slice(1).join("/")
+	};
+    };
     
     /*
      A source is a table of data.
@@ -61,9 +70,10 @@ OpenDataMap.sources = function(errors) {
 			throw "Unknown property " + p;
 		    }
 		    
-		    return keys.map(function(key){
-			var layerName = key.split("/")[0],
-			    id = key.split("/")[1];
+		    return keys.map(function(keyStr){
+			var k = makeKey(keyStr),
+			    layerName = k.layer,
+			    id = k.id;
 
 			if (myLayer && myLayer.name() !== layerName) {
 			    throw "Requested data for layer " + layerName + ", from source " + name + " which only provides data for layer " + myLayer.name();
@@ -269,16 +279,17 @@ OpenDataMap.sources = function(errors) {
 
 			var propertySources = propertiesCache.get(p);
 
-			return keys.map(function(key){
-			    var id = key.split("/")[1];
-			    var source = tryFindSource(keysCache, key, propertySources)
+			return keys.map(function(keyStr){
+			    var k = makeKey(keyStr);
+			    var id = k.id;
+			    var source = tryFindSource(keysCache, keyStr, propertySources)
 				    || tryFindSource(idsCache, id, propertySources);
 
 			    if (!source) {
 				return "";
 			    }
 
-			    return source.data([p], [key], time)[0][0];
+			    return source.data([p], [keyStr], time)[0][0];
 			});
 		    });
 		},
