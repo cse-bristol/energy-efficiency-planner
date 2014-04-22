@@ -55,7 +55,7 @@ OpenDataMap.file.drop = function(container, errors, handlers){
 		    };
 		    
 		    if (f.binary) {
-			reader.readAsBinaryString(file);
+			reader.readAsArrayBuffer(file);
 		    } else {
 			reader.readAsText(file);
 		    }
