@@ -103,7 +103,7 @@ var layerSelect = OpenDataMap.layerSelect(d3.select("#layer-select"), layers);
 
 var selection = OpenDataMap.selection(overlay);
 
-var worksheet = OpenDataMap.worksheet(layers, sources, errors);
+var worksheet = OpenDataMap.worksheet(d3.select("#worksheet"), layers, sources, errors);
 var resultsTable = OpenDataMap.resultsTable(d3.select("#results"));
 var colour = OpenDataMap.colour();
 var calculationsDisplay = OpenDataMap.calculationsDisplay(d3.select("#calculations"));

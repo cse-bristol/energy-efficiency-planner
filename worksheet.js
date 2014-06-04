@@ -9,7 +9,7 @@ if (!OpenDataMap) {
 /*
  Holds the names of the currently selected geometry, along with whichever sources are being used with it.
 */
-OpenDataMap.worksheet = function(layers, sources, errors) {
+OpenDataMap.worksheet = function(el, layers, sources, errors) {
     var sortProperties = [];
     var reverseSort = [];
 
@@ -45,7 +45,12 @@ OpenDataMap.worksheet = function(layers, sources, errors) {
 	callbacks.forEach(function(c){
 	    c();
 	});
+
+	el.classed("hidden", source.sources().length === 0);
     };
+
+    /* Ensure everything is set up in the empty state. */
+    changed();
     
     return {
 	selectionChanged : function(values, entering, leaving) {

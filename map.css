@@ -120,6 +120,10 @@ path.selected:hover {
     font-size: x-small;
 }
 
+#worksheet.hidden {
+    display: none;
+}
+
 #worksheet:hover {
     opacity: 0.9;
 }
