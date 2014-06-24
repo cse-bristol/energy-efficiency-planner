@@ -18,9 +18,11 @@ OpenDataMap.geometries = function() {
     }
     
     var transform = function(from, o) {
+	var proj = proj4(from, to);
+
 	var bbox = function(box) {
-	    var a = proj4(from, to, [box[0], box[1]]);
-	    var b = proj4(from, to, [box[2], box[3]]);
+	    var a = proj.forward([box[0], box[1]]);
+	    var b = proj.forward([box[2], box[3]]);
 
 	    box[0] = a[0];
 	    box[1] = a[1];
@@ -30,13 +32,14 @@ OpenDataMap.geometries = function() {
 
 	var coordinates = function(c) {
 	    if (c.length === 2 && isNumber(c[0]) && isNumber(c[1])) {
-		var b = proj4(from, to, c);
+		var b = proj.forward(c);
 		c[0] = b[0];
 		c[1] = b[1];
 	    } else {
-		c.forEach(function(c2){
-		    coordinates(c2);
-		});
+		var len = c.length;
+		for (var i = 0; i < len; i++) {
+		    coordinates(c[i]);
+		}
 	    }
 	};
 	
@@ -45,17 +48,19 @@ OpenDataMap.geometries = function() {
 		bbox(o.bbox);
 	    }
 	    if (o.features) {
-		o.features.forEach(function(c){
-		    obj(c);
-		});
+		var len = o.features.length;
+		for (var i = 0; i < len; i++) {
+		    obj(o.features[i]);
+		}
 	    }
 	    if (o.geometry) {
 		obj(o.geometry);
 	    }
 	    if (o.geometries) {
-		o.geometries.forEach(function(g){
-		    obj(g);
-		});
+		len = o.geometries.length;
+		for (i = 0; i < len; i++) {
+		    obj(o.geometries[i]);
+		}
 	    }
 	    if (o.coordinates) {
 		coordinates(o.coordinates);
