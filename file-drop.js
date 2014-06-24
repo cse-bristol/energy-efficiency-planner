@@ -35,6 +35,8 @@ OpenDataMap.file.drop = function(container, errors, handlers){
 
 	if (files.length > 0) {
 	    errors.informUser("Loading files...");
+	} else {
+	    errors.warnUser("Failed to find any files to load. If you are dropping files, the drop may be blocked by security settings on the files or in your browser.");
 	}
 
 	handlers.forEach(function(h){
