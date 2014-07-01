@@ -46,8 +46,11 @@ map.on('layerremove', function(event){
     layers.remove(event.layer);
 });
 
+/* The map will make us an svg. It will automatically sort out its bounds for us. */
+map._initPathRoot();
+
 var overlay = d3.select(map.getPanes().overlayPane)
-	.append("svg")
+	.select("svg")
 	.attr("id", "overlay");
 
 map.addControl(new L.Control.OSMGeocoder({

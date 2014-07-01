@@ -15,14 +15,6 @@ body {
     height: 99vh;
 }
 
-svg#overlay {
-    /* Not working in webkit browser */
-    clip: auto;
-    overflow: visible;
-    width: 200vw;
-    height: 200vh;
-}
-
 path {
     stroke: #444;
     stroke-linejoin: round;
