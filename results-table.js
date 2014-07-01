@@ -134,6 +134,15 @@ OpenDataMap.resultsTable = function(container) {
 
 	rowClicked : function(callback) {
 	    rowHandlers.push(callback);
+	},
+
+	column: function(n) {
+	    return tBody.selectAll("tr")
+		.selectAll("td:nth-child(" + (n + 1) + ")");
+	},
+	cells: function() {
+	    return tBody.selectAll("tr")
+		.selectAll("td");
 	}
     };
 

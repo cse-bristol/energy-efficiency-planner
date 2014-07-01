@@ -98,8 +98,8 @@ var paint = OpenDataMap.paint(overlay, transform, sortedByZ);
 layerOpacity.opacityChanged(paint.redrawAll);
 
 layerOrder.orderChanged(function(){
-    layerOrder.orderChanged(paint.redrawAll);
-    colour.paintProperty(worksheet.displayData(time.current()), selection.current());
+    paint.redrawAll();
+    paintDisplayColumn();
 });
 
 var layerSelect = OpenDataMap.layerSelect(d3.select("#layer-select"), layers);
@@ -198,8 +198,19 @@ time.onChange(worksheet.timeChanged);
 worksheet.dataChanged(function(){
     resultsTable.info(worksheet.propertyNames(), worksheet.allData(time.current()), worksheet.getSortProperties());
     calculationsDisplay.update(worksheet.sources());
-    colour.paintProperty(worksheet.displayData(time.current()), selection.current());
+    paintDisplayColumn();
 });
+
+var paintDisplayColumn = function() {
+    var displayData = worksheet.displayData(time.current());
+    colour.paintSVGElements(displayData, selection.current());
+
+    colour.unpaintHTML(resultsTable.cells());
+    if (worksheet.getSortProperties().properties.length > 0) {
+	colour.paintHTMLSelection(displayData, resultsTable.column(worksheet.propertyIndex(
+	    worksheet.getSortProperties().properties[0])));
+    }
+};
 
 
 d3.select("#worksheet")

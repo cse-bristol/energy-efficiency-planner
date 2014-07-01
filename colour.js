@@ -7,6 +7,7 @@ if (!OpenDataMap) {
 }
 
 OpenDataMap.colour = function() {
+    var blank = "#D0D0D0";
 
     var colourScale = function(data) {
 	var numeric = [];
@@ -27,24 +28,36 @@ OpenDataMap.colour = function() {
     };
 
     var categorical = d3.scale.category20();
-    
+
     var module = {
-	paintProperty : function(dataColumn, elements) {
+	paintSVGElements : function(dataColumn, elements) {
 	    if (dataColumn.length === 0) {
 		return;
 	    }
-	    
-	    var selection = d3.selectAll(elements);
 
+	    var selection = d3.selectAll(elements);	    
 	    var colour = colourScale(dataColumn);
 
-	    selection.attr("fill", function(d, i){
+	    selection.attr("fill", function(d, i) {
 		var datum = dataColumn[i];
-		return datum ? colour(dataColumn[i]) : "#D0D0D0";
+		return datum ? colour(dataColumn[i]) : blank;
+	    });
+	},
+	paintHTMLSelection: function(dataColumn, selection) {
+	    if (dataColumn.length === 0) {
+		return;
+	    }
+
+	    var colour = colourScale(dataColumn);
+	    selection.style("background-color", function(d, i){
+		return d ? colour(d) : blank;
 	    });
 	},
 	unpaint : function(elements) {
 	    d3.selectAll(elements).attr("fill", null);
+	},
+	unpaintHTML: function(selection) {
+	    selection.style("background-color", null);
 	}
     };
     return module;

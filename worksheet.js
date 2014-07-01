@@ -128,6 +128,13 @@ OpenDataMap.worksheet = function(el, layers, sources, errors) {
 		"reverse" : reverseSort
 	    };
 	},
+	
+	propertyIndex: function(p) {
+	    if (p === "layer") {
+		return 0;
+	    }
+	    return source.properties().indexOf(p);
+	},
 
 	displayData : function(time) {
 	    if (sortProperties.length > 0) {
