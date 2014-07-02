@@ -29,6 +29,14 @@ OpenDataMap.colour = function() {
 
     var categorical = d3.scale.category20();
 
+    var fontColour = function(colour) {
+	var rgb = d3.rgb(colour),
+	    lab = d3.lab(rgb.toString()),
+	    reverse = d3.lab(lab.l, -lab.a, -lab.b);
+
+	return d3.lab((lab.l + 50) % 100, -lab.a, -lab.b);
+    };
+
     var module = {
 	paintSVGElements : function(dataColumn, elements) {
 	    if (dataColumn.length === 0) {
@@ -49,15 +57,21 @@ OpenDataMap.colour = function() {
 	    }
 
 	    var colour = colourScale(dataColumn);
-	    selection.style("background-color", function(d, i){
-		return d ? colour(d) : blank;
-	    });
+	    selection
+		.style("background-color", function(d, i){
+		    return d ? colour(d) : blank;
+		})
+		.style("color", function(d, i){
+		    return d ? fontColour(colour(d)) : blank;
+		});
+	    
 	},
 	unpaint : function(elements) {
 	    d3.selectAll(elements).attr("fill", null);
 	},
 	unpaintHTML: function(selection) {
-	    selection.style("background-color", null);
+	    selection.style("background-color", null)
+		.style("color", null);
 	}
     };
     return module;

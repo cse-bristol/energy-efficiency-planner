@@ -22,3 +22,6 @@
 [submodule "lib/leaflet-opacity"]
 	path = lib/leaflet-opacity
 	url = git@github.com:cse-bristol/Leaflet.Control.Layers.Opacity.git
+[submodule "lib/tiff.js"]
+	path = lib/tiff.js
+	url = git@github.com:seikichi/tiff.js.git
