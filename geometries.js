@@ -1,6 +1,6 @@
 "use strict";
 
-/*global d3, topojson, proj4, Shapefile, DBF, OpenDataMap */
+/*global d3, Datum, topojson, proj4, Shapefile, DBF, OpenDataMap */
 
 if (!OpenDataMap) {
     var OpenDataMap = {};
@@ -13,13 +13,23 @@ if (!OpenDataMap) {
 OpenDataMap.geometries = function() {
     var to = "WGS84";
 
-    function isNumber(n) {
+    var fixDatum = function(str) {
+	/* 
+	 I've submitted a proper fix to this here https://github.com/proj4js/proj4js/pull/108
+
+	 Until then, here's a hack.
+	 */
+	return str.replace("D_OSGB_1936", "D_OSGB36");
+    };
+
+    var isNumber = function (n) {
 	return !isNaN(parseFloat(n)) && isFinite(n);
-    }
+    };
     
     var transform = function(from, o) {
-	var proj = proj4(from, to);
+	from = fixDatum(from);
 
+	var proj = proj4(from, to);
 	var bbox = function(box) {
 	    var a = proj.forward([box[0], box[1]]);
 	    var b = proj.forward([box[2], box[3]]);
