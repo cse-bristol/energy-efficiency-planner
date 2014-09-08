@@ -5,8 +5,9 @@
 var d3 = require("d3"),
     topojson = require("topojson"),
     proj4 = require("proj4"),
-    dbf = require("./lib/js-shapefile-to-geojson/dbf.js"),
-    shapefile = require("./lib/js-shapefile-to-geojson/shapefile.js"),
+    shapefileFunctions = require("js-shapefile-to-geojson--"),
+    dbf = shapefileFunctions.dbf,
+    shapefile = shapefileFunctions.shapefile,
     isNum = require("./helpers.js").isNum;
 
 var to = "WGS84";
