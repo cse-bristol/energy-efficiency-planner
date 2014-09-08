@@ -1,17 +1,17 @@
 "use strict";
 
-/*global d3, OpenDataMap*/
+/*global module, require*/
 
-if (!OpenDataMap) {
-    var OpenDataMap = {};
-}
+var helpers = require("./helpers.js"),
+    identity = helpers.identity,
+    callbackHandler = helpers.callbackHandler;
 
 /*
  Makes a clickable list of layers.
  */
-OpenDataMap.layerSelect = function(container, layers) {
+module.exports = function(container, layers) {
     var list = container.append("ul");
-    var callbacks = [];
+    var callbacks = callbackHandler();
 
     var redraw = function(){
 	var li = list.selectAll("li")
@@ -19,11 +19,9 @@ OpenDataMap.layerSelect = function(container, layers) {
 
 	li.exit().remove();
 	li.enter().append("li")
-	    .html(d3.identity)
+	    .html(identity)
 	    .on("click", function(d, i){
-		callbacks.forEach(function(c){
-		    c(d);
-		});
+		callbacks(d);
 	    });
     };
     
@@ -32,7 +30,7 @@ OpenDataMap.layerSelect = function(container, layers) {
 
     return {
 	onClick : function(callback) {
-	    callbacks.push(callback);
+	    callbacks.add(callback);
 	}
     };
 };

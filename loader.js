@@ -1,15 +1,12 @@
 "use strict";
 
-/*global d3, OpenDataMap */
-
-if(!OpenDataMap) {
-    var OpenDataMap = {};
-}
+/*global d3, module*/
 
 /*
- This is just a way to cache files as we load them.
+ Load files and store their data. 
+ Schedules a callback to run when the file has finished loading (or straightaway if it has already finished).
  */
-OpenDataMap.loader = function() {
+module.exports = function() {
     var callbacksByFile = d3.map({});
     var completed = d3.map({});
 

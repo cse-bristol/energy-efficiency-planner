@@ -1,94 +1,110 @@
 "use strict";
 
-/*global d3, OpenDataMap */
+/*global module, require, Tiff */
 
-if (!OpenDataMap) {
-    var OpenDataMap = {};
-}
+var d3 = require("d3");
 
-if (!OpenDataMap.file) {
-    OpenDataMap.file = {};
-}
-
-OpenDataMap.file.handlers = function(errors, geometries, layers, sources) {
-    var all = [];
-
-    var withoutExtension = function(filename) {
-	return filename.replace(/\..*$/, '');
-    };
-
-    var getExtension = function(filename) {
-	return filename.split('.').pop();
-    };
-
-    /*
-     Make a handler which will process text files only in batches of 1.
-     */
-    var singleText = function(extension, mime, onLoad) {
-	var h = {
-	    tryHandle : function(files) {
-		var handled = files.filter(function(f) {
-		    if (extension && extension === getExtension(f.name)) {
-			return true;
-		    }
-		    if (mime && mime === f.type) {
-			return true;
-		    }
-		    return false;
-		});
-
-		return handled.map(function(f){
-		    return OpenDataMap.file.batch(
-			[{file: f, binary: false}],
-			function(results){
-			    if (results.keys().length !== 1) {
-				throw "Expected results exactly 1 in length.";
-			    }
-
-			    var e = results.entries()[0];
-			    var filename = e.key;
-			    var data = e.value;
-			    onLoad(filename, data);
-			}
-		    );
-		});
-	    }
-	};
-	all.push(h);
-	return h;
-    };
-
-    var singleTable = function(extension, mime, parser){
-	return singleText(extension, mime, function(filename, text){
-	    var data = parser(text);
-	    sources.fromTable(withoutExtension(filename), data, filename);
-	});
-    };
-
+/*
+ Files is a list of dictionaries. Each dictionary has a file property and a binary property.
+ e.g. [{file: "table.tsv", binary: false}, {file: "geometry.shp", binary: true}]
+ */
+var batch = function(files, onLoad) {
+    var results = d3.map({});
+    var filenames = files.map(function(f){
+	return f.file.name;
+    });
+    
     return {
-	all : all,
+	files : files,
+	trigger : function(file, result) {
+	    if (filenames.indexOf(file) < 0) {
+		throw "File " + file + " does was not part of this batch.";
+	    }
 
-	tsv : singleTable("tsv", "test/tab-separated-values", d3.tsv.parse),
-	csv : singleTable("csv", "text/csv", d3.csv.parse),
-	json : singleText("json", "application/json", function(filename, text){
+	    if (results.has(file)) {
+		throw "File " + file + " was loaded twice";
+	    }
+
+	    results.set(file, result);
+
+	    if (results.keys().length === files.length) {
+		onLoad(results);
+	    }
+	}
+    };
+};
+
+var withoutExtension = function(filename) {
+    return filename.replace(/\..*$/, '');
+};
+
+var getExtension = function(filename) {
+    return filename.split('.').pop();
+};
+
+var makeFileFilter = function(mimes, extensions) {
+    return function(f) {
+	return extensions.indexOf(getExtension(f.name)) >= 0 || mimes.indexOf(f.type) >= 0;
+    };
+};
+
+/*
+ Make a handler which will process text files only in batches of 1.
+ */
+var singleText = function(extension, mime, onLoad) {
+    var h = {
+	tryHandle : function(files) {
+	    var handled = files.filter(makeFileFilter([mime], [extension]));
+
+	    return handled.map(function(f){
+		return batch(
+		    [{file: f, binary: false}],
+		    function(results){
+			if (results.keys().length !== 1) {
+			    throw "Expected results exactly 1 in length.";
+			}
+
+			var e = results.entries()[0];
+			var filename = e.key;
+			var data = e.value;
+			onLoad(filename, data);
+		    }
+		);
+	    });
+	}
+    };
+    return h;
+};
+
+var singleTable = function(extension, mime, parser, sources){
+    return singleText(extension, mime, function(filename, text){
+	var data = parser(text);
+	sources.fromTable(withoutExtension(filename), data, filename);
+    });
+};
+
+module.exports = function(errors, geometries, layers, sources) {
+    return [
+	singleTable("tsv", "test/tab-separated-values", d3.tsv.parse),
+	singleTable("csv", "text/csv", d3.csv.parse),
+	singleText("json", "application/json", function(filename, text){
 	    var data = JSON.parse(text);
 	    var shapes = geometries.manyFromTopoJSON(filename, data);
 	    shapes.entries().forEach(function(e){
 		layers.create(e.key, e.value);
 	    });
 	}),
-
-	shapefiles : function() {
+	function shapefile() {
 	    var makeBatch = function(shp, dbf, prj) {
 		var files = [
 		    {file: shp, binary: true},
 		    {file: dbf, binary: true}];
-
+		
 		if (prj) {
 		    files.push({file: prj, binary: false});
 		}
 		
-		return OpenDataMap.file.batch(
+		return batch(
 		    files,
 		    function(files){
 			var geojson;
@@ -133,7 +149,7 @@ OpenDataMap.file.handlers = function(errors, geometries, layers, sources) {
 		    });
 
 		    if (shp.size() === 1 && dbf.size() === 1 &&
-		       (prj.size() < 2)) {
+			(prj.size() < 2)) {
 			/* In the case that we've got one of each type of file,
 			 don't bother trying to match up the filenames. */
 			if (prj.size() === 1) {
@@ -166,24 +182,23 @@ OpenDataMap.file.handlers = function(errors, geometries, layers, sources) {
 		    }
 		}
 	    };
-	    all.push(h);
 	    return h;
 	}(),
 
 	/*
 	 * Fail case handlers - should come after real shp+dbf handler.
 	 */
-	shp : singleText("shp", null, function(filename, text){
+	singleText("shp", null, function(filename, text){
 	    errors.warnUser("Cannot load a shapefile by itself. Please import .dbf and .shp files together: " + filename);
 	}),
-	dbf: singleText("dbf", null, function(filename, text){
+	singleText("dbf", null, function(filename, text){
 	    errors.warnUser("Cannot load a dbf file by itself. Please import .dbf and .shp files together: " + filename);
 	}),
-	prj: singleText("prj", null, function(filename, text){
+	singleText("prj", null, function(filename, text){
 	    errors.warnUser("Cannot load a prj file by itself. Please import .prj, .dbf and .shp files together: " + filename);
 	}),	
 	
-	fallback : function() {
+	function fallback() {
 	    var h = {
 		tryHandle : function(files) {
 		    files.forEach(function(f){
@@ -192,38 +207,7 @@ OpenDataMap.file.handlers = function(errors, geometries, layers, sources) {
 		    return [];
 		}
 	    };
-	    all.push(h);
 	    return h;
 	}()
-    };
-};
-
-/*
- Files is a list of dictionaries. Each dictionary has a file property and a binary property.
- e.g. [{file: "table.tsv", binary: false}, {file: "geometry.shp", binary: true}]
- */
-OpenDataMap.file.batch = function(files, onLoad) {
-    var results = d3.map({});
-    var filenames = files.map(function(f){
-	return f.file.name;
-    });
-    
-    return {
-	files : files,
-	trigger : function(file, result) {
-	    if (filenames.indexOf(file) < 0) {
-		throw "File " + file + " does was not part of this batch.";
-	    }
-
-	    if (results.has(file)) {
-		throw "File " + file + " was loaded twice";
-	    }
-
-	    results.set(file, result);
-
-	    if (results.keys().length === files.length) {
-		onLoad(results);
-	    }
-	}
-    };
+    ];
 };

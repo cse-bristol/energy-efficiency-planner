@@ -1,19 +1,19 @@
 "use strict";
 
-/*global d3, OpenDataMap*/
+/*global module, require*/
 
-if (!OpenDataMap) {
-    var OpenDataMap = {};
-}
+var d3 = require("d3"),
+    helpers = require("./helpers.js"),
+    callbackHandler = helpers.callbackHandler;
 
 /*
  Maintains a selection list based on events received.
  If the shift key is held down at the time of the event, the selection will be toggled instead.
  Adds and removes the 'selected' class from the selected elements.
  */
-OpenDataMap.selection = function(container) {
+module.exports = function(container) {
     var selection = d3.map({});
-    var selectionChangedCallbacks = [];
+    var selectionChangedCallbacks = callbackHandler();
 
     var changeSelection = function(d3Elements, isModification) {
 	var notAlreadySelected = d3Elements.filter(function(d, i){
@@ -50,14 +50,10 @@ OpenDataMap.selection = function(container) {
 	    selection.set(d.key, this);
 	});
 	
-	selectionChangedCallbacks.forEach(function(c){
-	    c(selection.values(),
-	      entering,
-	      leaving);
-	});	
+	selectionChangedCallbacks(selection.values(), entering, leaving);
     };
 
-    var module = {
+    return {
 	/*
 	 Updates the selection with the given d3 event.
 	 */
@@ -92,9 +88,7 @@ OpenDataMap.selection = function(container) {
 	/*
 	 The callback will be called with the arguments selection, entering, leaving whenever the selection changes.
 	 */
-	addCallback : function(callback) {
-	    selectionChangedCallbacks.push(callback);
-	},
+	addCallback: selectionChangedCallbacks.add,
 
 	/*
 	 Returns the currently selected elements.
@@ -103,7 +97,5 @@ OpenDataMap.selection = function(container) {
 	    return selection.values();
 	}
     };
-    
-    return module;
 };
 

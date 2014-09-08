@@ -1,12 +1,13 @@
 "use strict";
 
-/*global d3, OpenDataMap*/
+/*global module*/
 
-if (!OpenDataMap) {
-    var OpenDataMap = {};
-}
+/*
+ It was originally intended to show what operations were applied to which data, but at present just lists what data is loaded and where it came form. 
 
-OpenDataMap.calculationsDisplay = function(container) {
+ It will need a redesign as we put in calculations for various forms of energy saving or generating technology.
+ */
+module.exports = function(container) {
     var ul = container.append("ul");
     
     return {

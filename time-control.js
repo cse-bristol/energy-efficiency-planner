@@ -1,15 +1,13 @@
 "use strict";
 
-/*global d3, OpenDataMap */
+/*global module, require*/
 
-if (!OpenDataMap) {
-    var OpenDataMap = {};
-}
+var d3 = require("d3");
 
 /*
  Given a container, provides a time slider which lets the user set the current year.
 */
-OpenDataMap.timeControl = function(container, min, max, start) {
+module.exports = function(container, min, max, start) {
     var display = container.append("h1")
 	    .html(start);
     

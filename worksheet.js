@@ -1,15 +1,14 @@
 "use strict";
 
-/*global d3, OpenDataMap*/
+/*global module, require*/
 
-if (!OpenDataMap) {
-    var OpenDataMap = {};
-}
+var d3 = require("d3"),
+    callbackHandler = require("./helpers.js").callbackHandler;
 
 /*
  Holds the names of the currently selected geometry, along with whichever sources are being used with it.
 */
-OpenDataMap.worksheet = function(el, layers, sources, errors) {
+module.exports = function(el, layers, sources, errors) {
     var sortProperties = [];
     var reverseSort = [];
 
@@ -17,7 +16,7 @@ OpenDataMap.worksheet = function(el, layers, sources, errors) {
     var names = d3.set([]);
     var layersByName = d3.map({});
 
-    var callbacks = [];
+    var callbacks = callbackHandler();
 
     var usesLayer = function(layer) {
 	return layersByName.values().indexOf(layer.name()) >= 0;
@@ -42,9 +41,7 @@ OpenDataMap.worksheet = function(el, layers, sources, errors) {
     };
 
     var changed = function() {
-	callbacks.forEach(function(c){
-	    c();
-	});
+	callbacks();
 
 	el.classed("hidden", source.sources().length === 0);
     };
@@ -157,7 +154,7 @@ OpenDataMap.worksheet = function(el, layers, sources, errors) {
 	 Register a callback which will be fired when the data changes.
 	 */
 	dataChanged : function(callback) {
-	    callbacks.push(callback);
+	    callbacks.add(callback);
 	},
 
 	/*

@@ -4,12 +4,11 @@
   <head>
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="map.css">
-    <link rel="stylesheet" type="text/css" href="lib/leaflet/dist/leaflet.css">
-    <link rel="stylesheet" type="text/css" href="lib/leaflet-control-osm-geocoder/Control.OSMGeocoder.css">
+    <link rel="stylesheet" type="text/css" href="node_modules/leaflet/dist/leaflet.css">
+    <link rel="stylesheet" type="text/css" href="node_modules/leaflet-control-geocoder/Control.Geocoder.css">
 
-    <link rel="stylesheet" type="text/css"" href="lib/leaflet-opacity/Layers.Delete.css">
-    
-  </head>
+    <link rel="stylesheet" type="text/css" href="node_modules/leaflet-fancy-layer-control/css/Layers.Delete.css">
+											</head>
 
   <body>
     <div id="left-pane"> 
@@ -25,56 +24,6 @@
       <div id="status"></div>
     </div>
 
-    <!-- libraries -->
-    <script src="lib/d3/d3.min.js"></script>
-    <script src="lib/d3-plugins/geo/tile/tile.js"></script>
-    <script src="lib/d3/lib/colorbrewer/colorbrewer.js"></script>
-    <script src="lib/topojson/topojson.js"></script>
-    <script src="lib/leaflet/dist/leaflet.js"></script>
-    <script src="lib/leaflet-control-osm-geocoder/Control.OSMGeocoder.js"></script>
-    <script src="lib/proj4js/dist/proj4.js"></script>
-    <script src="lib/tiff.js/tiff.min.js"></script>
-
-    <!-- Leaflet plugins we maintain -->
-    <script src="lib/leaflet-opacity/Layers.Extensible.js"></script>
-    <script src="lib/leaflet-opacity/Layers.Opacity.js"></script>
-    <script src="lib/leaflet-opacity/Layers.Order.js"></script>
-    <script src="lib/leaflet-opacity/Layers.Delete.js"></script>
-    
-    <!-- this library modified heavily for our purposes -->
-    <script src="lib/js-shapefile-to-geojson/stream.js"></script>
-    <script src="lib/js-shapefile-to-geojson/shapefile.js"></script>
-    <script src="lib/js-shapefile-to-geojson/dbf.js"></script>
-
-    <!-- our extensions to libraries -->
-    <script src="d3-extensions.js"></script>
-    <script src="projection-defs.js"></script>
-
-    <!-- our code -->
-    <script src="errors.js"></script>
-
-    <script src="file-handlers.js"></script>
-    <script src="file-drop.js"></script>
-
-    <script src="loader.js"></script>
-    <script src="geometries.js"></script>
-    <script src="layers.js"></script>
-    <script src="time-lookup.js"></script>
-    <script src="source.js"></script>
-
-    <script src="paint.js"></script>
-    <script src="time-control.js"></script>
-    <script src="layer-select.js"></script>
-    <script src="selection.js"></script>
-
-    <script src="worksheet.js"></script>
-    <script src="results-table.js"></script>
-    <script src="colour.js"></script>
-    <script src="calculations-display.js"></script>
-    <script src="floating-dialogue.js"></script>
-
-    <script src="manifest.js"></script>
-    
-    <script src="glue.js"></script>
+    <script src="bin/main.js"></script>
   </body>
 </html>

@@ -1,26 +1,11 @@
 "use strict";
 
-/*global d3, FileReader, OpenDataMap */
+/*global FileReader, require, module*/
 
-if (!OpenDataMap) {
-    var OpenDataMap = {};
-}
+var d3 = require("d3"), 
+    toArray = require("./helpers.js").toArray;
 
-if (!OpenDataMap.file) {
-    OpenDataMap.file = {};
-}
-
-OpenDataMap.file.drop = function(container, errors, handlers){
-    var toArray = function(filelist) {
-	var arr = [];
-	var len = filelist.length;
-	for(var i = 0; i < len; i++) {
-	    arr.push(filelist[i]);
-	}
-	
-	return arr;
-    };
-    
+module.exports = function(container, errors, handlers) {
     container.on("dragover", function(d, i){
 	d3.event.preventDefault();
 	d3.event.stopPropagation();

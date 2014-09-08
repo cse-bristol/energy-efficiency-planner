@@ -1,12 +1,8 @@
 "use strict";
 
-/*global d3, OpenDataMap*/
+/*global module*/
 
-if (!OpenDataMap) {
-    var OpenDataMap = {};
-}
-
-OpenDataMap.errors = function(container) {
+module.exports = function(container) {
     var fadeOut = function(selection) {
 	selection.transition()
 	    .delay(5000)

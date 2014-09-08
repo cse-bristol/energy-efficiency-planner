@@ -1,22 +1,15 @@
 "use strict";
 
-/*global d3, OpenDataMap */
+/*global module, require*/
 
-if (!OpenDataMap) {
-    var OpenDataMap = {};
-}
+var d3 = require("d3"),
+    callbackHandler = require("./helpers.js").callbackHandler;
 
-OpenDataMap.layers = function(errors, sources) {
+module.exports = function(errors, sources) {
     var layers = d3.map([]);
-    var createCallbacks = [];
-    var changeCallbacks = [];
-    var removeCallbacks = [];
-
-    var layerChanged = function(l) {
-	changeCallbacks.forEach(function(c){
-	    c(l);
-	});
-    };
+    var createCallbacks = callbackHandler();
+    var changeCallbacks = callbackHandler();
+    var removeCallbacks = callbackHandler();
 
     var stripRegex = new RegExp(" ", "g");
     var stripSpaces = function(s) {
@@ -168,22 +161,22 @@ OpenDataMap.layers = function(errors, sources) {
 		
 		setOpacity : function(o) {
 		    l.options.opacity = o;
-		    layerChanged(l);
+		    changeCallbacks(l);
 		},
 		
 		setZIndex : function(z) {
 		    l.options.zIndex = z;
-		    layerChanged(l);
+		    changeCallbacks(l);
 		},
 
 		onAdd : function() {
 		    l.enabled = true;
-		    layerChanged(l);
+		    changeCallbacks(l);
 		},
 
 		onRemove : function() {
 		    l.enabled = false;
-		    layerChanged(l);
+		    changeCallbacks(l);
 		},
 
 		overlay : true	
@@ -202,9 +195,7 @@ OpenDataMap.layers = function(errors, sources) {
 	    
 	    layers.set(l.name(), l);
 
-	    createCallbacks.forEach(function(c){
-		c(l);
-	    });
+	    createCallbacks(l);
 	    
 	    return l;
 	},
@@ -213,9 +204,7 @@ OpenDataMap.layers = function(errors, sources) {
 	    if(layer && layer.name && layers.has(layer.name())) {
 		layers.remove(layer.name());
 
-		removeCallbacks.forEach(function(c){
-		    c(layer);
-		});
+		removeCallbacks(layer);
 	    }
 	},
 
@@ -223,20 +212,14 @@ OpenDataMap.layers = function(errors, sources) {
 	 callback is a function which will be called every time a new layer is created.
 	 It will be passed the layer as an argument.
 	 */
-	layerCreated : function(callback) {
-	    createCallbacks.push(callback);
-	},
+	layerCreated: createCallbacks.add,
 
 	/*
 	 Callbacks passed here will be called with a layer every time some aspect of its physical display changes (opacity, z-index, enabled).
 	 */
-	layerChanged : function(callback) {
-	    changeCallbacks.push(callback);
-	},
+	layerChanged: changeCallbacks.add,
 
-	layerRemoved : function(callback) {
-	    removeCallbacks.push(callback);
-	}
+	layerRemoved: removeCallbacks.add
     };
 };
 

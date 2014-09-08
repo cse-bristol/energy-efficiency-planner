@@ -1,58 +1,32 @@
 "use strict";
 
-/*global d3, OpenDataMap*/
+/*global module, require*/
 
-if (!OpenDataMap) {
-    var OpenDataMap = {};
-}
+var d3 = require("d3"),
+    callbackHandler = require("./helpers.js").callbackHandler,
+    timeLookup = require("./time-lookup.js");
 
-OpenDataMap.sources = function(errors) {
-    var newSourceCallbacks = [];
-    var sourceLoaded = function(s) {
-	newSourceCallbacks.forEach(function(c){
-	    c(s);
-	});
-    };
-
-    var makeKey = function(keyStr) {
-	var parts = keyStr.split("/");
-	
-	return {
-	    layer: parts[0],
-	    id: parts.slice(1).join("/")
-	};
-    };
+var makeKey = function(keyStr) {
+    var parts = keyStr.split("/");
     
-    /*
-     A source is a table of data.
-     It has a list of names.
-     It has a list of properties.
-     It provides a data table for those names and properties.
-     The data in the table are OpenDataMap.timeLookup values.
-     */
-    var source = function() {
-	return {
-	    properties : function() {
-		throw "Not implemented";
-	    },
-	    ids : function() {
-		throw "Not implemented";
-	    },
-	    data : function(properties, keys, time) {
-		throw "Not implemented";
-	    },
-	    name : function() {
-		throw "Not implemented";
-	    },
-	    onChange : function(callback) {
-		throw "Not Implemented";
-	    }
-	};
-    }();
+    return {
+	layer: parts[0],
+	id: parts.slice(1).join("/")
+    };
+};
+
+/*
+ A source is a table of data.
+ It has a list of names.
+ It has a list of properties.
+ It provides a data table for those names and properties.
+ The data in the table are timeLookup values.
+ */
+module.exports = function(errors) {
+    var newSourceCallbacks = callbackHandler();
 
     var immutable = function(myProps, myIds, myLayer, myData, name) {
 	var result = {
-	    prototype : OpenDataMap.source,
 	    properties : function() {
 		return myProps;
 	    },
@@ -96,13 +70,13 @@ OpenDataMap.sources = function(errors) {
 		// no-op
 	    }
 	};
-	sourceLoaded(result);
+	newSourceCallbacks(result);
 	return result;
     };
 
     return {
 	onSourceLoad : function(callback) {
-	    newSourceCallbacks.push(callback);
+	    newSourceCallbacks.add(callback);
 	},
 	
 	empty : function() {
@@ -145,7 +119,7 @@ OpenDataMap.sources = function(errors) {
 	    var data = headers.map(function(h){
 		return shapeProperties.map(function(s){
 		    var datum = s.has(h) ? s.get(h) : "";
-		    return OpenDataMap.timeLookup.constant(datum);
+		    return timeLookup.constant(datum);
 		});
 	    });
 	    
@@ -158,7 +132,7 @@ OpenDataMap.sources = function(errors) {
 	 each row must have an id property.
 	 a row may have have either a constant property, or a series of dates to values
 
-	 layer is an optional layer made with OpenDataMap.layers.create(). It restricts this table to only providing data for that layer.
+	 layer is an optional layer made with layers.create(). It restricts this table to only providing data for that layer.
 	 
 	 Example 1: [{"Name": "my-name", "constant": 5}]
 	 Example 2: [{"Name": "my-name", 2013: 5, 2014: 6, 2015: 7}]
@@ -177,10 +151,10 @@ OpenDataMap.sources = function(errors) {
 		ids.push(row.get("id"));
 
 		if (row.has("constant")) {
-		    data.push(OpenDataMap.timeLookup.constant(row));
+		    data.push(timeLookup.constant(row));
 		} else {
 		    row.remove("id");
-		    data.push(OpenDataMap.timeLookup.series(row));
+		    data.push(timeLookup.series(row));
 		}	
 	    });
 
@@ -238,7 +212,6 @@ OpenDataMap.sources = function(errors) {
 	    };
 	    
 	    return {
-		prototype: source,
 		ids : function() {
 		    var result = [];
 		    sources.forEach(function(s){

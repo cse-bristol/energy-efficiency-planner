@@ -1,23 +1,22 @@
 "use strict";
 
-/*global d3, OpenDataMap*/
+/*global module, require*/
 
-if (!OpenDataMap) {
-    var OpenDataMap = {};
-}
-
+var helpers = require("./helpers.js"),
+    callbackHandler = helpers.callbackHandler,
+    identity = helpers.identity;
 
 /*
  Make an info panel for a polygon on the map.
  
  Call it with a container which it will make the panel inside.
  */
-OpenDataMap.resultsTable = function(container) {
+module.exports = function(container) {
     var table = container.append("table");
     var tHead = table.append("thead").append("tr");
     var tBody = table.append("tbody");
-    var rowHandlers = [];
-    var headHandlers = [];
+    var rowHandlers = callbackHandler();
+    var headHandlers = callbackHandler();
 
     var transpose = function(arr){
 	if (arr.length === 0) {
@@ -88,15 +87,13 @@ OpenDataMap.resultsTable = function(container) {
 	    var h = tHead.selectAll("th").data(head);
 	    h.exit().remove();
 	    h.enter().append("th");
-	    h.html(d3.identity)
+	    h.html(identity)
 		.on("click", function(event, index) {
 		    var column = body.map(function(row){
 			return row[index];
 		    });
 		    
-		    headHandlers.forEach(function(h){
-			h(event, column);
-		    });
+		    headHandlers(event, column);
 		});
 	    h.each(function(d, i){
 		var j = ordering.properties.indexOf(d);
@@ -114,9 +111,7 @@ OpenDataMap.resultsTable = function(container) {
 	    tr.enter().append("tr");
 	    tr.exit().remove();
 	    tr.on("click", function(event, index){
-		rowHandlers.forEach(function(h){
-		    h(head, event);
-		});
+		rowHandlers(head, event);
 	    });
 
 	    var td = tr.selectAll("td").data(function(d, i){
@@ -128,13 +123,8 @@ OpenDataMap.resultsTable = function(container) {
 	    td.html(withRounding);
 	},
 
-	headerClicked : function(callback) {
-	    headHandlers.push(callback);
-	},
-
-	rowClicked : function(callback) {
-	    rowHandlers.push(callback);
-	},
+	headerClicked : headHandlers.add,
+	rowClicked : rowHandlers.add,
 
 	column: function(n) {
 	    return tBody.selectAll("tr")

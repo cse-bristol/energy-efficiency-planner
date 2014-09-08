@@ -1,44 +1,66 @@
 * Open Data Map
+A web-based mapping tool. Use it to plan an energy intervention in an area, then share that plan with local stakeholders. Create alternative versions of plans which have been shared with you.
 
- 1. Import shapes onto a map by dragging and dropping geoJSON, topoJSON or Shapefile, along with data describing attributes of those shapes as tsv.
- 2. Manipulate the data using simple formulae and lookup tables, or by writing very small computer programs.
- 3. Colour the map using the data.
- 4. Share the results as a web page or pdf.
- 5. Build upon other people's shared work.
+Name of the project is subject to change, since it is currently not very descriptive.
+  
+** Features
+ + Import shapes onto a map by dragging and dropping geoJSON, topoJSON or Shapefile, along with data describing attributes of those shapes as tsv.
+ + View the data associated with the shapes in a table.
+ + Colour the shapes on the map according to the data.
 
-** Running
-  * Clone this git repository, then change directory to its root.
-  * git submodule init
-  * git submodule update
-  * Build leaflet.js (TODO: make this step less annoying)
-    * Install node.js (http://nodejs.org/ or sudo aptitude install nodejs)
-    * sudo npm install -g jake
-    * sudo npm install -g jshint
-    * sudo npm install -g uglify-js
-    * cd /lib/leaflet
-    * jake build
-    * cd ../..
-  * python3 toTopoJson.py (dependencies listed in file).
-  * sudo python3 -m http.server 80 &
-  * Open prototype.html in a browser (TODO: change to index.html).
-    
-* Technology
-We are drawing the map in D3 using vectors and SVG.
+** Source Code
+The source code for Open Data Map is not currently publically available. We intend to release it under an open-source license in the near future.
 
-We want to try to push a lot of the work out to the client side (that is, in the user's browser).
+** Installation
+To install, clone the repository then serve using any web server, for example using python3 on a Debian system:
+#+BEGIN_SRC sh
+  sudo python3 -m http.server 80 &
+#+END_SRC
 
-Working from this example http://bl.ocks.org/mbostock/5616813.
+*** Building the Code
+If you make changes to the code, you will need to rebuild it. Our Javascript files our arranged as node.js modules, and we use the 'browserify' tool to combine them into a single file.
 
+Begin by installing [[http://nodejs.org/][Node JS]]. On a Debian-based system, I'd recommend using this PPA:
+#+BEGIN_SRC sh
+sudo add-apt-repository ppa:chris-lea/node.js 
+sudo aptitude update
+sudo aptitude install -y nodejs
+#+END_SRC
 
-* TODO Postcodes
+Then run the following:
+#+BEGIN_SRC sh
+  npm -g install browserify # Install Browserify as a command you can run.
+  npm install # Install the various packages we depend on (listed in package.json).
+  browserify glue.js -o bin/main.js # Package all the Javascript code together in a way that we can load into a browser.
+#+END_SRC
+** TODO Future Plans
+ + Add energy saving or generating technologies to the map to form an energy plan.
+ + Calculate cost and energy savings/production of your planned interventions.
+ + Examine and modify the assumptions behind the calculations.
+ + Save to and load from a wiki.
+ + Compare different versions of plans using a key-frame animation.
+ + View the progress of a plan over time.
+*** TODO UK Regions
+It would be useful to display some regions on the map and attach some data to them.
+
+In the UK, we would like to display postcodes. However, postcode data is privately owned and very expensive.
+
 There is the Python file postcodes.py which should takes a zip of postcodes and makes up some boundaries for those postcodes based on their Easting and Northing and the LSOA which contains them. It is unfinished.
 
-*** DONE Tesselation
+This approach will be inaccurate, but may be good enough for many purposes.
+
+Alternatively, we there are some efforts to produce open postcode data. See http://random.dev.openstreetmap.org/postcodes which looks like it also uses a Voronoi tesselation.
+ + OpenStreetMap's postcodes have some glaring errors, such as BS prefixes in Gloucester.
+ + NPE maps are out of date.
+ + Free the Postcode only provides point data.
+ + OS Code-Point will provide polygons if you pay, otherwise only point data.
+
+**** DONE Tesselation
 We've used a Voronoi tesselation from Scipy on the postcodes.
 http://cgm.cs.mcgill.ca/~mcleish/644/Projects/DerekJohns/Sweep.htm
 http://docs.scipy.org/doc/scipy/reference/tutorial/spatial.html
 
-*** Performance
+**** Performance
 There are about 35,000 LSOAs.
 30,000 LSOAs have 10 < postcodes < 100.
 Around 3000 LSOAs have 100 < postcodes < 500
@@ -51,7 +73,7 @@ Smaller LSOAs do appear to have simpler geometries.
 
 Tesselation + geojson output seems to do a few hundred a second, so assume it would take a minute or two to run them all.
 
-*** Load LSOA data
+**** Load LSOA data
 We need to convert the LSOA shapefile to a geojson file projected using OS Map, so that we can use the boundaries.
 
 Find the code which we need (something like L9999999)
@@ -63,10 +85,10 @@ Make the changes to some of them.
 Turn the map back into a list and write it back out.
 
 
-*** Eliminate postcodes which aren't really in the LSOA
+**** Eliminate postcodes which aren't really in the LSOA
 These can't work.
 
-*** Intersect with LSOA boundary
+**** Intersect with LSOA boundary
 The output of the voronoi tesselation includes infinite points, which we need to eliminate. It may also generate finite points which are outside of the LSOA.
 
 For each ridge, we know which cell is to its left and right, and can therefore work out which direction the infinite point should be.
@@ -81,15 +103,15 @@ A possible algorithm is the wall-crawl technique (also useful for exploring dung
     - If there are multiple possible choices at a turn, there will be exactly one ridge which borders c.
   - Follow round until we get back to r.
 
-**** Special cases
+***** Special cases
 For cases where there are 1 or 2 postcodes in an LSOA, we can take a simpler approach since we know the ridges will never intersect.
 
-*** Add intersections to LSOAs
+**** Add intersections to LSOAs
 We have a list of intersections between postcodes and LSOAs. We need to add this to the LSOA geometry.
 
 This will allow the topojson to understand that the LSOAs and postcodes share some arcs.
 
-*** Convert to topojson
+**** Convert to topojson
 Once we've generated our geojson, we need to project it into the same format as the other geojson files.
 
 We can then include it when we topojson everything together at the end.
