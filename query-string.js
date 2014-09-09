@@ -8,6 +8,8 @@ var URL = require("url"),
     d3 = require("d3");
 
 module.exports = function(map, layersControl, baseLayers) {
+    var listening = true;
+
     var build = function() {
 	var latLng = map.getCenter();
 
@@ -20,10 +22,12 @@ module.exports = function(map, layersControl, baseLayers) {
     };
 
     var updateQueryString = function() {
-	var url = URL.parse(window.location.href, true);
-	url.search = null;
-	url.query = build();
-	window.history.pushState(null, "", URL.format(url));
+	if (listening) {
+	    var url = URL.parse(window.location.href, true);
+	    url.search = null;
+	    url.query = build();
+	    window.history.pushState(null, "", URL.format(url));
+	}
     };
 
     var fromQueryString = function() {
@@ -53,6 +57,8 @@ module.exports = function(map, layersControl, baseLayers) {
 	updateQueryString();
     });
     d3.select(window).on("popstate", function() {
+	listening = false;
 	fromQueryString();
+	listening = true;
     });
 };
