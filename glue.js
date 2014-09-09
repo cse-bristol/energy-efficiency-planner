@@ -42,7 +42,6 @@ var nationalHeatMap = leaflet.tileLayer('http://test-tiles.0d9303a4.cdn.memsites
     maxZoom: 17
 });
 
-
 var map = new leaflet.Map("map")
 	.addLayer(osmLayer)
 	.setView(startCoordinates, zoom);
@@ -64,7 +63,9 @@ map.addControl(new geocoder({
 
 var layerOpacity = leaflet.Control.Layers.Opacity();
 var layerOrder = leaflet.Control.Layers.Order();
-var layerDelete = leaflet.Control.Layers.Delete(map);
+var layerDelete = leaflet.Control.Layers.Delete(map, function secondaryLayersOnly (layer, name, isOverlay) {
+    return !!isOverlay;
+});
 var layersControl = new leaflet.Control.Layers.Extensible(
     {
 	"Open Street Map" : osmLayer,
