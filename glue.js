@@ -15,35 +15,19 @@ var startCoordinates = [0, 0],
     geometries = require("./geometries.js"),
     handlers = require("./file-handlers.js")(errors, geometries, layers, sources),
     floatDialogue = require("./floating-dialogue.js"),
-    queryString = require("./query-string.js");
+    baseLayers = require("./base-layers.js")(errors);
 
 require("leaflet-fancy-layer-control");
 require("./lib/d3-plugins/geo/tile/tile.js");
 
-var osmLayer = leaflet.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
-});
-var Stamen_TonerBackground = leaflet.tileLayer('http://{s}.tile.stamen.com/toner-background/{z}/{x}/{y}.png', {
-    attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
-    subdomains: 'abcd',
-    minZoom: 0,
-    maxZoom: 20
-});
-var Esri_WorldShadedRelief = leaflet.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri &mdash; Source: Esri',
-    maxZoom: 13
-});
-var Esri_WorldImagery = leaflet.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-});
 var nationalHeatMap = leaflet.tileLayer('http://test-tiles.0d9303a4.cdn.memsites.com/Total%20Heat%20Density/Z{z}/{y}/{x}.png', {
     attribution: '<a href="http://tools.decc.gov.uk/nationalheatmap/">National Heat Map</a>,',
     minZoom: 2,
     maxZoom: 17
-});
-
-var map = new leaflet.Map("map")
-	.addLayer(osmLayer)
+}),
+    
+    map = new leaflet.Map("map")
+	.addLayer(baseLayers.default())
 	.setView(startCoordinates, zoom);
 
 map.on('layerremove', function(event){
@@ -67,12 +51,7 @@ var layerDelete = leaflet.Control.Layers.Delete(map, function secondaryLayersOnl
     return !!isOverlay;
 });
 var layersControl = new leaflet.Control.Layers.Extensible(
-    {
-	"Open Street Map" : osmLayer,
-	"Stamen Toner" : Stamen_TonerBackground,
-	"ESRI Relief": Esri_WorldShadedRelief,
-	"ESRI World Imagery" : Esri_WorldImagery
-    },
+    baseLayers.dict,
     {
 	"National Heat Map" : nationalHeatMap
     },
@@ -220,10 +199,4 @@ d3.select("#worksheet")
     .call(floatDialogue.resize);
 //    .call(floatDialogue.close);
 
-queryString.fromQueryString(map);
-map.on("moveend", function(e) {
-    queryString.updateQueryString(map);
-});
-d3.select(window).on("popstate", function() {
-    queryString.fromQueryString(map);
-});
+require("./query-string.js")(map, layersControl, baseLayers);
