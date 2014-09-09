@@ -3,28 +3,6 @@
 /*global require, module*/
 
 module.exports = {
-    /*
-     Modifies a function such that when it is called multiple times in a short space of time, only the final call will actually happen.
-
-     Delay specified in milliseconds.
-     */
-    defer: function(action, delay) {
-	var lastOccurance = new Date(),
-	    lastArgs;
-
-	return function() {
-	    lastArgs = arguments;
-	    var savedArgs = arguments;
-
-	    window.setTimeout(
-		function() {
-		    if (savedArgs === lastArgs) {
-			action(savedArgs);
-		    }
-		}, 
-		delay);
-	};
-    },
     toArray: function(pseudoArray) {
 	return Array.prototype.slice.call(pseudoArray, 0);
     },

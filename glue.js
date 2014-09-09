@@ -14,7 +14,8 @@ var startCoordinates = [0, 0],
     layers = require("./layers.js")(errors, sources),
     geometries = require("./geometries.js"),
     handlers = require("./file-handlers.js")(errors, geometries, layers, sources),
-    floatDialogue = require("./floating-dialogue.js");
+    floatDialogue = require("./floating-dialogue.js"),
+    queryString = require("./query-string.js");
 
 require("leaflet-fancy-layer-control");
 require("./lib/d3-plugins/geo/tile/tile.js");
@@ -217,3 +218,11 @@ d3.select("#worksheet")
     .call(floatDialogue.drag)
     .call(floatDialogue.resize);
 //    .call(floatDialogue.close);
+
+queryString.fromQueryString(map);
+map.on("moveend", function(e) {
+    queryString.updateQueryString(map);
+});
+d3.select(window).on("popstate", function() {
+    queryString.fromQueryString(map);
+});
