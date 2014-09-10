@@ -179,6 +179,7 @@ th.reverse:after {
     top: 10px;
     left: 25vw;
     width: 20vw;
+    pointer-events: none;
 }
 
 .error {
