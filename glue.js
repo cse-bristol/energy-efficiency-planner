@@ -14,7 +14,7 @@ var startCoordinates = [0, 0],
     layers = require("./layers.js")(errors, sources),
     geometries = require("./geometries.js"),
     handlers = require("./file-handlers.js")(errors, geometries, layers, sources),
-    floatDialogue = require("./floating-dialogue.js"),
+    floatDialogue = require("floating-dialogue"),
     baseLayers = require("./base-layers.js")(errors);
 
 require("leaflet-fancy-layer-control");

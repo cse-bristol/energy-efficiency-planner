@@ -13,6 +13,7 @@
 	
 	,"leaflet-opacity": "git://github.com/cse-bristol/Leaflet.Control.Layers.Opacity.git",
 	
-	"js-shapefile-to-geojson--": "git://github.com/GlennS/js-shapefile-to-geojson.git"
+	"js-shapefile-to-geojson--": "git://github.com/GlennS/js-shapefile-to-geojson.git",
+	"floating-dialogue": "git://github.com/cse-bristol/floating-dialogue.git"
     }
 }
