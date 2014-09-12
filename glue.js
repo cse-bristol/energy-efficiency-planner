@@ -200,3 +200,8 @@ d3.select("#worksheet")
 //    .call(floatDialogue.close);
 
 require("./query-string.js")(map, layersControl, baseLayers);
+require("./wiki-store.js")(
+    errors, 
+    d3.select("#wiki-controls"), 
+    d3.select("#toolbar"), 
+    handlers);

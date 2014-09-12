@@ -197,3 +197,20 @@ th.reverse:after {
     opacity: 0.8;
     background-color: #C0C0C0;
 }
+
+#toolbar {
+    opacity: 0.6;
+    position: fixed;
+    top: 20vh;
+    padding-left: 0.5vw;
+}
+
+#toolbar:hover {
+    opacity: 1.0;
+}
+
+#wiki-controls {
+    position: fixed;
+    left: 5vw;
+    top: 1vh;
+}
