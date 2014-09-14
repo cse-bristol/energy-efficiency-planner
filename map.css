@@ -128,7 +128,7 @@ path.selected:hover {
 
 #worksheet {
     position: fixed;
-    top: 20px;
+    top: 100px;
     left: 49vw;
     max-height: 93vh;
     min-height: 40px;
@@ -206,7 +206,7 @@ th.reverse:after {
 #messages {
     position: fixed;
     top: 10px;
-    left: 25vw;
+    left: 400px;
     width: 20vw;
     pointer-events: none;
 }
