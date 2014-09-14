@@ -5,7 +5,7 @@
 module.exports = function(container) {
     var fadeOut = function(selection) {
 	selection.transition()
-	    .delay(5000)
+	    .delay(15000)
 	    .style("opacity", "0.000001")
 	    .remove();
     };
