@@ -91,9 +91,16 @@ module.exports = function(container) {
 	addCallback: selectionChangedCallbacks.add,
 
 	/*
+	 Returns the names of the currently selected elements.
+	 */
+	names: function() {
+	    return selection.keys();
+	},
+
+	/*
 	 Returns the currently selected elements.
 	 */
-	current : function(){
+	current: function() {
 	    return selection.values();
 	}
     };

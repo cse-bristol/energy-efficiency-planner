@@ -10,6 +10,35 @@ body {
     height: 99vh;
 }
 
+#title {
+    font-size: xx-large;
+    background-color: transparent;
+    border: none;
+    font-weight: bolder;
+    color: darkslategrey;
+    position: fixed;
+    top: 10px;
+    left: 50px;
+}
+
+#toolbar {
+    opacity: 0.6;
+    position: fixed;
+    top: 100px;
+    padding-left: 0.5vw;
+}
+
+#toolbar:hover {
+    opacity: 1.0;
+}
+
+#wiki-controls {
+    position: fixed;
+    right: 90px;
+    top: 15px;
+}
+
+
 #map {
     width: 99vw;
     height: 99vh;
@@ -41,7 +70,7 @@ path.selected:hover {
 
 #layer-select {
     position: fixed;
-    top: 0;
+    top: 50px;
     left: 50px;
 }
 
@@ -196,21 +225,4 @@ th.reverse:after {
     padding: 4px;
     opacity: 0.8;
     background-color: #C0C0C0;
-}
-
-#toolbar {
-    opacity: 0.6;
-    position: fixed;
-    top: 20vh;
-    padding-left: 0.5vw;
-}
-
-#toolbar:hover {
-    opacity: 1.0;
-}
-
-#wiki-controls {
-    position: fixed;
-    left: 5vw;
-    top: 1vh;
 }

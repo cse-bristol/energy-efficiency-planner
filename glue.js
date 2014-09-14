@@ -15,7 +15,8 @@ var startCoordinates = [0, 0],
     geometries = require("./geometries.js"),
     handlers = require("./file-handlers.js")(errors, geometries, layers, sources),
     floatDialogue = require("floating-dialogue"),
-    baseLayers = require("./base-layers.js")(errors);
+    baseLayers = require("./base-layers.js")(errors),
+    title = require("./title.js")(d3.select("#left-pane"));
 
 require("leaflet-fancy-layer-control");
 require("./lib/d3-plugins/geo/tile/tile.js");
@@ -199,9 +200,19 @@ d3.select("#worksheet")
     .call(floatDialogue.resize);
 //    .call(floatDialogue.close);
 
-require("./query-string.js")(map, layersControl, baseLayers);
-require("./wiki-store.js")(
+var wikiStore = require("./wiki-store.js")(
     errors, 
     d3.select("#wiki-controls"), 
     d3.select("#toolbar"), 
-    handlers);
+    layers,
+    worksheet,
+    selection,
+    title,
+    function findShapesByName(names) {
+	return d3.selectAll("map svg g path")
+	    .filter(function(d, i) {
+		return names.has(d.layer.name() + "/" + d.id);
+	    });
+    });
+
+require("./query-string.js")(map, layersControl, baseLayers, wikiStore, title, errors);
