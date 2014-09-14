@@ -209,7 +209,7 @@ var wikiStore = require("./wiki-store.js")(
     selection,
     title,
     function findShapesByName(names) {
-	return d3.selectAll("map svg g path")
+	return d3.selectAll("#map svg g path")
 	    .filter(function(d, i) {
 		return names.has(d.layer.name() + "/" + d.id);
 	    });
