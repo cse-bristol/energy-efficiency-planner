@@ -1569,7 +1569,7 @@ module.exports = {
 module.exports = function(container) {
     var fadeOut = function(selection) {
 	selection.transition()
-	    .delay(5000)
+	    .delay(15000)
 	    .style("opacity", "0.000001")
 	    .remove();
     };
@@ -2190,7 +2190,7 @@ var wikiStore = require("./wiki-store.js")(
     selection,
     title,
     function findShapesByName(names) {
-	return d3.selectAll("map svg g path")
+	return d3.selectAll("#map svg g path")
 	    .filter(function(d, i) {
 		return names.has(d.layer.name() + "/" + d.id);
 	    });
@@ -12043,7 +12043,7 @@ module.exports = function(
 		d3.event.preventDefault();
 		onSave(commitMessage.node().value);
 		hide(commitForm);
-		commitMessage.value = "";
+		commitMessage.node().value = "";
 	    });
 
     startHidden(commitForm);
@@ -12336,6 +12336,7 @@ var fileLink = {
 	    name = text.load(a);
 
 	fileQueue.add(name);
+	return name;
     },
     save: function(val) {
 	return "[" + val + "]()";
@@ -12381,7 +12382,7 @@ var pageAsMarkdown = function(content, schema) {
 		tableKeys, 
 		rowData.map(function (row) {
 		    return tableKeys.map(function(column) {
-			if (!row[column]) {
+			if (row[column] === undefined) {
 			    throw new Error("Missing column " + column + " in table " + table);
 			}
 			return tableSchema[column]
@@ -12440,7 +12441,7 @@ module.exports = function(loadPage, loadFile, save) {
 		    missingFiles.forEach(function (file) {
 			requestedFiles.add(file);
 			loadFile(
-			    page,
+			    file,
 			    function (content) {
 				fileData.set(file, content);
 				load();
@@ -12902,7 +12903,11 @@ module.exports = function() {
 		makeURL([url, file]),
 		function(error, obj) {
 		    if (error) {
-			errback(error.response);
+			if (error.response) {
+			    errback(error.response);
+			} else {
+			    errback(error);
+			}	
 		    } else {
 			callback(obj);
 		    }
@@ -36975,49 +36980,53 @@ module.exports = function(container) {
 var _ = require("lodash"),
     d3 = require("d3"),
     interopModule = require("gitit-interop"),
-    layerPrefix = "layers/";
+    layerPrefix = "layers/",
+    layerFileExt = ".geojson",
+    prefixLen = layerPrefix.length,
+    extLen = layerFileExt.length;
+
+var layerName = function(path) {
+    return path.slice(prefixLen, path.length - extLen);
+};
 
 module.exports = function(errors, container, buttonContainer, layers, worksheet, selection, title, findShapesByName) {
     var wikiLoad = function(page) {
 	interop.parser.loadPagesStartingFrom(
-	    title.title(), 
+	    page, 
 	    schema, 
 	    function(pageData, fileData) {
 		fileData.entries().forEach(function(e) {
-		    var geometry = JSON.parse(e.value);
-		    layers.create(e.key, geometry);
+		    layers.create(layerName(e.key), e.value);
 		});
 
 		var pages = pageData.entries();
 		if (pages.length !== 1) {
 		    errors.warnUser("Map page had child pages - this should never happen.");
 		}
-		var page = pages[0].value;
+		var loaded = pages[0].value;
 		
-		if (page.layers) {
-		    page.layers.entries().forEach(function(l) {
-			var layerName = l.key.slice(layerPrefix.length);
-			var layer = layers.get(layerName);
-			
-			layer.setOpacity(l.value.opacity);
+		if (loaded.has("layers")) {
+		    loaded.get("layers").forEach(function(l) {
+			var layer = layers.get(layerName(l.get("layer")));
+			layer.setOpacity(l.get("opacity"));
 		    });
 		}
 
-		if (page.selection) {
+		if (loaded.has("selection")) {
 		    selection.select(
 			findShapesByName(
 			    d3.set(
-				page.selection.map(function(s) {
-				    return s.selection;
+				loaded.get("selection").map(function(s) {
+				    return s.get("selection");
 				}))));
 		}
 
-		if (page.sort) {
-		    page.sort.forEach(function(s) {
-			worksheet.sortProperty(s.sort, true);
-			if (s.reverse) {
+		if (loaded.has("sort")) {
+		    loaded.get("sort").forEach(function(s) {
+			worksheet.sortProperty(s.get("sort"), true);
+			if (s.get("reverse")) {
 			    // Additional sort on the same property reverses it.
-			    worksheet.sortPropert(s.sort, true);
+			    worksheet.sortPropert(s.get("sort"), true);
 			}
 		    });
 		}
@@ -37033,7 +37042,7 @@ module.exports = function(errors, container, buttonContainer, layers, worksheet,
 	    function onWikiSave(logMessage) {
 		var files = layers.names().map(function(layerName) {
 		    return {
-			name: layerPrefix + layerName + ".json",
+			name: layerPrefix + layerName + layerFileExt,
 			content: JSON.stringify(
 			    layers.get(layerName)
 				.geometry())
@@ -37048,7 +37057,7 @@ module.exports = function(errors, container, buttonContainer, layers, worksheet,
 				layers: layers.names().map(function(layerName) {
 				    var l = layers.get(layerName);
 				    return {
-					layer: layerPrefix + layerName + ".json",
+					layer: layerPrefix + layerName + layerFileExt,
 					opacity: l.options.opacity
 				    };
 				}),
