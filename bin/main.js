@@ -37036,7 +37036,8 @@ var _ = require("lodash"),
     layerPrefix = "layers/",
     layerFileExt = ".geojson",
     prefixLen = layerPrefix.length,
-    extLen = layerFileExt.length;
+    extLen = layerFileExt.length,
+    selectedLimit = 10;
 
 var layerName = function(path) {
     return path.slice(prefixLen, path.length - extLen);
@@ -37055,37 +37056,36 @@ module.exports = function(errors, container, buttonContainer, layers, worksheet,
 			e.value.bbox);
 		});
 
-		var pages = pageData.entries();
-		if (pages.length !== 1) {
-		    errors.warnUser("Map page had child pages - this should never happen.");
-		}
-		var loaded = pages[0].value;
-		
-		if (loaded.has("layers")) {
-		    loaded.get("layers").forEach(function(l) {
-			var layer = layers.get(layerName(l.get("layer")));
-			layer.setOpacity(l.get("opacity"));
-		    });
-		}
+		var pages = pageData.entries().forEach(function(e) {
+		    var loaded = e.value;
 
-		if (loaded.has("selection")) {
-		    selection.select(
-			findShapesByName(
-			    d3.set(
-				loaded.get("selection").map(function(s) {
-				    return s.get("selection");
-				}))));
-		}
+		    if (loaded.has("layers")) {
+			loaded.get("layers").forEach(function(l) {
+			    var layer = layers.get(layerName(l.get("layer")));
+			    layer.setOpacity(l.get("opacity"));
+			});
+		    }
 
-		if (loaded.has("sort")) {
-		    loaded.get("sort").forEach(function(s) {
-			worksheet.sortProperty(s.get("sort"), true);
-			if (s.get("reverse")) {
-			    // Additional sort on the same property reverses it.
-			    worksheet.sortPropert(s.get("sort"), true);
-			}
-		    });
-		}
+		    if (loaded.has("selection")) {
+			selection.select(
+			    findShapesByName(
+				d3.set(
+				    loaded.get("selection").map(function(s) {
+					return s.get("selection");
+				    }))));
+		    }
+
+		    if (loaded.has("sort")) {
+			loaded.get("sort").forEach(function(s) {
+			    worksheet.sortProperty(s.get("sort"), true);
+			    if (s.get("reverse")) {
+				// Additional sort on the same property reverses it.
+				worksheet.sortPropert(s.get("sort"), true);
+			    }
+			});
+		    }
+
+		});
 
 		title.title(page);
 
@@ -37094,9 +37094,65 @@ module.exports = function(errors, container, buttonContainer, layers, worksheet,
 	    errors.warnUser
 	);
     },
+
+	savePages = function() {
+	    var selectedThings = selection.names()
+		    .map(function(s) {
+			return {selection: s};
+		    }),
+		
+		frontPage = {
+		    name: title.title(),
+		    content: {
+			layers: layers.names().map(function(layerName) {
+			    var l = layers.get(layerName);
+			    return {
+				layer: layerPrefix + layerName + layerFileExt,
+				opacity: l.options.opacity
+			    };
+			}),
+
+			sort: _.zip(
+			    worksheet.getSortProperties().properties, 
+			    worksheet.getSortProperties().reverse)
+			    .map(function(pair) {
+				return {
+				    sort: pair[0],
+				    reverse: pair[1]
+				};
+			    })
+		    }
+		},
+		data = [frontPage];
+
+	    if (selectedThings.length > 10) {
+		frontPage.content.selectionPage = {
+		    selection: title.title() + "/selection"
+		};
+
+		data.push({
+		    name: title.title() + "/selection",
+		    content: {
+			selection: selectedThings
+		    }
+		});
+		
+	    } else {
+		frontPage.content.selection = selectedThings;
+	    }
+
+	    return data.map(function(d) {
+		return { 
+		    name: d.name,
+		    content: parser.pageAsMarkdown(d.content, schema)
+		};
+	    });
+	},
+
+	
 	
 	interop = interopModule(
-	    errors, 
+	    errors.warnUser, 
 	    function onWikiSave(logMessage) {
 		var files = layers.names().map(function(layerName) {
 		    var layer = layers.get(layerName);
@@ -37111,34 +37167,7 @@ module.exports = function(errors, container, buttonContainer, layers, worksheet,
 		});
 
 		interop.requests.save(
-		    [{
-			name: title.title(),
-			content: parser.pageAsMarkdown(
-			    {
-				layers: layers.names().map(function(layerName) {
-				    var l = layers.get(layerName);
-				    return {
-					layer: layerPrefix + layerName + layerFileExt,
-					opacity: l.options.opacity
-				    };
-				}),
-
-				selection: selection.names().map(function(s) {
-				    return {selection: s};
-				}),
-
-				sort: _.zip(
-				    worksheet.getSortProperties().properties, 
-				    worksheet.getSortProperties().reverse)
-				    .map(function(pair) {
-					return {
-					    sort: pair[0],
-					    reverse: pair[1]
-					};
-				    })
-			    }, 
-			    schema)
-		    }],
+		    savePages(),
 		    files, 
 		    logMessage, 
 		    errors.informUser,
@@ -37166,8 +37195,11 @@ module.exports = function(errors, container, buttonContainer, layers, worksheet,
 		opacity: optional(float(0, 1), 1)
 	    }),
 	    selection: multiple({
-		"selection" : text
+		selection: text
 	    }),
+	    selectionPage: {
+		selection: pageLink
+	    },
 	    sort: multiple({
 		sort: text,
 		reverse: boolean
