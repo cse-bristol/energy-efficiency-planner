@@ -16,8 +16,13 @@ var startCoordinates = [0, 0],
     floatDialogue = require("floating-dialogue"),
     baseLayers = require("./base-layers.js")(errors),
     title = require("./title.js")(d3.select("#left-pane")),
+    toolbar = d3.select("#toolbar"),
+    tableOpenClose = toolbar.append("span")
+	.html("⊞"),
     worksheetContainer = floatDialogue(d3.select("#worksheet"))
 	.resize()
+	.open(tableOpenClose)
+	.close()
 	.drag();
 
 require("leaflet-fancy-layer-control");
@@ -210,7 +215,7 @@ var paintDisplayColumn = function() {
 var wikiStore = require("./wiki-store.js")(
     errors, 
     d3.select("body"), 
-    d3.select("#toolbar"), 
+    toolbar,
     layers,
     worksheet,
     selection,
