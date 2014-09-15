@@ -2191,7 +2191,7 @@ d3.select("#worksheet")
 
 var wikiStore = require("./wiki-store.js")(
     errors, 
-    d3.select("#wiki-controls"), 
+    d3.select("body"), 
     d3.select("#toolbar"), 
     layers,
     worksheet,

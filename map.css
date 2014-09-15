@@ -32,12 +32,10 @@ body {
     opacity: 1.0;
 }
 
-#wiki-controls {
-    position: fixed;
-    right: 90px;
+#wiki-persistence {
+    left: calc(100% - 340px);
     top: 15px;
 }
-
 
 #map {
     width: 99vw;
