@@ -139,25 +139,29 @@ path.selected:hover {
     font-size: x-small;
 }
 
-#worksheet.hidden {
-    display: none;
-}
-
 #worksheet:hover {
     opacity: 0.9;
 }
 
-#results table {
+#results {
     text-align: right;
 }
 
-#results table thead tr th, #results table tbody tr td {
+#results thead tr th, #results table tbody tr td {
     border-bottom: 1px solid gray;    
     padding: 0.1em 0.4em 0.1em 0.4em;
     max-width: 15em;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+td {
+    cursor: pointer;
+}
+
+th {
+    cursor: pointer;
 }
 
 th.sorted:after {
@@ -168,19 +172,19 @@ th.reverse:after {
     content: "↓";
 }
 
-#results table thead tr th:hover {
+#results thead tr th:hover {
     background-color: LightSlateGray;
 }
 
-#results table tbody tr:hover {
+#results tbody tr:hover {
     background-color: LightSteelBlue;
 }
 
-#results table tbody tr td:hover {
+#results tbody tr td:hover {
     background-color: LightSlateGray;
 }
 
-#calculations ul {
+#calculations {
     padding-left: 0;
 }
 
