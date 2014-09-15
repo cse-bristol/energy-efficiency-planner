@@ -37043,7 +37043,10 @@ module.exports = function(errors, container, buttonContainer, layers, worksheet,
 	    schema, 
 	    function(pageData, fileData) {
 		fileData.entries().forEach(function(e) {
-		    layers.create(layerName(e.key), e.value);
+		    layers.create(
+			layerName(e.key), 
+			e.value.features, 
+			e.value.bbox);
 		});
 
 		var pages = pageData.entries();
@@ -37090,11 +37093,14 @@ module.exports = function(errors, container, buttonContainer, layers, worksheet,
 	    errors, 
 	    function onWikiSave(logMessage) {
 		var files = layers.names().map(function(layerName) {
+		    var layer = layers.get(layerName);
 		    return {
 			name: layerPrefix + layerName + layerFileExt,
-			content: JSON.stringify(
-			    layers.get(layerName)
-				.geometry())
+			content: JSON.stringify({
+			    type: "FeatureCollection",
+			    features: layer.geometry(),
+			    bbox: layer.boundingbox()
+			})
 		    };
 		});
 
