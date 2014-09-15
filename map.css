@@ -143,6 +143,11 @@ path.selected:hover {
     opacity: 0.9;
 }
 
+.content {
+    overflow: auto;
+    height: 100%;
+}
+
 #results {
     text-align: right;
 }
