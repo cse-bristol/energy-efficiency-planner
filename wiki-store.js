@@ -99,7 +99,7 @@ module.exports = function(errors, container, buttonContainer, layers, worksheet,
 
 	    if (selectedThings.length > 10) {
 		frontPage.content.selectionPage = {
-		    selection: title.title() + "/selection"
+		    "selection page": title.title() + "/selection"
 		};
 
 		data.push({
@@ -170,7 +170,7 @@ module.exports = function(errors, container, buttonContainer, layers, worksheet,
 		selection: text
 	    }),
 	    selectionPage: {
-		selection: pageLink
+		"selection page": pageLink
 	    },
 	    sort: multiple({
 		sort: text,
