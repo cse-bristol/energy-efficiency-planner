@@ -14,7 +14,7 @@ var layerName = function(path) {
     return path.slice(prefixLen, path.length - extLen);
 };
 
-module.exports = function(errors, container, buttonContainer, layers, worksheet, selection, title, findShapesByName) {
+module.exports = function(errors, container, buttonContainer, layers, worksheet, selection, title, findShapesByName, redraw) {
     var wikiLoad = function(page) {
 	interop.parser.loadPagesStartingFrom(
 	    page, 
@@ -57,6 +57,8 @@ module.exports = function(errors, container, buttonContainer, layers, worksheet,
 		}
 
 		title.title(page);
+
+		redraw();
 	    },
 	    errors.warnUser
 	);

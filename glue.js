@@ -13,7 +13,6 @@ var startCoordinates = [0, 0],
     sources = require("./sources.js")(errors),
     layers = require("./layers.js")(errors, sources),
     geometries = require("./geometries.js"),
-    handlers = require("./file-handlers.js")(errors, geometries, layers, sources),
     floatDialogue = require("floating-dialogue"),
     baseLayers = require("./base-layers.js")(errors),
     title = require("./title.js")(d3.select("#left-pane"));
@@ -102,11 +101,6 @@ var getLayerObjects = function(layerName) {
 	.selectAll("path");
 };
 
-layers.layerCreated(function(l){
-    paint.redrawAll();
-    zoomToLayer(l);
-    selection.select(getLayerObjects(l.name()), false);
-});
 layers.layerChanged(function(l){
     if (!l.enabled) {
 	selection.deselect(getLayerObjects(l.name()));
@@ -166,6 +160,17 @@ selection.addCallback(function(values, entering, leaving){
     worksheet.selectionChanged(values, entering, leaving);
 });
 
+var handlers = require("./file-handlers.js")(
+    errors, 
+    geometries, 
+    layers, 
+    sources, 
+    function(layer) {
+	zoomToLayer(layer);
+	selection.select(getLayerObjects(layer.name()), false);
+    }, 
+    paint.redrawAll
+);
 require("./file-drop.js")(d3.select("body"), errors, handlers);
 
 resultsTable.headerClicked(function(h){
@@ -213,6 +218,8 @@ var wikiStore = require("./wiki-store.js")(
 	    .filter(function(d, i) {
 		return names.has(d.layer.name() + "/" + d.id);
 	    });
-    });
+    },
+    paint.redrawAll
+);
 
 require("./query-string.js")(map, layersControl, baseLayers, wikiStore, title, errors);

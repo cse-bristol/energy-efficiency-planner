@@ -83,7 +83,7 @@ var singleTable = function(extension, mime, parser, sources){
     });
 };
 
-module.exports = function(errors, geometries, layers, sources) {
+module.exports = function(errors, geometries, layers, sources, selectLayer, refresh) {
     return [
 	singleTable("tsv", "test/tab-separated-values", d3.tsv.parse),
 	singleTable("csv", "text/csv", d3.csv.parse),
@@ -93,6 +93,7 @@ module.exports = function(errors, geometries, layers, sources) {
 	    shapes.entries().forEach(function(e){
 		layers.create(e.key, e.value);
 	    });
+	    refresh();
 	}),
 	function shapefile() {
 	    var makeBatch = function(shp, dbf, prj) {
@@ -125,7 +126,9 @@ module.exports = function(errors, geometries, layers, sources) {
 			}
 			
 			var name = withoutExtension(shp.name);
-			layers.create(name, geojson.features, geojson.bbox);
+			var l = layers.create(name, geojson.features, geojson.bbox);
+			refresh();
+			selectLayer(l);
 		    }
 		);
 	    };

@@ -1736,7 +1736,7 @@ var singleTable = function(extension, mime, parser, sources){
     });
 };
 
-module.exports = function(errors, geometries, layers, sources) {
+module.exports = function(errors, geometries, layers, sources, selectLayer, refresh) {
     return [
 	singleTable("tsv", "test/tab-separated-values", d3.tsv.parse),
 	singleTable("csv", "text/csv", d3.csv.parse),
@@ -1746,6 +1746,7 @@ module.exports = function(errors, geometries, layers, sources) {
 	    shapes.entries().forEach(function(e){
 		layers.create(e.key, e.value);
 	    });
+	    refresh();
 	}),
 	function shapefile() {
 	    var makeBatch = function(shp, dbf, prj) {
@@ -1778,7 +1779,9 @@ module.exports = function(errors, geometries, layers, sources) {
 			}
 			
 			var name = withoutExtension(shp.name);
-			layers.create(name, geojson.features, geojson.bbox);
+			var l = layers.create(name, geojson.features, geojson.bbox);
+			refresh();
+			selectLayer(l);
 		    }
 		);
 	    };
@@ -1994,7 +1997,6 @@ var startCoordinates = [0, 0],
     sources = require("./sources.js")(errors),
     layers = require("./layers.js")(errors, sources),
     geometries = require("./geometries.js"),
-    handlers = require("./file-handlers.js")(errors, geometries, layers, sources),
     floatDialogue = require("floating-dialogue"),
     baseLayers = require("./base-layers.js")(errors),
     title = require("./title.js")(d3.select("#left-pane"));
@@ -2083,11 +2085,6 @@ var getLayerObjects = function(layerName) {
 	.selectAll("path");
 };
 
-layers.layerCreated(function(l){
-    paint.redrawAll();
-    zoomToLayer(l);
-    selection.select(getLayerObjects(l.name()), false);
-});
 layers.layerChanged(function(l){
     if (!l.enabled) {
 	selection.deselect(getLayerObjects(l.name()));
@@ -2147,6 +2144,17 @@ selection.addCallback(function(values, entering, leaving){
     worksheet.selectionChanged(values, entering, leaving);
 });
 
+var handlers = require("./file-handlers.js")(
+    errors, 
+    geometries, 
+    layers, 
+    sources, 
+    function(layer) {
+	zoomToLayer(layer);
+	selection.select(getLayerObjects(layer.name()), false);
+    }, 
+    paint.redrawAll
+);
 require("./file-drop.js")(d3.select("body"), errors, handlers);
 
 resultsTable.headerClicked(function(h){
@@ -2194,7 +2202,9 @@ var wikiStore = require("./wiki-store.js")(
 	    .filter(function(d, i) {
 		return names.has(d.layer.name() + "/" + d.id);
 	    });
-    });
+    },
+    paint.redrawAll
+);
 
 require("./query-string.js")(map, layersControl, baseLayers, wikiStore, title, errors);
 
@@ -36989,7 +36999,7 @@ var layerName = function(path) {
     return path.slice(prefixLen, path.length - extLen);
 };
 
-module.exports = function(errors, container, buttonContainer, layers, worksheet, selection, title, findShapesByName) {
+module.exports = function(errors, container, buttonContainer, layers, worksheet, selection, title, findShapesByName, redraw) {
     var wikiLoad = function(page) {
 	interop.parser.loadPagesStartingFrom(
 	    page, 
@@ -37032,6 +37042,8 @@ module.exports = function(errors, container, buttonContainer, layers, worksheet,
 		}
 
 		title.title(page);
+
+		redraw();
 	    },
 	    errors.warnUser
 	);
