@@ -8,15 +8,14 @@ var d3 = require("d3"),
 /*
  Holds the names of the currently selected geometry, along with whichever sources are being used with it.
 */
-module.exports = function(el, layers, sources, errors) {
-    var sortProperties = [];
-    var reverseSort = [];
-
-    var source = sources.combined([], "selected-sources");
-    var names = d3.set([]);
-    var layersByName = d3.map({});
-
-    var callbacks = callbackHandler();
+module.exports = function(container, layers, sources, errors) {
+    var sortProperties = [],
+	reverseSort = [],
+	source = sources.combined([], "selected-sources"),
+	names = d3.set([]),
+	layersByName = d3.map({}),
+	callbacks = callbackHandler(),
+	el = container.content();
 
     var usesLayer = function(layer) {
 	return layersByName.values().indexOf(layer.name()) >= 0;
@@ -43,7 +42,11 @@ module.exports = function(el, layers, sources, errors) {
     var changed = function() {
 	callbacks();
 
-	el.classed("hidden", source.sources().length === 0);
+	if (source.sources().length === 0) {
+	    container.hide();
+	} else {
+	    container.show();
+	}
     };
 
     /* Ensure everything is set up in the empty state. */

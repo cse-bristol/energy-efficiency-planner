@@ -12,7 +12,8 @@ var helpers = require("./helpers.js"),
  Call it with a container which it will make the panel inside.
  */
 module.exports = function(container) {
-    var table = container.append("table");
+    var table = container.append("table")
+	    .attr("id", "results");
     var tHead = table.append("thead").append("tr");
     var tBody = table.append("tbody");
     var rowHandlers = callbackHandler();

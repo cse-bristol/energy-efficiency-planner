@@ -1473,7 +1473,8 @@ module.exports = function(errors) {
  It will need a redesign as we put in calculations for various forms of energy saving or generating technology.
  */
 module.exports = function(container) {
-    var ul = container.append("ul");
+    var ul = container.append("ul")
+	    .attr("id", "calculations");
     
     return {
 	update : function(sources) {
@@ -1999,7 +2000,10 @@ var startCoordinates = [0, 0],
     geometries = require("./geometries.js"),
     floatDialogue = require("floating-dialogue"),
     baseLayers = require("./base-layers.js")(errors),
-    title = require("./title.js")(d3.select("#left-pane"));
+    title = require("./title.js")(d3.select("#left-pane")),
+    worksheetContainer = floatDialogue(d3.select("#worksheet"))
+	.resize()
+	.drag();
 
 require("leaflet-fancy-layer-control");
 require("./lib/d3-plugins/geo/tile/tile.js");
@@ -2073,10 +2077,14 @@ layerOrder.orderChanged(function(){
 
 var layerSelect = require("./layer-select.js")(d3.select("#layer-select"), layers),
     selection = require("./selection.js")(overlay),
-    worksheet = require("./worksheet.js")(d3.select("#worksheet"), layers, sources, errors),
-    resultsTable = require("./results-table.js")(d3.select("#results")),
+    worksheet = require("./worksheet.js")(
+	worksheetContainer,
+	layers, 
+	sources, 
+	errors),
+    resultsTable = require("./results-table.js")(worksheetContainer.content()),
     colour = require("./colour.js"),
-    calculationsDisplay = require("./calculations-display.js")(d3.select("#calculations"));
+    calculationsDisplay = require("./calculations-display.js")(worksheetContainer.content());
 
 sources.onSourceLoad(worksheet.addSource);
 
@@ -2183,11 +2191,6 @@ var paintDisplayColumn = function() {
 	    worksheet.getSortProperties().properties[0])));
     }
 };
-
-d3.select("#worksheet")
-    .call(floatDialogue.drag)
-    .call(floatDialogue.resize);
-//    .call(floatDialogue.close);
 
 var wikiStore = require("./wiki-store.js")(
     errors, 
@@ -11845,105 +11848,137 @@ module.exports = function() {
 
 var d3 = require("d3");
 
-var makeToggleFunction = function(el, button) {
-    return function() {
-	var wasVisible = (el.style("visibility") === "visible");
-	
-	button.classed("element-visible", wasVisible ? false : true);
-	el.style("visibility", wasVisible ? "hidden" : "visible");
-    };
-};
-
 /*
  Provides some functions which can be applied to an HTML element.
  */
-module.exports = {
-    drag: function(el) {
-	el.style("cursor", "move");
+module.exports = function(el) {
+    var openButton,
+	closeButton,
+	content = el.append("div")
+	    .classed("content", true);
 
-	if(el.style("left") === "auto") {
-	    el.style("left", 0);
+    var visibility = function(show) {
+	if (openButton) {
+	    openButton.classed("element-visible", show);
 	}
-	if(el.style("top") === "auto") {
-	    el.style("top", 0);
-	}
+	el.style("visibility", show ? "visible" : "hidden");
+    };
+
+    var toggle = function() {
+	var wasVisible = (el.style("visibility") === "visible");
+	visibility(!wasVisible);
+    };
+
+    el
+    // Padding prevents us from make the box too small to resize.
+	.style("overflow", "hidden")
+	.style("padding-right", "2em")
+	.style("padding-bottom", "3em");
+
+    var m = {
+	drag: function() {
+	    el
+		.style("cursor", "move")
+		.style("position", "absolute");
+
+	    if(el.style("left") === "auto") {
+		el.style("left", 0);
+	    }
+	    if(el.style("top") === "auto") {
+		el.style("top", 0);
+	    }
+	    
+	    el.call(
+		d3.behavior.drag()
+		    .origin(function(d){
+			return {
+			    "x" : parseInt(el.style("left")),
+			    "y" : parseInt(el.style("top"))
+			};
+		    })
+		    .on("drag", function(d){
+			d3.event.sourceEvent.preventDefault();
+			el
+			    .style("top", d3.event.y + "px")
+			    .style("left", d3.event.x + "px");
+		    })
+	    );
+
+	    return m;
+	},
 	
-	el.call(
-	    d3.behavior.drag()
-		.origin(function(d){
-		    return {
-			"x" : parseInt(el.style("left")),
-			"y" : parseInt(el.style("top"))
-		    };
-		})
-		.on("drag", function(d){
-		    d3.event.sourceEvent.preventDefault();
-		    el
-			.style("top", d3.event.y + "px")
-			.style("left", d3.event.x + "px");
-		})
-	);
-    },
-    
+	open: function(button) {
+	    button
+		.classed("open-button", true)
+		.style("cursor", "pointer")
+		.on("click", toggle);
 
+	    openButton = button;
 
-    open: function(el, button) {
-	button
-	    .classed("open-button", true)
-	    .style("cursor", "pointer")
-	    .on("click", makeToggleFunction(el, button));
-    },
+	    return m;
+	},
 
-    close: function(el, openButton) {
-	var closeButton = el.append("span")
-		.classed("close-button", true)
-		.style("font-size", "large")
+	close: function() {
+	    var closeButton = el.append("span")
+		    .classed("close-button", true)
+		    .style("font-size", "x-large")
+		    .style("font-family", "monospace")
+		    .style("position", "absolute")
+		    .style("top", "0")
+		    .style("right", "5px")
+		    .style("opacity", "0.6")
+		    .style("cursor", "pointer")
+		    .html("❌");
+
+	    closeButton.on("click", toggle);
+
+	    return m;
+	},
+
+	resize: function() {
+	    var dragHandle = d3.behavior.drag()
+		    .origin(function(d){
+			return {
+			    "x" : parseInt(el.style("width")),
+			    "y" : parseInt(el.style("height"))
+			};
+		    })
+		    .on("dragstart", function(d){
+			d3.event.sourceEvent.stopPropagation();
+		    })
+		    .on("drag", function(d){
+			el.style("height", d3.event.y + "px");
+			el.style("width", d3.event.x + "px");
+		    });
+
+	    el.append("span")
+		.style("font-size", "xx-large")
+		.style("font-family", "monospace")
 		.style("position", "absolute")
-		.style("top", "3px")
+		.style("bottom", "0")
 		.style("right", "5px")
 		.style("opacity", "0.6")
-		.style("cursor", "pointer")
-		.html("❌");
+		.html("⇲")
+		.call(dragHandle);
 
-	if (openButton) {
-	    closeButton.on("click", makeToggleFunction(el, openButton));
-	    
-	} else {
-	    closeButton.on(
-		"click", 
-		function(d, i){
-		    el.style("visibility", "hidden");
-		}
-	    );
+	    return m;
+	},
+
+	hide: function() {
+	    visibility(false);
+	},
+
+	show: function() {
+	    visibility(true);
+	},
+
+	content: function() {
+	    return content;
 	}
-    },
-
-    resize: function(el) {
-	var dragHandle = d3.behavior.drag()
-		.origin(function(d){
-		    return {
-			"x" : parseInt(el.style("width")),
-			"y" : parseInt(el.style("height"))
-		    };
-		})
-		.on("dragstart", function(d){
-		    d3.event.sourceEvent.stopPropagation();
-		})
-		.on("drag", function(d){
-		    el.style("height", d3.event.y + "px");
-		    el.style("width", d3.event.x + "px");
-		});
-
-	el.append("span")
-	    .style("font-size", "large")
-	    .style("position", "absolute")
-	    .style("bottom", "5px")
-	    .style("right", "5px")
-	    .style("opacity", "0.6")
-	    .html("⇲")
-	    .call(dragHandle);
-    }
+    };
+    return m;
 };
+
 },{"d3":19}],21:[function(require,module,exports){
 module.exports=require(20)
 },{"d3":19}],22:[function(require,module,exports){
@@ -12002,8 +12037,17 @@ module.exports = function(
 	);
     };
 
-    var persist = container.append("div")
-	    .attr("id", "wiki-persistence");
+    var openCloseButton = buttonContainer.append("div")
+	    .attr("id", "wiki-open-close")
+	    .text("W");
+
+    var persist = floatDialogue(
+	container.append("div")
+	    .attr("id", "wiki-persistence"))
+	    .drag()
+	    .open(openCloseButton)
+	    .close()
+	    .content();
 
     var firstRow = persist.append("form")
 	    .on("submit", function() {
@@ -12013,8 +12057,8 @@ module.exports = function(
 	    });
 
     var saveButton = firstRow.append("input")
-	.attr("type", "submit")
-	.attr("value", "Save");
+	    .attr("type", "submit")
+	    .attr("value", "Save");
 
     var urlInput = firstRow.append("input")
 	    .attr("type", "text")
@@ -12064,14 +12108,6 @@ module.exports = function(
 		hide(commitForm);
 	    });
     
-    var openCloseButton = buttonContainer.append("div")
-	    .attr("id", "wiki-open-close")
-	    .text("W");
-
-    floatDialogue.drag(persist);
-    floatDialogue.open(persist, openCloseButton);
-    floatDialogue.close(persist, openCloseButton);
-
     var m = {
 	update: function() {
 	    urlInput[0][0].value = baseURL();
@@ -36336,7 +36372,8 @@ var helpers = require("./helpers.js"),
  Call it with a container which it will make the panel inside.
  */
 module.exports = function(container) {
-    var table = container.append("table");
+    var table = container.append("table")
+	    .attr("id", "results");
     var tHead = table.append("thead").append("tr");
     var tBody = table.append("tbody");
     var rowHandlers = callbackHandler();
@@ -37148,15 +37185,14 @@ var d3 = require("d3"),
 /*
  Holds the names of the currently selected geometry, along with whichever sources are being used with it.
 */
-module.exports = function(el, layers, sources, errors) {
-    var sortProperties = [];
-    var reverseSort = [];
-
-    var source = sources.combined([], "selected-sources");
-    var names = d3.set([]);
-    var layersByName = d3.map({});
-
-    var callbacks = callbackHandler();
+module.exports = function(container, layers, sources, errors) {
+    var sortProperties = [],
+	reverseSort = [],
+	source = sources.combined([], "selected-sources"),
+	names = d3.set([]),
+	layersByName = d3.map({}),
+	callbacks = callbackHandler(),
+	el = container.content();
 
     var usesLayer = function(layer) {
 	return layersByName.values().indexOf(layer.name()) >= 0;
@@ -37183,7 +37219,11 @@ module.exports = function(el, layers, sources, errors) {
     var changed = function() {
 	callbacks();
 
-	el.classed("hidden", source.sources().length === 0);
+	if (source.sources().length === 0) {
+	    container.hide();
+	} else {
+	    container.show();
+	}
     };
 
     /* Ensure everything is set up in the empty state. */

@@ -8,7 +8,8 @@
  It will need a redesign as we put in calculations for various forms of energy saving or generating technology.
  */
 module.exports = function(container) {
-    var ul = container.append("ul");
+    var ul = container.append("ul")
+	    .attr("id", "calculations");
     
     return {
 	update : function(sources) {

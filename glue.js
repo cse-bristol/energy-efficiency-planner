@@ -15,7 +15,10 @@ var startCoordinates = [0, 0],
     geometries = require("./geometries.js"),
     floatDialogue = require("floating-dialogue"),
     baseLayers = require("./base-layers.js")(errors),
-    title = require("./title.js")(d3.select("#left-pane"));
+    title = require("./title.js")(d3.select("#left-pane")),
+    worksheetContainer = floatDialogue(d3.select("#worksheet"))
+	.resize()
+	.drag();
 
 require("leaflet-fancy-layer-control");
 require("./lib/d3-plugins/geo/tile/tile.js");
@@ -89,10 +92,14 @@ layerOrder.orderChanged(function(){
 
 var layerSelect = require("./layer-select.js")(d3.select("#layer-select"), layers),
     selection = require("./selection.js")(overlay),
-    worksheet = require("./worksheet.js")(d3.select("#worksheet"), layers, sources, errors),
-    resultsTable = require("./results-table.js")(d3.select("#results")),
+    worksheet = require("./worksheet.js")(
+	worksheetContainer,
+	layers, 
+	sources, 
+	errors),
+    resultsTable = require("./results-table.js")(worksheetContainer.content()),
     colour = require("./colour.js"),
-    calculationsDisplay = require("./calculations-display.js")(d3.select("#calculations"));
+    calculationsDisplay = require("./calculations-display.js")(worksheetContainer.content());
 
 sources.onSourceLoad(worksheet.addSource);
 
@@ -199,11 +206,6 @@ var paintDisplayColumn = function() {
 	    worksheet.getSortProperties().properties[0])));
     }
 };
-
-d3.select("#worksheet")
-    .call(floatDialogue.drag)
-    .call(floatDialogue.resize);
-//    .call(floatDialogue.close);
 
 var wikiStore = require("./wiki-store.js")(
     errors, 
