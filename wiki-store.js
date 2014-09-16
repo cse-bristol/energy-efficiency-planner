@@ -161,7 +161,7 @@ module.exports = function(errors, container, buttonContainer, layers, worksheet,
 	    },
 	    wikiLoad,
 	    errors.informUser,
-	    title.title()
+	    title.title
 	),
 
 	schema = {
