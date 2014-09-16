@@ -16,6 +16,35 @@ var layerName = function(path) {
 };
 
 module.exports = function(errors, container, buttonContainer, layers, worksheet, selection, title, findShapesByName, redraw) {
+    var interop = interopModule(errors.warnUser),
+
+	s = interop.schema,
+	pageAsMarkdown = s.pageAsMarkdown,
+	multiple = s.multiple,
+	optional = s.optional,
+	boolean = s.boolean,
+	float = s.float,
+	text = s.text,
+	pageLink = s.pageLink,
+	fileLink = s.fileLink,
+
+	schema = {
+	    layers: multiple({
+		layer: fileLink,
+		opacity: optional(float(0, 1), 1)
+	    }),
+	    selection: multiple({
+		selection: text
+	    }),
+	    selectionPage: {
+		"selection page": pageLink
+	    },
+	    sort: multiple({
+		sort: text,
+		reverse: boolean
+	    })
+	};
+
     var wikiLoad = function(page) {
 	interop.parser.loadPagesStartingFrom(
 	    page, 
@@ -116,24 +145,10 @@ module.exports = function(errors, container, buttonContainer, layers, worksheet,
 	    return data.map(function(d) {
 		return { 
 		    name: d.name,
-		    content: parser.pageAsMarkdown(d.content, schema)
+		    content: interop.parser.pageAsMarkdown(d.content, schema)
 		};
 	    });
 	},
-
-	
-	
-	interop = interopModule(errors.warnUser),
-
-	parser = interop.parser,
-	pageAsMarkdown = parser.pageAsMarkdown,
-	multiple = parser.multiple,
-	optional = parser.optional,
-	boolean = parser.boolean,
-	float = parser.float,
-	text = parser.text,
-	pageLink = parser.pageLink,
-	fileLink = parser.fileLink,
 
 	display = interop.makeDisplay(
 	    container, 
@@ -162,24 +177,7 @@ module.exports = function(errors, container, buttonContainer, layers, worksheet,
 	    wikiLoad,
 	    errors.informUser,
 	    title.title
-	),
-
-	schema = {
-	    layers: multiple({
-		layer: fileLink,
-		opacity: optional(float(0, 1), 1)
-	    }),
-	    selection: multiple({
-		selection: text
-	    }),
-	    selectionPage: {
-		"selection page": pageLink
-	    },
-	    sort: multiple({
-		sort: text,
-		reverse: boolean
-	    })
-	};
+	);
 
     return {
 	baseURL: function() {
