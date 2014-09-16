@@ -33,5 +33,10 @@ module.exports = {
     },
     identity: function(x) {
 	return x;
+    },
+    origin: function() {
+	var a = document.createElement("a");
+	a.href = "/";
+	return a.href;
     }
 };

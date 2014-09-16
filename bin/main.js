@@ -2252,6 +2252,11 @@ module.exports = {
     },
     identity: function(x) {
 	return x;
+    },
+    origin: function() {
+	var a = document.createElement("a");
+	a.href = "/";
+	return a.href;
     }
 };
 },{}],15:[function(require,module,exports){
@@ -36284,6 +36289,7 @@ module.exports = function(container, projection, dataSource) {
 
 var URL = require("url"),
     helpers = require("./helpers.js"),
+    origin = helpers.origin,
     leaflet = require("leaflet"),
     d3 = require("d3");
 
@@ -36349,6 +36355,8 @@ module.exports = function(map, layersControl, baseLayers, wikiStore, title, erro
 		}, 
 		errors.warnUser
 	    );
+	} else {
+	    wikiStore.baseURL(origin());
 	}
     };
 
