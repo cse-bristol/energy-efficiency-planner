@@ -53,19 +53,19 @@ module.exports = function(map, layersControl, baseLayers, wikiStore, title, erro
 	);
 
 	if (query.base) {
-	    baseLayers.current(map, layersControl, query.base);
+	    baseLayers.current(map, layersControl, decodeURIComponent(query.base));
 	}
 	
 	if (query.page) {
-	    title.title(query.page);
+	    title.title(decodeURIComponent(query.page));
 	}
 
 	if (query.wiki) {
 	    wikiStore.baseURL(
-		query.wiki,
+		decodeURIComponent(query.wiki),
 		function baseURLOK(baseURL) {
 		    if (query.page) {
-			wikiStore.loadPage(query.page);
+			wikiStore.loadPage(decodeURIComponent(query.page));
 		    }
 		}, 
 		errors.warnUser

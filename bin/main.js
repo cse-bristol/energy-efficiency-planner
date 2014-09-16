@@ -12014,17 +12014,20 @@ var show = function(el) {
 };
 
 module.exports = function(
-    baseURL, 
-    baseURLValid,
+    requests,
+    // callback which takes a commit message
     onSave,
+    // callback which takes a page
     onLoad,
-    search,
+    // callback
+    onEmbedSuccess,
+    embedMessage,
     container, 
     buttonContainer,
     errors
 ) {
     var fillSearch = function() {
-	search(
+	requests.search(
 	    searchBox[0][0].value,
 	    function success(pages) {
 		var results = searchResults.selectAll("li")
@@ -12033,18 +12036,37 @@ module.exports = function(
 		results.exit().remove();
 		results.enter()
 		    .append("li")
+		    .on("mouseenter", function(page, index) {
+			d3.select("#wiki-search-buttons").remove();
+
+			d3.select(this)
+			    .append("div")
+			    .attr("id", "wiki-search-buttons")
+			    .selectAll("button")
+			    .data(d3.map({
+				load: onLoad,
+				embed: embed
+			    }).entries())
+			    .enter()
+			    .append("button")
+			    .classed("wiki-search-button", true)
+			    .text(function(d, i) {
+				return d.key;
+			    })
+			    .on("click", function(d, i) {
+				console.log("Doing " + d.key + " for " + page);
+				d.value(page);
+			    });
+		    })
+		    .append("span")
 		    .text(function(d, i) {
 			return d;
-		    })
-		    .on("click", function (d, i) {
-			onLoad(d);
 		    });
-
+		
 		show(searchResults);
 	    },
-	    function error(errorText) {
-		errors(errorText);
-	    }
+	    errors
+	    
 	);
     };
 
@@ -12075,10 +12097,10 @@ module.exports = function(
 	    .attr("type", "text")
 	    .attr("id", "wiki-url")
 	    .on("input", function(d, i) {
-		baseURL(urlInput[0][0].value);
+		requests.baseURL(urlInput[0][0].value);
 	    });
 
-    urlInput[0][0].value = baseURL();
+    urlInput[0][0].value = requests.baseURL();
 
     var secondRow = persist.append("form")
 	    .on("submit", function() {
@@ -12118,11 +12140,37 @@ module.exports = function(
 	    .on("blur", function(d, i) {
 		hide(commitForm);
 	    });
+
+    var embed = function(page) {
+	var url = encodeURI(window.location.href);
+	
+	requests.loadPageRaw(
+	    page,
+	    function (rawText) {
+		var content = encodeURIComponent([
+		    rawText,
+		    '',
+		    '[' + embedMessage + '](' + url  + ')',
+			'',
+		    '<iframe width="640px" height="480px" src="' + url + '"></iframe>'
+		].join("\n"));
+
+		requests.save(
+		    [{name: page, content: content}],
+		    [],
+		    "Embedded " + page,
+		    onEmbedSuccess,
+		    errors
+		);
+	    },
+	    errors
+	);
+    };
     
     var m = {
 	update: function() {
-	    urlInput[0][0].value = baseURL();
-	    var valid = baseURLValid();
+	    urlInput[0][0].value = requests.baseURL();
+	    var valid = requests.baseURLValid();
 	    urlInput.style("color", valid ? "black" : "red");
 	    saveButton[0][0].disabled = !valid;
 	    searchBox[0][0].disabled = !valid;
@@ -12162,21 +12210,21 @@ var requests = require("./requests.js"),
     display = require("./display.js"),
     parse = require("./parse-tables.js");
 
-module.exports = function(errors, onSave, onLoad) {
+module.exports = function(errors) {
     var requestsInstance = requests();
 
     return {
 	requests: requestsInstance,
-	makeDisplay: function(container, buttonContainer) {
+	makeDisplay: function(container, buttonContainer, onSave, onLoad, onEmbedSuccess, embedMessage) {
 	    if(!container) {
 		throw new Error("Display require a container to be initialized inside.");
 	    }
 	    var d = display(
-		requestsInstance.baseURL,
-		requestsInstance.baseURLValid,
+		requestsInstance,
 		onSave,
 		onLoad,
-		requestsInstance.search,
+		onEmbedSuccess,
+		embedMessage,
 		container,
 		buttonContainer,
 		errors
@@ -12934,6 +12982,25 @@ module.exports = function() {
 	 */
 	loadPage: loadPage,
 
+	loadPageRaw: function(page, callback, errback) {
+	    getHistory(
+		page,
+		function gotRevision(rev) {
+		    d3.xhr(
+			makeURL([url, "_showraw", page + "?revision=" + rev]), 
+			function(error, response) {
+			    if (error) {
+				errback(error);
+			    } else {
+				callback(response.response);
+			    }
+			}
+		    );
+		},
+		errback
+	    );
+	},
+
 	/*
 	 Loads and parses a TSV file from the wiki.
 	 Calls callback with a row array.
@@ -12949,7 +13016,6 @@ module.exports = function() {
 		    }
 		}
 	    );
-
 	},
 
 	/*
@@ -36338,19 +36404,19 @@ module.exports = function(map, layersControl, baseLayers, wikiStore, title, erro
 	);
 
 	if (query.base) {
-	    baseLayers.current(map, layersControl, query.base);
+	    baseLayers.current(map, layersControl, decodeURIComponent(query.base));
 	}
 	
 	if (query.page) {
-	    title.title(query.page);
+	    title.title(decodeURIComponent(query.page));
 	}
 
 	if (query.wiki) {
 	    wikiStore.baseURL(
-		query.wiki,
+		decodeURIComponent(query.wiki),
 		function baseURLOK(baseURL) {
 		    if (query.page) {
-			wikiStore.loadPage(query.page);
+			wikiStore.loadPage(decodeURIComponent(query.page));
 		    }
 		}, 
 		errors.warnUser
@@ -37159,8 +37225,21 @@ module.exports = function(errors, container, buttonContainer, layers, worksheet,
 
 	
 	
-	interop = interopModule(
-	    errors.warnUser, 
+	interop = interopModule(errors.warnUser),
+
+	parser = interop.parser,
+	pageAsMarkdown = parser.pageAsMarkdown,
+	multiple = parser.multiple,
+	optional = parser.optional,
+	boolean = parser.boolean,
+	float = parser.float,
+	text = parser.text,
+	pageLink = parser.pageLink,
+	fileLink = parser.fileLink,
+
+	display = interop.makeDisplay(
+	    container, 
+	    buttonContainer,
 	    function onWikiSave(logMessage) {
 		var files = layers.names().map(function(layerName) {
 		    var layer = layers.get(layerName);
@@ -37182,20 +37261,10 @@ module.exports = function(errors, container, buttonContainer, layers, worksheet,
 		    errors.warnUser
 		);
 	    },
-	    wikiLoad
+	    wikiLoad,
+	    errors.informUser,
+	    title.title()
 	),
-
-	parser = interop.parser,
-	pageAsMarkdown = parser.pageAsMarkdown,
-	multiple = parser.multiple,
-	optional = parser.optional,
-	boolean = parser.boolean,
-	float = parser.float,
-	text = parser.text,
-	pageLink = parser.pageLink,
-	fileLink = parser.fileLink,
-
-	display = interop.makeDisplay(container, buttonContainer),
 
 	schema = {
 	    layers: multiple({

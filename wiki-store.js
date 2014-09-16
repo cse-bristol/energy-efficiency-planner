@@ -123,8 +123,21 @@ module.exports = function(errors, container, buttonContainer, layers, worksheet,
 
 	
 	
-	interop = interopModule(
-	    errors.warnUser, 
+	interop = interopModule(errors.warnUser),
+
+	parser = interop.parser,
+	pageAsMarkdown = parser.pageAsMarkdown,
+	multiple = parser.multiple,
+	optional = parser.optional,
+	boolean = parser.boolean,
+	float = parser.float,
+	text = parser.text,
+	pageLink = parser.pageLink,
+	fileLink = parser.fileLink,
+
+	display = interop.makeDisplay(
+	    container, 
+	    buttonContainer,
 	    function onWikiSave(logMessage) {
 		var files = layers.names().map(function(layerName) {
 		    var layer = layers.get(layerName);
@@ -146,20 +159,10 @@ module.exports = function(errors, container, buttonContainer, layers, worksheet,
 		    errors.warnUser
 		);
 	    },
-	    wikiLoad
+	    wikiLoad,
+	    errors.informUser,
+	    title.title()
 	),
-
-	parser = interop.parser,
-	pageAsMarkdown = parser.pageAsMarkdown,
-	multiple = parser.multiple,
-	optional = parser.optional,
-	boolean = parser.boolean,
-	float = parser.float,
-	text = parser.text,
-	pageLink = parser.pageLink,
-	fileLink = parser.fileLink,
-
-	display = interop.makeDisplay(container, buttonContainer),
 
 	schema = {
 	    layers: multiple({
