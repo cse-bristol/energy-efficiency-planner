@@ -1,8 +1,24 @@
 "use strict";
 
-/*global module*/
+/*global module, require*/
 
-module.exports = function(container) {
+var float = require("floating-dialogue");
+
+module.exports = function(container, toolbar) {
+
+    var messagesOpenClose = toolbar.append("span")
+	    .html("!");
+
+    var messages = float(
+	container.append("div")
+	    .attr("id", "messages"))
+	    .drag()
+	    .resize()
+	    .close()
+	    .open(messagesOpenClose)
+	    .hide()
+	    .content();
+
     var fadeOut = function(selection) {
 	selection.transition()
 	    .delay(15000)
@@ -14,7 +30,8 @@ module.exports = function(container) {
 	informUser : function(text) {
 	    console.log(text);
 	    
-	    var infoMsg = container.append("div")
+	    var infoMsg = messages
+		    .append("div")
 		    .classed("info", true)
 		    .html(text);
 
@@ -23,7 +40,8 @@ module.exports = function(container) {
 	warnUser : function(text) {
 	    console.warn(text);
 	    
-	    var errorMsg = container.append("div")
+	    var errorMsg = messages
+		    .append("div")
 		    .classed("error", true)
 		    .html(text);
 

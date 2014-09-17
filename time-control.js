@@ -2,16 +2,28 @@
 
 /*global module, require*/
 
-var d3 = require("d3");
+var d3 = require("d3"),
+    float = require("floating-dialogue");
 
 /*
  Given a container, provides a time slider which lets the user set the current year.
 */
-module.exports = function(container, min, max, start) {
-    var display = container.append("h1")
+module.exports = function(container, toolbar, min, max, start) {
+    var timeOpenClose = toolbar.append("span")
+	    .html("⌛");
+
+    var timeContainer = float(container.append("div")
+	    .attr("id", "time"))
+	    .open(timeOpenClose)
+	    .hide()
+	    .content();
+
+    var display = timeContainer.append("h2")
 	    .html(start);
     
-    var slider = container.append("div")
+    var slider = timeContainer
+	    .append("div")
+	    .classed("time-input-wrapper", true)
 	    .append("input")
 	    .attr("type", "range")
 	    .attr("min", min)

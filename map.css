@@ -2,12 +2,12 @@ body {
     margin: 0;
     padding: 0;
     font-family: Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    overflow: hidden;
 }
 
-#left-pane {
-    border-right: 1px solid grey;
-    width: 99vw;
-    height: 99vh;
+#toolbar .open-button {
+    position: static;
+    display: block;
 }
 
 #title {
@@ -42,8 +42,8 @@ body {
 }
 
 #map {
-    width: 99vw;
-    height: 99vh;
+    width: 100vw;
+    height: 100vh;
 }
 
 path {
@@ -78,11 +78,6 @@ path.selected:hover {
     margin: 0;
 }
 
-#layer-select ul {
-    padding: 0;
-    margin: 0;
-}
-
 #layer-select li {
     text-overflow: ellipsis;
     list-style-type: none;
@@ -99,43 +94,37 @@ path.selected:hover {
     opacity: 1.0;
 }
 
-#time-control {
+#time {
     position: absolute;
-    width: 47vw;
-    bottom: 25px;
-    left: 2vw;
-    pointer-events: none;
-}
-
-#time-control div {
-    background-color: orange;
-    border: 2px dashed black;
-    padding-right: 10px;
+    width: 20em;
+    top: calc(100% - 8em);
+    left: 0.6em;
     opacity: 0.7;
-    pointer-events: auto;
 }
 
-#time-control div:hover {
-    border-style: solid;
-    opacity: 0.9;
+#time:hover {
+    opacity: 1.0;
 }
 
-#time-control div input {
-    width: 100%;
-}
-
-#time-control h1 {
-    padding: 4px;
+#time h2 {
     width: 3em;
     text-align: center;
     background-color: orange;
-    border: 2px solid black;
-    opacity: 0.9;
+}
+
+.time-input-wrapper {
+    background-color: orange;
+    overflow: hidden;
+}
+
+#time input {
+    margin-left: 2.5%;
+    width: 95%;
 }
 
 #worksheet {
     position: absolute;
-    top: 7em;
+    top: 6em;
     left: 50vw;
     max-height: 85vh;
     max-width: 46vw;
@@ -219,24 +208,19 @@ th.reverse:after {
 
 #messages {
     position: absolute;
-    top: 10px;
-    left: 400px;
-    width: 20vw;
-    pointer-events: none;
+    top: 0.6em;
+    left: 25em;
+    width: 25em;
+    height: 13em;
+    background-color: white;
 }
 
 .error {
-    border: 2px solid red;
     color: red;
-    padding: 4px;
-    opacity: 0.8;
-    background-color: #C0C0C0;
+    margin: 0.1em;
 }
 
 .info {
-    border: 2px solid green;
     color: green;
-    padding: 4px;
-    opacity: 0.8;
-    background-color: #C0C0C0;
+    margin: 0.1em;
 }

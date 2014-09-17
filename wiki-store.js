@@ -15,7 +15,7 @@ var layerName = function(path) {
     return path.slice(prefixLen, path.length - extLen);
 };
 
-module.exports = function(errors, container, buttonContainer, layers, worksheet, selection, title, findShapesByName, redraw) {
+module.exports = function(errors, container, toolbar, layers, worksheet, selection, title, findShapesByName, redraw) {
     var interop = interopModule(errors.warnUser),
 
 	s = interop.schema,
@@ -152,7 +152,7 @@ module.exports = function(errors, container, buttonContainer, layers, worksheet,
 
 	display = interop.makeDisplay(
 	    container, 
-	    buttonContainer,
+	    toolbar,
 	    function onWikiSave(logMessage) {
 		var files = layers.names().map(function(layerName) {
 		    var layer = layers.get(layerName);

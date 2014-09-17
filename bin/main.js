@@ -1565,9 +1565,25 @@ module.exports = {
 },{"d3":19}],9:[function(require,module,exports){
 "use strict";
 
-/*global module*/
+/*global module, require*/
 
-module.exports = function(container) {
+var float = require("floating-dialogue");
+
+module.exports = function(container, toolbar) {
+
+    var messagesOpenClose = toolbar.append("span")
+	    .html("!");
+
+    var messages = float(
+	container.append("div")
+	    .attr("id", "messages"))
+	    .drag()
+	    .resize()
+	    .close()
+	    .open(messagesOpenClose)
+	    .hide()
+	    .content();
+
     var fadeOut = function(selection) {
 	selection.transition()
 	    .delay(15000)
@@ -1579,7 +1595,8 @@ module.exports = function(container) {
 	informUser : function(text) {
 	    console.log(text);
 	    
-	    var infoMsg = container.append("div")
+	    var infoMsg = messages
+		    .append("div")
 		    .classed("info", true)
 		    .html(text);
 
@@ -1588,7 +1605,8 @@ module.exports = function(container) {
 	warnUser : function(text) {
 	    console.warn(text);
 	    
-	    var errorMsg = container.append("div")
+	    var errorMsg = messages
+		    .append("div")
 		    .classed("error", true)
 		    .html(text);
 
@@ -1596,7 +1614,7 @@ module.exports = function(container) {
 	}
     };
 };
-},{}],10:[function(require,module,exports){
+},{"floating-dialogue":20}],10:[function(require,module,exports){
 "use strict";
 
 /*global FileReader, require, module*/
@@ -1990,25 +2008,33 @@ module.exports = {
 var startCoordinates = [0, 0],
     zoom = 2,
     d3 = require("d3"),
+    dialogue = require("floating-dialogue"),
     geocoder = require("leaflet-control-geocoder"),
     leaflet = require("leaflet"),
-    errors = require("./errors.js")(d3.select("#messages")),
-    time = require("./time-control.js")(d3.select("#time-control"), 2013, 2024, 2014),
+
+    body = d3.select("body"),
+    mapDiv = body.append("div").attr("id", "map"),
+
+    toolbar = body.append("div").attr("id", "toolbar"),
+
+    worksheetOpenClose = toolbar.append("span")
+	.html("⊞"),
+    worksheetContainer = dialogue(
+	body.append("div").attr("id", "worksheet"))
+	.resize()
+	.close()
+	.open(worksheetOpenClose)
+	.drag(),
+
+    errors = require("./errors.js")(body, toolbar),
+    time = require("./time-control.js")(body, toolbar, 2013, 2024, 2014),
     loader = require("./loader.js"),
     sources = require("./sources.js")(errors),
     layers = require("./layers.js")(errors, sources),
     geometries = require("./geometries.js"),
-    floatDialogue = require("floating-dialogue"),
+
     baseLayers = require("./base-layers.js")(errors),
-    title = require("./title.js")(d3.select("#left-pane")),
-    toolbar = d3.select("#toolbar"),
-    tableOpenClose = toolbar.append("span")
-	.html("⊞"),
-    worksheetContainer = floatDialogue(d3.select("#worksheet"))
-	.resize()
-	.open(tableOpenClose)
-	.close()
-	.drag();
+    title = require("./title.js")(body);
 
 require("leaflet-fancy-layer-control");
 require("./lib/d3-plugins/geo/tile/tile.js");
@@ -2080,7 +2106,7 @@ layerOrder.orderChanged(function(){
     paintDisplayColumn();
 });
 
-var layerSelect = require("./layer-select.js")(d3.select("#layer-select"), layers),
+var layerSelect = require("./layer-select.js")(body, toolbar, layers),
     selection = require("./selection.js")(overlay),
     worksheet = require("./worksheet.js")(
 	worksheetContainer,
@@ -2199,7 +2225,7 @@ var paintDisplayColumn = function() {
 
 var wikiStore = require("./wiki-store.js")(
     errors, 
-    d3.select("body"), 
+    body, 
     toolbar,
     layers,
     worksheet,
@@ -2264,16 +2290,25 @@ module.exports = {
 
 /*global module, require*/
 
-var helpers = require("./helpers.js"),
+var float = require("floating-dialogue"),
+    helpers = require("./helpers.js"),
     identity = helpers.identity,
     callbackHandler = helpers.callbackHandler;
 
 /*
  Makes a clickable list of layers.
  */
-module.exports = function(container, layers) {
-    var list = container.append("ul");
-    var callbacks = callbackHandler();
+module.exports = function(container, toolbar, layers) {
+    var openclose = toolbar.append("span")
+	    .html("L");
+    
+    var list = float(
+	container.append("ul")
+	    .attr("id", "layer-select"))
+	    .open(openclose)
+	    .content(),
+
+	callbacks = callbackHandler();
 
     var redraw = function(){
 	var li = list.selectAll("li")
@@ -2289,7 +2324,7 @@ module.exports = function(container, layers) {
     
     layers.layerCreated(redraw);
     layers.layerRemoved(redraw);
-
+    
     return {
 	onClick : function(callback) {
 	    callbacks.add(callback);
@@ -2297,7 +2332,7 @@ module.exports = function(container, layers) {
     };
 };
 
-},{"./helpers.js":14}],16:[function(require,module,exports){
+},{"./helpers.js":14,"floating-dialogue":20}],16:[function(require,module,exports){
 "use strict";
 
 /*global module, require*/
@@ -11922,7 +11957,10 @@ module.exports = function(el) {
 		.classed("open-button", true)
 		.classed("element-visible", el.attr("visibility") !== "hidden")
 		.style("cursor", "pointer")
-		.on("click", toggle);
+		.on("click", function(d, i) {
+		    d3.event.preventDefault();
+		    toggle();
+		});
 
 	    openButton = button;
 
@@ -11977,10 +12015,12 @@ module.exports = function(el) {
 
 	hide: function() {
 	    visibility(false);
+	    return m;
 	},
 
 	show: function() {
 	    visibility(true);
+	    return m;
 	},
 
 	content: function() {
@@ -12171,7 +12211,7 @@ module.exports = function(
 		    '',
 		    '[' + embedMessage() + '](' + url  + ')',
 		    '',
-		    '<iframe width="640px" height="480px" src="' + url + '"></iframe>'
+		    '<iframe width="100%" height="480px" scrolling="no" src="' + url + '"></iframe>'
 		].join("\n"));
 
 		requests.save(
@@ -12392,19 +12432,37 @@ var pageAsMarkdown = function(content, schema) {
 
 	    var tableSchema = schema[table],
 		rowData = tableSchema.multiple ? content[table] : [content[table]],
-		tableKeys = _.without(Object.keys(tableSchema), "multiple");
-	    
-	    return markdownTable(
-		tableKeys, 
-		rowData.map(function (row) {
-		    return tableKeys.map(function(column) {
-			if (row[column] === undefined) {
+		columns = _.without(Object.keys(tableSchema), "multiple"),
+		usedColumns = columns.map(function(c) { return false; });
+
+	    	    
+	    var rowDataTabular = rowData.map(function (row) {
+		return columns.map(function(column, i) {
+		    if (row[column] === undefined) {
+			if (!tableSchema[column].optional) {
 			    throw new Error("Missing column " + column + " in table " + table);
 			}
-			return tableSchema[column]
-			    .save(row[column]);
-		    });
-		})
+		    } else {
+			usedColumns[i] = true;
+		    }
+		    return tableSchema[column]
+			.save(row[column]);
+		});
+	    });
+
+	    rowDataTabular = rowDataTabular.map(function(row) {
+		return row.filter(function(cell, i) {
+		    return usedColumns[i];
+		});
+	    });
+
+	    columns = columns.filter(function(k, i) {
+		return usedColumns[i];
+	    });
+
+	    return markdownTable(
+		columns, 
+		rowDataTabular
 	    );
 	}).join("\n");
 };
@@ -12561,7 +12619,11 @@ module.exports = function() {
 		makeURL([url, address]), 
 		function(error, html) {
 		    if (error) {
-			errback(error);
+			if (error.statusText !== undefined) {
+			    errback(error.statusText + " " + address);
+			} else {
+			    errback(error);
+			}
 		    } else {
 			var content = html.querySelector("#content");
 			if (content) {
@@ -12581,12 +12643,19 @@ module.exports = function() {
 	    function lookupRevision (content) {
 		var latest = content.querySelector("ul li");
 		if (!latest) {
-		    errback("Could not find history for " + page);
+		    errback("Could not find any versions of " + page);
 		} else {
-		    var rev = latest.getAttribute("revision");
-		    pageCache.set(page, rev);		 
+		    var subject = latest.querySelector(".subject").innerHTML;
+		    if (subject.indexOf("Deleted using web interface.") >= 0) {
 
-		    callback(rev);
+			pageCache.remove(page);
+			callback("");
+
+		    } else {
+			var rev = latest.getAttribute("revision");
+			pageCache.set(page, rev);
+			callback(rev);
+		    }
 		}
 	    },
 	    errback
@@ -12628,9 +12697,19 @@ module.exports = function() {
 	);
     };
 
+    var getRevisionThenSave = function(name, markdown, logMessage, callback, errback) {
+	// We need the revision number to do this save.
+	getHistory(
+	    name,
+	    function gotRevision(rev) {
+		savePage(name, markdown, logMessage, callback, errback);
+	    },
+	    errback);
+    };
+
     var savePage = function(name, markdown, logMessage, callback, errback) {
 	if (pageCache.has(name) && pageCache.get(name) === null) {
-	    errback("Cannot save page " + name + " because it already exists, and we can't update it since we don't know what version we have.");
+	    getRevisionThenSave(name, markdown, logMessage, callback, errback);
 
 	} else {
 	    d3.xhr(makeURL([url, name]))
@@ -12639,9 +12718,9 @@ module.exports = function() {
 		    makeSavePagePost(name, markdown, logMessage), 
 		    function (error, response) {
 			if (error) {
-			    if (error.response === "Server error: ResourceExists") {
-				errback("Attempted to save page " + name
-					+ " as a new page, but it already exists.");
+			    if (error.response.indexOf("ResourceExists") >= 0) {
+				getRevisionThenSave(name, markdown, logMessage, callback, errback);
+
 			    } else {
 				errback(error.response);
 			    }
@@ -12703,8 +12782,7 @@ module.exports = function() {
 		getContent(
 		    page + "?revision=" + rev,
 		    function onSuccess(content) {
-			removeElements(".revision", content);
-			callback(content);
+			callback(content.querySelector("#wikipage"));
 		    },
 		    errback
 		);
@@ -12832,7 +12910,7 @@ module.exports = function() {
 	save: function(pages, files, logMessage, callback, errback) {
 	    var pageStack = pages.slice(),
 		fileStack = files.slice(),
-		reportedSuccess = false;
+		done = 0;
 
 	    var saveLoop = function() {
 		if (pageStack.length > 0) {
@@ -12850,6 +12928,7 @@ module.exports = function() {
 			    loadPage(
 				page.name,
 				function onSuccess(content) {
+				    done++;
 				    saveLoop();
 				},
 				function onError(error) {
@@ -12868,13 +12947,13 @@ module.exports = function() {
 			file.content,
 			logMessage,
 			function onSuccess() {
+			    done++;
 			    saveLoop();
 			},
 			errback
 		    );
 
-		} else if (!reportedSuccess) {
-		    reportedSuccess = true;
+		} else if (done === (pages.length = files.length)) {
 		    callback("Successful save.");
 		}
 	    };
@@ -12965,7 +13044,9 @@ var choices = function(options) {
     return {
 	load: function(el) {
 	    var val = text.load(el);
+
 	    if (options.indexOf(val) >= 0) {
+		return val;
 	    } else {
 		throw new Error("Saw " + val + ", but was expecting one of: " + options.join(", "));
 	    }
@@ -13029,7 +13110,8 @@ var optional = function(fieldType) {
 	},
 	save: function(val) {
 	    return val;
-	}
+	},
+	optional: true
     };
 };
 
@@ -13055,7 +13137,7 @@ var pageLink = {
 	return name;
     },
     save: function(val) {
-	return "[" + val + "]()";
+	return "[" + (val[0] === "/" ? "" : "/") + val + "]()";
     }
 };
 
@@ -37027,16 +37109,28 @@ module.exports = function(errors) {
 
 /*global module, require*/
 
-var d3 = require("d3");
+var d3 = require("d3"),
+    float = require("floating-dialogue");
 
 /*
  Given a container, provides a time slider which lets the user set the current year.
 */
-module.exports = function(container, min, max, start) {
-    var display = container.append("h1")
+module.exports = function(container, toolbar, min, max, start) {
+    var timeOpenClose = toolbar.append("span")
+	    .html("⌛");
+
+    var timeContainer = float(container.append("div")
+	    .attr("id", "time"))
+	    .open(timeOpenClose)
+	    .hide()
+	    .content();
+
+    var display = timeContainer.append("h2")
 	    .html(start);
     
-    var slider = container.append("div")
+    var slider = timeContainer
+	    .append("div")
+	    .classed("time-input-wrapper", true)
 	    .append("input")
 	    .attr("type", "range")
 	    .attr("min", min)
@@ -37072,7 +37166,7 @@ module.exports = function(container, min, max, start) {
     return module;
 };
 
-},{"d3":19}],115:[function(require,module,exports){
+},{"d3":19,"floating-dialogue":20}],115:[function(require,module,exports){
 "use strict";
 
 /*global module, require */
@@ -37168,7 +37262,7 @@ var layerName = function(path) {
     return path.slice(prefixLen, path.length - extLen);
 };
 
-module.exports = function(errors, container, buttonContainer, layers, worksheet, selection, title, findShapesByName, redraw) {
+module.exports = function(errors, container, toolbar, layers, worksheet, selection, title, findShapesByName, redraw) {
     var interop = interopModule(errors.warnUser),
 
 	s = interop.schema,
@@ -37234,7 +37328,7 @@ module.exports = function(errors, container, buttonContainer, layers, worksheet,
 			    worksheet.sortProperty(s.get("sort"), true);
 			    if (s.get("reverse")) {
 				// Additional sort on the same property reverses it.
-				worksheet.sortPropert(s.get("sort"), true);
+				worksheet.sortProperty(s.get("sort"), true);
 			    }
 			});
 		    }
@@ -37305,7 +37399,7 @@ module.exports = function(errors, container, buttonContainer, layers, worksheet,
 
 	display = interop.makeDisplay(
 	    container, 
-	    buttonContainer,
+	    toolbar,
 	    function onWikiSave(logMessage) {
 		var files = layers.names().map(function(layerName) {
 		    var layer = layers.get(layerName);

@@ -5,25 +5,33 @@
 var startCoordinates = [0, 0],
     zoom = 2,
     d3 = require("d3"),
+    dialogue = require("floating-dialogue"),
     geocoder = require("leaflet-control-geocoder"),
     leaflet = require("leaflet"),
-    errors = require("./errors.js")(d3.select("#messages")),
-    time = require("./time-control.js")(d3.select("#time-control"), 2013, 2024, 2014),
+
+    body = d3.select("body"),
+    mapDiv = body.append("div").attr("id", "map"),
+
+    toolbar = body.append("div").attr("id", "toolbar"),
+
+    worksheetOpenClose = toolbar.append("span")
+	.html("⊞"),
+    worksheetContainer = dialogue(
+	body.append("div").attr("id", "worksheet"))
+	.resize()
+	.close()
+	.open(worksheetOpenClose)
+	.drag(),
+
+    errors = require("./errors.js")(body, toolbar),
+    time = require("./time-control.js")(body, toolbar, 2013, 2024, 2014),
     loader = require("./loader.js"),
     sources = require("./sources.js")(errors),
     layers = require("./layers.js")(errors, sources),
     geometries = require("./geometries.js"),
-    floatDialogue = require("floating-dialogue"),
+
     baseLayers = require("./base-layers.js")(errors),
-    title = require("./title.js")(d3.select("#left-pane")),
-    toolbar = d3.select("#toolbar"),
-    tableOpenClose = toolbar.append("span")
-	.html("⊞"),
-    worksheetContainer = floatDialogue(d3.select("#worksheet"))
-	.resize()
-	.open(tableOpenClose)
-	.close()
-	.drag();
+    title = require("./title.js")(body);
 
 require("leaflet-fancy-layer-control");
 require("./lib/d3-plugins/geo/tile/tile.js");
@@ -95,7 +103,7 @@ layerOrder.orderChanged(function(){
     paintDisplayColumn();
 });
 
-var layerSelect = require("./layer-select.js")(d3.select("#layer-select"), layers),
+var layerSelect = require("./layer-select.js")(body, toolbar, layers),
     selection = require("./selection.js")(overlay),
     worksheet = require("./worksheet.js")(
 	worksheetContainer,
@@ -214,7 +222,7 @@ var paintDisplayColumn = function() {
 
 var wikiStore = require("./wiki-store.js")(
     errors, 
-    d3.select("body"), 
+    body, 
     toolbar,
     layers,
     worksheet,
