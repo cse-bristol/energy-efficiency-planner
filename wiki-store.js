@@ -81,7 +81,7 @@ module.exports = function(errors, container, buttonContainer, layers, worksheet,
 			    worksheet.sortProperty(s.get("sort"), true);
 			    if (s.get("reverse")) {
 				// Additional sort on the same property reverses it.
-				worksheet.sortPropert(s.get("sort"), true);
+				worksheet.sortProperty(s.get("sort"), true);
 			    }
 			});
 		    }
