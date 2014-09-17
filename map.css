@@ -11,22 +11,25 @@ body {
 }
 
 #title {
-    font-size: xx-large;
+    font-size: x-large;
     background-color: transparent;
     border: none;
     font-weight: bolder;
     color: darkslategrey;
-    position: fixed;
-    top: 10px;
-    left: 50px;
+    position: absolute;
+    top: 0.3em;
+    left: 2em;
     text-overflow: ellipsis;
+    padding: 0.1em;
+    margin: 0;
+    width: 14em;
 }
 
 #toolbar {
     opacity: 0.6;
-    position: fixed;
-    top: 100px;
-    padding-left: 0.5vw;
+    position: absolute;
+    top: 5em;
+    left: 0.6em;
 }
 
 #toolbar:hover {
@@ -34,8 +37,8 @@ body {
 }
 
 #wiki-persistence {
-    left: calc(100% - 340px);
-    top: 15px;
+    left: calc(100% - 21em);
+    top: 0.3em;
 }
 
 #map {
@@ -68,31 +71,36 @@ path.selected:hover {
 }
 
 #layer-select {
-    position: fixed;
-    top: 50px;
-    left: 50px;
+    position: absolute;
+    top: 2.5em;
+    left: 3em;
+    padding: 0;
+    margin: 0;
 }
 
 #layer-select ul {
-    padding-left: 0;
+    padding: 0;
+    margin: 0;
 }
 
 #layer-select li {
+    text-overflow: ellipsis;
     list-style-type: none;
-    border: 2px black dashed;
-    padding: 4px;
-    margin: 4px;
-    opacity: 0.8;
+    margin: 0.1em;
+    padding: 0.1em;
+    opacity: 0.7;
     background-color: orange;
+    cursor: pointer;
+    width: 21em;
+    overflow: hidden;
 }
 
 #layer-select li:hover {
     opacity: 1.0;
-    border-style: solid;
 }
 
 #time-control {
-    position: fixed;
+    position: absolute;
     width: 47vw;
     bottom: 25px;
     left: 2vw;
@@ -126,17 +134,15 @@ path.selected:hover {
 }
 
 #worksheet {
-    position: fixed;
-    top: 100px;
-    left: 49vw;
-    max-height: 93vh;
-    min-height: 40px;
+    position: absolute;
+    top: 7em;
+    left: 50vw;
+    max-height: 85vh;
     max-width: 46vw;
-    min-width: 40px;
     overflow: auto;
     background-color: #F0F0F0;
     opacity: 0.8;
-    padding: 5px 20px 5px 5px;
+    padding: 0.3em;
     font-size: x-small;
 }
 
@@ -197,8 +203,8 @@ th.reverse:after {
 #calculations li {
     list-style-type: none;
     border: 1px grey dashed;
-    margin: 4px;
-    padding: 4px;
+    margin: 0.2em;
+    padding: 0.2em;
     opacity: 0.9;
 }
 
@@ -212,7 +218,7 @@ th.reverse:after {
 }
 
 #messages {
-    position: fixed;
+    position: absolute;
     top: 10px;
     left: 400px;
     width: 20vw;
