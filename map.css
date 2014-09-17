@@ -19,6 +19,7 @@ body {
     position: fixed;
     top: 10px;
     left: 50px;
+    text-overflow: ellipsis;
 }
 
 #toolbar {
