@@ -3,7 +3,8 @@
 /*global module, require*/
 
 var d3 = require("d3"),
-    float = require("floating-dialogue");
+    float = require("floating-dialogue"),
+    callbackFactory = require("./helpers.js").callbackHandler;
 
 /*
  Given a container, provides a time slider which lets the user set the current year.
@@ -33,14 +34,12 @@ module.exports = function(container, toolbar, min, max, start) {
 
     var current = start;
 
-    var callbacks = [];
+    var callbacks = callbackFactory();
 
     slider.on("change", function(event, index){
 	current = d3.event.target.value;
 	display.html(current);
-	callbacks.forEach(function(c){
-	    c(current);
-	});
+	callbacks(current);
     });
 
     var module = {
@@ -48,7 +47,7 @@ module.exports = function(container, toolbar, min, max, start) {
 	 Passed a function, calls that function with the new date whenever it changes.
 	 */
 	onChange : function(callback) {
-	    callbacks.push(callback);
+	    callbacks.add(callback);
 	},
 
 	current : function() {

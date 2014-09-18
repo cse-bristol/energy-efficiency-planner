@@ -12555,6 +12555,16 @@ var d3 = require("d3"),
     mapEl = domHelpers.mapEl,
     removeElements = domHelpers.removeElements;
 
+var errorFromResponse = function(error, errback) {
+    if (error.statusText) {
+	errback(error.statusText);
+    } else if (error.response) {
+	errback(error.response);
+    } else {
+	errback(error);
+    }
+};
+
 
 var makeURL = function(parts) {
     var url = parts[0];
@@ -12591,7 +12601,7 @@ module.exports = function() {
 	d3.html(url, function(error, html) {
 	    if (error) {
 		validURL = false;
-		errback(error.response);
+		errorFromResponse(error, errback);
 		return;
 	    } else {
 		var logo = html.querySelector("#logo");
@@ -12619,11 +12629,7 @@ module.exports = function() {
 		makeURL([url, address]), 
 		function(error, html) {
 		    if (error) {
-			if (error.statusText !== undefined) {
-			    errback(error.statusText + " " + address);
-			} else {
-			    errback(error);
-			}
+			errorFromResponse(error, errback);
 		    } else {
 			var content = html.querySelector("#content");
 			if (content) {
@@ -12722,7 +12728,7 @@ module.exports = function() {
 				getRevisionThenSave(name, markdown, logMessage, callback, errback);
 
 			    } else {
-				errback(error.response);
+				errorFromResponse(error, errback);
 			    }
 			} else {
 			    var errors = checkResponseMessages(response, name);
@@ -12767,7 +12773,7 @@ module.exports = function() {
 		saveFilePostData(name, content, logMessage),
 		function (error, response) {
 		    if (error) {
-			errback(error.response);
+			errorFromResponse(error, errback);
 		    } else {
 			callback();
 		    }
@@ -12885,7 +12891,7 @@ module.exports = function() {
 		    makeURL([url, "_search" + "?search=Search&patterns=" + pattern]),
 		    function(error, html) {
 			if (error) {
-			    errback(error);
+			    errorFromResponse(error, errback);
 			} else {
 			    callback(
 				html.querySelector("#pattern").innerHTML,
@@ -12976,7 +12982,7 @@ module.exports = function() {
 			makeURL([url, "_showraw", page + "?revision=" + rev]), 
 			function(error, response) {
 			    if (error) {
-				errback(error);
+				errorFromResponse(error, errback);
 			    } else {
 				callback(response.response);
 			    }
@@ -12996,7 +13002,7 @@ module.exports = function() {
 		makeURL([url, file]),
 		function(error, rows) {
 		    if (error) {
-			errback(error.response);
+			errorFromResponse(error, errback);
 		    } else {
 			callback(rows);
 		    }
@@ -13013,7 +13019,7 @@ module.exports = function() {
 		function(error, obj) {
 		    if (error) {
 			if (error.response) {
-			    errback(error.response);
+			    errorFromResponse(error, errback);
 			} else {
 			    errback(error);
 			}	
@@ -36795,11 +36801,10 @@ module.exports = function(container) {
 		leaving.push(this);
 	    });
 	    
-	    selectionChangedCallbacks.forEach(function(c){
-		c(selection.values(),
-		  [],
-		  leaving);
-	    });
+	    selectionChangedCallbacks(
+		selection.values(),
+		[],
+		leaving);
 	},
 
 	/*
@@ -37110,7 +37115,8 @@ module.exports = function(errors) {
 /*global module, require*/
 
 var d3 = require("d3"),
-    float = require("floating-dialogue");
+    float = require("floating-dialogue"),
+    callbackFactory = require("./helpers.js").callbackHandler;
 
 /*
  Given a container, provides a time slider which lets the user set the current year.
@@ -37140,14 +37146,12 @@ module.exports = function(container, toolbar, min, max, start) {
 
     var current = start;
 
-    var callbacks = [];
+    var callbacks = callbackFactory();
 
     slider.on("change", function(event, index){
 	current = d3.event.target.value;
 	display.html(current);
-	callbacks.forEach(function(c){
-	    c(current);
-	});
+	callbacks(current);
     });
 
     var module = {
@@ -37155,7 +37159,7 @@ module.exports = function(container, toolbar, min, max, start) {
 	 Passed a function, calls that function with the new date whenever it changes.
 	 */
 	onChange : function(callback) {
-	    callbacks.push(callback);
+	    callbacks.add(callback);
 	},
 
 	current : function() {
@@ -37166,7 +37170,7 @@ module.exports = function(container, toolbar, min, max, start) {
     return module;
 };
 
-},{"d3":19,"floating-dialogue":20}],115:[function(require,module,exports){
+},{"./helpers.js":14,"d3":19,"floating-dialogue":20}],115:[function(require,module,exports){
 "use strict";
 
 /*global module, require */

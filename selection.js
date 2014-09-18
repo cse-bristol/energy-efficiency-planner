@@ -78,11 +78,10 @@ module.exports = function(container) {
 		leaving.push(this);
 	    });
 	    
-	    selectionChangedCallbacks.forEach(function(c){
-		c(selection.values(),
-		  [],
-		  leaving);
-	    });
+	    selectionChangedCallbacks(
+		selection.values(),
+		[],
+		leaving);
 	},
 
 	/*
