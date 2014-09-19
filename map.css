@@ -70,28 +70,12 @@ path.selected:hover {
     stroke: yellow;
 }
 
-#layer-select {
-    position: absolute;
-    top: 2.5em;
-    left: 3em;
-    padding: 0;
-    margin: 0;
-}
-
-#layer-select li {
-    text-overflow: ellipsis;
-    list-style-type: none;
-    margin: 0.1em;
-    padding: 0.1em;
-    opacity: 0.7;
-    background-color: orange;
+.select-and-focus {
     cursor: pointer;
-    width: 21em;
-    overflow: hidden;
 }
 
-#layer-select li:hover {
-    opacity: 1.0;
+.select-and-focus:hover {
+    text-decoration: underline;
 }
 
 #time {

@@ -1,6 +1,61 @@
 "use strict";
 
-/*global module, require, GLOBAL*/
+/*global module, require*/
+
+/*
+ This file is where all the mess and wiring goes.
+ We should aim to reduce its size.
+*/
+
+var log2 = function(n) {
+    return Math.log(n) / Math.LN2;
+    
+};
+var zoomToLayer = function(l) {
+    if (l.boundingbox()) {
+	var x1 = l.boundingbox()[0],
+	    y1 = l.boundingbox()[1],
+	    x2 = l.boundingbox()[2],
+	    y2 = l.boundingbox()[3];
+
+	var boxSize = Math.max(
+	    Math.abs(x1 - x2),
+	    Math.abs(y1 - y2));
+
+	var newZoom = Math.round(
+	    log2(360 / boxSize) + 1.5);
+	console.log("new zoom " + newZoom);
+	console.log("new bounds " + [(y1 + y2) / 2, (x1 + x2) / 2]);
+	
+	map.setView(
+	    leaflet.latLng(
+		(y1 + y2) / 2,
+		(x1 + x2) / 2),	    
+	    newZoom);
+    }
+};
+
+var projectPoint = function(x, y) {
+    var point = map.latLngToLayerPoint(new leaflet.LatLng(y, x));
+    this.stream.point(point.x, point.y);
+};
+
+var sortedByZ = function() {
+    return layers.enabled().slice(0).sort(function(a, b){
+	return a.options.zIndex - b.options.zIndex;
+    });
+};
+
+var paintDisplayColumn = function() {
+    var displayData = worksheet.displayData(time.current());
+    colour.paintSVGElements(displayData, selection.current());
+
+    colour.unpaintHTML(resultsTable.cells());
+    if (worksheet.getSortProperties().properties.length > 0) {
+	colour.paintHTMLSelection(displayData, resultsTable.column(worksheet.propertyIndex(
+	    worksheet.getSortProperties().properties[0])));
+    }
+};
 
 var startCoordinates = [0, 0],
     zoom = 2,
@@ -31,7 +86,8 @@ var startCoordinates = [0, 0],
     geometries = require("./geometries.js"),
 
     baseLayers = require("./base-layers.js")(errors),
-    title = require("./title.js")(body);
+    title = require("./title.js")(body),
+    transform = d3.geo.transform({point: projectPoint});
 
 require("leaflet-fancy-layer-control");
 require("./lib/d3-plugins/geo/tile/tile.js");
@@ -55,45 +111,37 @@ map._initPathRoot();
 
 var overlay = d3.select(map.getPanes().overlayPane)
 	.select("svg")
-	.attr("id", "overlay");
+	.attr("id", "overlay"),
+
+    selection = require("./selection.js")(overlay);
 
 map.addControl(new geocoder({
     email: "research@cse.org.uk"
 }));
 
-var layerOpacity = leaflet.Control.Layers.Opacity();
-var layerOrder = leaflet.Control.Layers.Order();
-var layerDelete = leaflet.Control.Layers.Delete(map, function secondaryLayersOnly (layer, name, isOverlay) {
-    return !!isOverlay;
-});
-var layersControl = new leaflet.Control.Layers.Extensible(
-    baseLayers.dict,
-    {
-	"National Heat Map" : nationalHeatMap
-    },
-    {
-	hooks : [layerDelete, layerOpacity],
-	baseHooks : [],
-	overlayHooks : [layerOrder]
-    });
+var layerOpacity = leaflet.Control.Layers.Opacity(),
+    layerOrder = leaflet.Control.Layers.Order(),
+    layerDelete = leaflet.Control.Layers.Delete(map),
+    layerSelect = require("./layer-select.js")(leaflet, zoomToLayer, layers, selection, getLayerObjects, function(layer, name, overlay) {
+	return layers.get(name) !== undefined;
+    }),
+    
+    layersControl = new leaflet.Control.Layers.Extensible(
+	baseLayers.dict,
+	{
+	    "National Heat Map" : nationalHeatMap
+	},
+	{
+	    hooks : [layerOpacity],
+	    baseHooks : [],
+	    overlayHooks : [layerOrder, layerDelete, layerSelect]
+	});
 
 layersControl.addTo(map);
 layers.layerCreated(function(l){
     map.addLayer(l);
     layersControl.addOverlay(l, l.name());
 });
-
-var projectPoint = function(x, y) {
-    var point = map.latLngToLayerPoint(new leaflet.LatLng(y, x));
-    this.stream.point(point.x, point.y);
-};
-var transform = d3.geo.transform({point: projectPoint});
-
-var sortedByZ = function() {
-    return layers.enabled().slice(0).sort(function(a, b){
-	return a.options.zIndex - b.options.zIndex;
-    });
-};
 
 var paint = require("./paint.js")(overlay, transform, sortedByZ);
 layerOpacity.opacityChanged(paint.redrawAll);
@@ -103,9 +151,7 @@ layerOrder.orderChanged(function(){
     paintDisplayColumn();
 });
 
-var layerSelect = require("./layer-select.js")(body, toolbar, layers),
-    selection = require("./selection.js")(overlay),
-    worksheet = require("./worksheet.js")(
+var worksheet = require("./worksheet.js")(
 	worksheetContainer,
 	layers, 
 	sources, 
@@ -132,48 +178,9 @@ layers.layerRemoved(function(l){
     paint.redrawAll();
 });
 
-var log2 = function(n) {
-    return Math.log(n) / Math.LN2;
-    
-};
-var zoomToLayer = function(l) {
-    if (l.boundingbox()) {
-	var x1 = l.boundingbox()[0],
-	    y1 = l.boundingbox()[1],
-	    x2 = l.boundingbox()[2],
-	    y2 = l.boundingbox()[3];
-
-	var boxSize = Math.max(
-	    Math.abs(x1 - x2),
-	    Math.abs(y1 - y2));
-
-	var newZoom = Math.round(
-	    log2(360 / boxSize) + 1.5);
-	console.log("new zoom " + newZoom);
-	console.log("new bounds " + [(y1 + y2) / 2, (x1 + x2) / 2]);
-	
-	map.setView(
-	    leaflet.latLng(
-		(y1 + y2) / 2,
-		(x1 + x2) / 2),	    
-	    newZoom);
-    }
-};
-
 paint.addClickHandler(selection.clickHandler);
 
 map.on("viewreset", paint.redrawAll);
-
-/*
- When we click on a layer in the list of layers,
- get all of the shapes in that layer and select them.
- */
-layerSelect.onClick(function(layerName){
-    if (!d3.event.shiftKey) {
-	zoomToLayer(layers.get(layerName));
-    }
-    selection.select(getLayerObjects(layerName), d3.event.shiftKey);
-});
 
 selection.addCallback(function(values, entering, leaving){
     colour.unpaint(leaving);
@@ -208,17 +215,6 @@ worksheet.dataChanged(function(){
     calculationsDisplay.update(worksheet.sources());
     paintDisplayColumn();
 });
-
-var paintDisplayColumn = function() {
-    var displayData = worksheet.displayData(time.current());
-    colour.paintSVGElements(displayData, selection.current());
-
-    colour.unpaintHTML(resultsTable.cells());
-    if (worksheet.getSortProperties().properties.length > 0) {
-	colour.paintHTMLSelection(displayData, resultsTable.column(worksheet.propertyIndex(
-	    worksheet.getSortProperties().properties[0])));
-    }
-};
 
 var wikiStore = require("./wiki-store.js")(
     errors, 

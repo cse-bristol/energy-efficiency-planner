@@ -2,44 +2,33 @@
 
 /*global module, require*/
 
-var float = require("floating-dialogue"),
+var d3 = require("d3"),
     helpers = require("./helpers.js"),
     identity = helpers.identity,
     callbackHandler = helpers.callbackHandler;
 
 /*
- Makes a clickable list of layers.
+ When we click on a layer in the list of layers,
+ get all of the shapes in that layer and select them.
  */
-module.exports = function(container, toolbar, layers) {
-    var openclose = toolbar.append("span")
-	    .html("L");
-    
-    var list = float(
-	container.append("ul")
-	    .attr("id", "layer-select"))
-	    .open(openclose)
-	    .content(),
+module.exports = function(L, zoomToLayer, layers, selection, getLayerObjects, layerFilter) {
+    return function(obj, container, row, control) {
+	if (layerFilter === undefined
+	    || layerFilter(obj.layer, obj.name, obj.overlay)) {
 
-	callbacks = callbackHandler();
+	    var label = row.children.item(0);
+	    L.DomUtil.addClass(label, "select-and-focus");
 
-    var redraw = function(){
-	var li = list.selectAll("li")
-		.data(layers.names());
+	    L.DomEvent.on(label, "click", function(event) {
+		event.preventDefault();
+		event.stopPropagation();
 
-	li.exit().remove();
-	li.enter().append("li")
-	    .html(identity)
-	    .on("click", function(d, i){
-		callbacks(d);
-	    });
-    };
-    
-    layers.layerCreated(redraw);
-    layers.layerRemoved(redraw);
-    
-    return {
-	onClick : function(callback) {
-	    callbacks.add(callback);
+		if (!event.shiftKey) {
+		    zoomToLayer(obj.layer);
+		}
+		selection.select(getLayerObjects(obj.layer.name()), event.shiftKey);
+
+	    }, this);
 	}
     };
 };
