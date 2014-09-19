@@ -20,10 +20,6 @@ module.exports = function(map, layersControl, baseLayers, wikiStore, title, erro
 		"base": baseLayers.current(map, layersControl)
 	    };
 	
-	if (wikiStore.baseURLValid()) {
-	    params.wiki = wikiStore.baseURL();
-	}
-
 	params.page = title.title();
 
 	return params;
@@ -58,20 +54,7 @@ module.exports = function(map, layersControl, baseLayers, wikiStore, title, erro
 	
 	if (query.page) {
 	    title.title(decodeURIComponent(query.page));
-	}
-
-	if (query.wiki) {
-	    wikiStore.baseURL(
-		decodeURIComponent(query.wiki),
-		function baseURLOK(baseURL) {
-		    if (query.page) {
-			wikiStore.loadPage(decodeURIComponent(query.page));
-		    }
-		}, 
-		errors.warnUser
-	    );
-	} else {
-	    wikiStore.baseURL(origin());
+	    wikiStore.loadPage(decodeURIComponent(query.page));
 	}
     };
 

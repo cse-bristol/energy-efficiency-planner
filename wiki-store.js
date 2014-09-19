@@ -176,16 +176,13 @@ module.exports = function(errors, container, toolbar, layers, worksheet, selecti
 	    },
 	    wikiLoad,
 	    errors.informUser,
-	    title.title
+	    "Map of " + title.title
 	);
 
+    title.onChange(display.wikiPage);
+    display.wikiPage(title.title());
+
     return {
-	baseURL: function() {
-	    return interop.requests.baseURL.apply(this, arguments);
-	},
-	baseURLValid: function() {
-	    return interop.requests.baseURLValid.apply(this, arguments);
-	},
 	loadPage: function(page) {
 	    wikiLoad(page);
 	}

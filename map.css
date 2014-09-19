@@ -37,8 +37,8 @@ body {
 }
 
 #wiki-persistence {
-    left: calc(100% - 21em);
-    top: 0.3em;
+    left: 3em;
+    top: 3em;
 }
 
 #map {
