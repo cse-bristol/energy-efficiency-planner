@@ -2,28 +2,46 @@
 
 /*global module, require*/
 
-var float = require("floating-dialogue");
+var float = require("floating-dialogue"),
+    d3 = require("d3");
 
 module.exports = function(container, toolbar) {
-
     var messagesOpenClose = toolbar.append("span")
-	    .html("!");
+	    .html("!"),
 
-    var messages = float(
-	container.append("div")
-	    .attr("id", "messages"))
+	dialogue = float(
+	    container.append("div")
+		.attr("id", "messages"))
 	    .drag()
 	    .resize()
 	    .close()
 	    .open(messagesOpenClose)
-	    .hide()
-	    .content();
+	    .hide(),
+
+	messages = dialogue
+	    .content(),
+
+	noErrors = messages.append("div")
+	    .classed("info", true)
+	    .text("No errors.");
+
+    var hideNoErrors = function() {
+	noErrors.style("display", "none");
+    };
+
+    var maybeShowNoErrors = function() {
+	if (messages.node().childNodes.length <= 1) {
+	    noErrors.style("display", "block");
+	}
+    };
 
     var fadeOut = function(selection) {
 	selection.transition()
 	    .delay(15000)
-	    .style("opacity", "0.000001")
-	    .remove();
+	    .remove()
+	    .each("end", function() {
+		maybeShowNoErrors();
+	    });
     };
     
     return {
@@ -33,7 +51,9 @@ module.exports = function(container, toolbar) {
 	    var infoMsg = messages
 		    .append("div")
 		    .classed("info", true)
-		    .html(text);
+		    .text(text);
+
+	    hideNoErrors();
 
 	    fadeOut(infoMsg);
 	},
@@ -42,10 +62,24 @@ module.exports = function(container, toolbar) {
 	    
 	    var errorMsg = messages
 		    .append("div")
-		    .classed("error", true)
-		    .html(text);
+		    .classed("error", true);
 
-	    fadeOut(errorMsg);
+	    errorMsg
+		.append("div")
+		.classed("error-text", true)
+		.text(text);
+
+	    errorMsg.append("div")
+		.classed("close-error", true)
+		.text("X")
+		.on("click", function() {
+		    errorMsg.remove();
+		    maybeShowNoErrors();
+		});
+
+	    hideNoErrors();
+
+	    dialogue.show();
 	}
     };
 };
