@@ -183,7 +183,9 @@ module.exports = function(errors, container, toolbar, layers, worksheet, selecti
 	    },
 	    wikiLoad,
 	    errors.informUser,
-	    "Map of " + title.title
+	    function() {
+		return "Map of " + title.title();
+	    }
 	);
 
     title.onChange(display.wikiPage);
