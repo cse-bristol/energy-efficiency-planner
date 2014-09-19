@@ -37,7 +37,7 @@ require("leaflet-fancy-layer-control");
 require("./lib/d3-plugins/geo/tile/tile.js");
 
 var nationalHeatMap = leaflet.tileLayer('http://test-tiles.0d9303a4.cdn.memsites.com/Total%20Heat%20Density/Z{z}/{y}/{x}.png', {
-    attribution: '<a href="http://tools.decc.gov.uk/nationalheatmap/">National Heat Map</a>,',
+    attribution: '<a href="http://tools.decc.gov.uk/nationalheatmap/">English National Heat Map</a>,',
     minZoom: 2,
     maxZoom: 17
 }),
