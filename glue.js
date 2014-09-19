@@ -57,6 +57,11 @@ var paintDisplayColumn = function() {
     }
 };
 
+var getLayerObjects = function(layerName) {
+    return d3.select("#map svg g#" + layerName)
+	.selectAll("path");
+};
+
 var startCoordinates = [0, 0],
     zoom = 2,
     d3 = require("d3"),
@@ -163,11 +168,6 @@ var worksheet = require("./worksheet.js")(
     calculationsDisplay = require("./calculations-display.js")(worksheetContainer.content());
 
 sources.onSourceLoad(worksheet.addSource);
-
-var getLayerObjects = function(layerName) {
-    return d3.select("#map svg g#" + layerName)
-	.selectAll("path");
-};
 
 layers.layerChanged(function(l){
     if (!l.enabled) {
