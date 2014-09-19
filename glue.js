@@ -98,7 +98,9 @@ var nationalHeatMap = leaflet.tileLayer('http://test-tiles.0d9303a4.cdn.memsites
     maxZoom: 17
 }),
     
-    map = new leaflet.Map("map")
+    map = new leaflet.Map("map", {
+	doubleClickZoom: false
+    })
 	.addLayer(baseLayers.default())
 	.setView(startCoordinates, zoom);
 
