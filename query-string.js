@@ -20,7 +20,7 @@ module.exports = function(map, layersControl, baseLayers, wikiStore, title, erro
 		"base": baseLayers.current(map, layersControl)
 	    };
 	
-	params.page = title.title();
+	params.page = "maps/" + title.title();
 
 	return params;
     };

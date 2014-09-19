@@ -9,10 +9,15 @@ var _ = require("lodash"),
     layerFileExt = ".geojson",
     prefixLen = layerPrefix.length,
     extLen = layerFileExt.length,
-    selectedLimit = 10;
+    selectedLimit = 10,
+    mapPrefix = "maps/";
 
 var layerName = function(path) {
     return path.slice(prefixLen, path.length - extLen);
+};
+
+var mapName = function(path) {
+    return path.indexOf(mapPrefix) === 0 ? path.slice(mapPrefix.length) : path;
 };
 
 module.exports = function(errors, container, toolbar, layers, worksheet, selection, title, findShapesByName, redraw) {
@@ -88,7 +93,7 @@ module.exports = function(errors, container, toolbar, layers, worksheet, selecti
 
 		});
 
-		title.title(page);
+		title.title(mapName(page));
 
 		redraw();
 	    },
@@ -97,13 +102,15 @@ module.exports = function(errors, container, toolbar, layers, worksheet, selecti
     },
 
 	savePages = function() {
+	    var mapPage = mapPrefix + title.title();
+
 	    var selectedThings = selection.names()
 		    .map(function(s) {
 			return {selection: s};
 		    }),
 		
 		frontPage = {
-		    name: title.title(),
+		    name: mapPage,
 		    content: {
 			layers: layers.names().map(function(layerName) {
 			    var l = layers.get(layerName);
@@ -128,11 +135,11 @@ module.exports = function(errors, container, toolbar, layers, worksheet, selecti
 
 	    if (selectedThings.length > 10) {
 		frontPage.content.selectionPage = {
-		    "selection page": title.title() + "/selection"
+		    "selection page": mapPage + "/selection"
 		};
 
 		data.push({
-		    name: title.title() + "/selection",
+		    name: mapPage + "/selection",
 		    content: {
 			selection: selectedThings
 		    }
