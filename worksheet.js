@@ -41,12 +41,6 @@ module.exports = function(container, layers, sources, errors) {
 
     var changed = function() {
 	callbacks();
-
-	if (source.sources().length === 0) {
-	    container.hide();
-	} else {
-	    container.show();
-	}
     };
 
     /* Ensure everything is set up in the empty state. */

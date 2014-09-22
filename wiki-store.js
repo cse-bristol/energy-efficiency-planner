@@ -55,13 +55,16 @@ module.exports = function(errors, container, toolbar, map, layersControl, baseLa
 		sort: text,
 		reverse: boolean
 	    }),
-	    locationPage: {
-		"location page": pageLink
-	    },
 	    location: {
 		coordinates: list(float()),
 		zoom: float(),
 		baseLayer: choices(Object.keys(baseLayers.dict))
+	    },
+	    tools: {
+		"W": boolean,
+		"!": boolean,
+		"⌛": boolean,
+		"⊞": boolean
 	    }
 	};
 
@@ -120,6 +123,17 @@ module.exports = function(errors, container, toolbar, map, layersControl, baseLa
 			
 			baseLayers.current(map, layersControl, location.get("baseLayer"));
 		    }
+
+		    if (loaded.has("tools")) {
+			var tools = loaded.get("tools"),
+			    buttons = d3.selectAll(".open-button");
+
+			buttons.each(function(d, i) {
+			    if (tools.has(this.innerHTML)) {
+				d3.select(this).classed("element-visible", tools.get(this.innerHTML));
+			    }
+			});
+		    }
 		});
 
 		title.title(mapName(page));
@@ -131,6 +145,16 @@ module.exports = function(errors, container, toolbar, map, layersControl, baseLa
 	    errors.warnUser
 	);
     },
+
+	saveTools = function() {
+	    var result = {};
+
+	    d3.selectAll(".open-button").each(function(d, i) {
+		result[this.innerHTML] = d3.select(this).classed("element-visible");
+	    });
+	    
+	    return result;
+	},
 
 	savePages = function() {
 	    var mapPage = mapPrefix + title.title();
@@ -168,7 +192,9 @@ module.exports = function(errors, container, toolbar, map, layersControl, baseLa
 				    sort: pair[0],
 				    reverse: pair[1]
 				};
-			    })
+			    }),
+
+			tools: saveTools()
 		    }
 		},
 		data = [frontPage];
