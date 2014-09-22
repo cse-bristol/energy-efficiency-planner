@@ -51,6 +51,9 @@ module.exports = function(container, projection, dataSource) {
 		p.attr("d", path)
 		    .attr("id", function(d, i){
 			return d.id;
+		    })
+		    .each(function(d, i) {
+			d3.select(this).classed(d.geometry.type, true);
 		    });
 	    });
 	}

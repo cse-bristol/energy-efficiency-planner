@@ -54,6 +54,12 @@ path {
     opacity: 0.3;
 }
 
+path.LineString {
+    fill: none;
+    stroke: black !important;
+    stroke-width: 3px !important;
+}
+
 path:hover {
     stroke-width: 1px;
     stroke: green;
