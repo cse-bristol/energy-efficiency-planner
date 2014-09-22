@@ -23,8 +23,6 @@ var colourScale = function(data) {
 	.interpolate(d3.interpolateLab);
 };
 
-var categorical = d3.scale.category20();
-
 var fontColour = function(colour) {
     var rgb = d3.rgb(colour),
 	lab = d3.lab(rgb.toString()),
