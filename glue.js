@@ -109,10 +109,6 @@ var nationalHeatMap = leaflet.tileLayer('http://test-tiles.0d9303a4.cdn.memsites
 	.addLayer(baseLayers.default())
 	.setView(startCoordinates, zoom);
 
-map.on('layerremove', function(event){
-    layers.remove(event.layer);
-});
-
 /* The map will make us an svg. It will automatically sort out its bounds for us. */
 map._initPathRoot();
 
@@ -128,7 +124,9 @@ map.addControl(new geocoder({
 
 var layerOpacity = leaflet.Control.Layers.Opacity(),
     layerOrder = leaflet.Control.Layers.Order(),
-    layerDelete = leaflet.Control.Layers.Delete(map),
+    layerDelete = leaflet.Control.Layers.Delete(map, undefined, function(layer) {
+	layers.remove(layer);
+    }),
     layerSelect = require("./layer-select.js")(leaflet, zoomToLayer, layers, selection, getLayerObjects, function(layer, name, overlay) {
 	return layers.get(name) !== undefined;
     }),
