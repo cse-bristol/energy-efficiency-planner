@@ -17,9 +17,11 @@ module.exports = function(L, zoomToLayer, layers, selection, getLayerObjects, la
 	    || layerFilter(obj.layer, obj.name, obj.overlay)) {
 
 	    var label = row.children.item(0);
-	    L.DomUtil.addClass(label, "select-and-focus");
 
-	    L.DomEvent.on(label, "click", function(event) {
+	    var layerNameSpan = label.children.item(1);
+	    L.DomUtil.addClass(layerNameSpan, "select-and-focus");
+
+	    L.DomEvent.on(layerNameSpan, "click", function(event) {
 		event.preventDefault();
 		event.stopPropagation();
 
