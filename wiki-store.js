@@ -37,7 +37,7 @@ module.exports = function(errors, container, toolbar, map, layersControl, baseLa
 	text = s.text,
 	pageLink = s.pageLink,
 	fileLink = s.fileLink,
-	list = s.list,
+	tuple = s.tuple,
 	choices = s.choices,
 
 	schema = {
@@ -56,7 +56,7 @@ module.exports = function(errors, container, toolbar, map, layersControl, baseLa
 		reverse: boolean
 	    }),
 	    location: {
-		coordinates: list(float()),
+		coordinates: tuple(float(), float()),
 		zoom: float(),
 		baseLayer: choices(Object.keys(baseLayers.dict))
 	    },
