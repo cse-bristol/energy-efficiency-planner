@@ -4,6 +4,8 @@
 
 var _ = require("lodash"),
     d3 = require("d3"),
+    leaflet = require("leaflet"),
+    callbackFactory = require("./helpers.js").callbackHandler,
     interopModule = require("gitit-interop"),
     layerPrefix = "layers/",
     layerFileExt = ".geojson",
@@ -20,7 +22,10 @@ var mapName = function(path) {
     return path.indexOf(mapPrefix) === 0 ? path.slice(mapPrefix.length) : path;
 };
 
-module.exports = function(errors, container, toolbar, layers, worksheet, selection, title, findShapesByName, redraw) {
+module.exports = function(errors, container, toolbar, map, layersControl, baseLayers, layers, worksheet, selection, title, findShapesByName, redraw) {
+    var onSave = callbackFactory(),
+	onLoad = callbackFactory();
+
     var interop = interopModule(errors.warnUser),
 
 	s = interop.schema,
@@ -32,6 +37,8 @@ module.exports = function(errors, container, toolbar, layers, worksheet, selecti
 	text = s.text,
 	pageLink = s.pageLink,
 	fileLink = s.fileLink,
+	list = s.list,
+	choices = s.choices,
 
 	schema = {
 	    layers: multiple({
@@ -47,7 +54,15 @@ module.exports = function(errors, container, toolbar, layers, worksheet, selecti
 	    sort: multiple({
 		sort: text,
 		reverse: boolean
-	    })
+	    }),
+	    locationPage: {
+		"location page": pageLink
+	    },
+	    location: {
+		coordinates: list(float()),
+		zoom: float(),
+		baseLayer: choices(Object.keys(baseLayers.dict))
+	    }
 	};
 
     var wikiLoad = function(page) {
@@ -91,9 +106,25 @@ module.exports = function(errors, container, toolbar, layers, worksheet, selecti
 			});
 		    }
 
+		    if (loaded.has("location")) {
+			var location = loaded.get("location"),
+			    coords = location.get("coordinates");
+			
+			map.setView(
+			    leaflet.latLng(coords[0], coords[1]),
+			    location.get("zoom"),
+			    {
+				animate: false
+			    }
+			);
+			
+			baseLayers.current(map, layersControl, location.get("baseLayer"));
+		    }
 		});
 
 		title.title(mapName(page));
+
+		onLoad();
 
 		redraw();
 	    },
@@ -119,6 +150,15 @@ module.exports = function(errors, container, toolbar, layers, worksheet, selecti
 				opacity: l.options.opacity
 			    };
 			}),
+
+			location: {
+			    coordinates: [
+				map.getCenter().lat,
+				map.getCenter().lng
+			    ],
+			    zoom: map.getZoom(),
+			    baseLayer: baseLayers.current(map, layersControl)
+			},
 
 			sort: _.zip(
 			    worksheet.getSortProperties().properties, 
@@ -176,8 +216,11 @@ module.exports = function(errors, container, toolbar, layers, worksheet, selecti
 		interop.requests.save(
 		    savePages(),
 		    files, 
-		    logMessage, 
-		    errors.informUser,
+		    logMessage,
+		    function(message) {
+			onSave();
+			errors.informUser(message);
+		    },
 		    errors.warnUser
 		);
 	    },
@@ -194,6 +237,8 @@ module.exports = function(errors, container, toolbar, layers, worksheet, selecti
     return {
 	loadPage: function(page) {
 	    wikiLoad(page);
-	}
+	}, 
+	onSave: onSave.add,
+	onLoad: onLoad.add
     };
 };

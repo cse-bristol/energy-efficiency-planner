@@ -218,8 +218,11 @@ worksheet.dataChanged(function(){
 
 var wikiStore = require("./wiki-store.js")(
     errors, 
-    body, 
+    body,
     toolbar,
+    map,
+    layersControl,
+    baseLayers,
     layers,
     worksheet,
     selection,
@@ -233,4 +236,4 @@ var wikiStore = require("./wiki-store.js")(
     paint.redrawAll
 );
 
-require("./query-string.js")(map, layersControl, baseLayers, wikiStore, title, errors);
+require("./query-string.js")(wikiStore, title);
