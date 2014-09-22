@@ -6,9 +6,9 @@ var d3 = require("d3");
 
 module.exports = function(container, projection, dataSource) {
     var path = d3.geo.path()
-	    .projection(projection);
-    
-    var clickHandlers = [];
+	    .projection(projection),
+	colours = d3.scale.category10(),
+    	clickHandlers = [];
     
     var module = {
 	/*
@@ -19,20 +19,25 @@ module.exports = function(container, projection, dataSource) {
 	},
 	redrawAll : function() {
 	    var l = container.selectAll("g")
-		    .data(dataSource);
+		    .data(dataSource, function(d, i) {
+			return d.name();
+		    });
 
 	    l.enter().append("g")
 		.classed("leaflet-zoom-hide", true);
 	    
 	    l.exit().remove();
 
-	    l.style("opacity", function(l){
-		return l.options.opacity;
-	    });
-
-	    l.attr("id", function(l) {
-		return l.name();
-	    });
+	    l
+		.style("opacity", function(l){
+		    return l.options.opacity;
+		})
+		.style("fill", function(d, i) {
+		    return colours(i);
+		})
+		.attr("id", function(l) {
+		    return l.name();
+		});
 
 	    l.each(function(parentDatum){
 		var p = d3.select(this).selectAll("path")
