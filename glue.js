@@ -97,15 +97,9 @@ var startCoordinates = [0, 0],
 require("leaflet-fancy-layer-control");
 require("./lib/d3-plugins/geo/tile/tile.js");
 
-var nationalHeatMap = leaflet.tileLayer('http://test-tiles.0d9303a4.cdn.memsites.com/Total%20Heat%20Density/Z{z}/{y}/{x}.png', {
-    attribution: '<a href="http://tools.decc.gov.uk/nationalheatmap/">English National Heat Map</a>,',
-    minZoom: 2,
-    maxZoom: 17
-}),
-    
-    map = new leaflet.Map("map", {
-	doubleClickZoom: false
-    })
+var map = new leaflet.Map("map", {
+    doubleClickZoom: false
+})
 	.addLayer(baseLayers.default())
 	.setView(startCoordinates, zoom);
 
@@ -133,9 +127,7 @@ var layerOpacity = leaflet.Control.Layers.Opacity(),
     
     layersControl = new leaflet.Control.Layers.Extensible(
 	baseLayers.dict,
-	{
-	    "National Heat Map" : nationalHeatMap
-	},
+	baseLayers.overlays,
 	{
 	    hooks : [layerOpacity],
 	    baseHooks : [],

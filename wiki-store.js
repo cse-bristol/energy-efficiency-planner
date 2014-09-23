@@ -43,8 +43,14 @@ module.exports = function(errors, container, toolbar, map, layersControl, baseLa
 	schema = {
 	    layers: multiple({
 		layer: fileLink,
-		opacity: optional(float(0, 1), 1)
+		opacity: optional(float(0, 1))
 	    }),
+	    builtInOverlays: multiple({
+		overlay: text,
+		opacity: float(0, 1),
+		enabled: boolean
+	    }),
+
 	    selection: multiple({
 		selection: text
 	    }),
@@ -87,6 +93,19 @@ module.exports = function(errors, container, toolbar, map, layersControl, baseLa
 			loaded.get("layers").forEach(function(l) {
 			    var layer = layers.get(layerName(l.get("layer")));
 			    layer.setOpacity(l.get("opacity"));
+			});
+		    }
+
+		    if (loaded.has("builtInOverlays")) {
+			loaded.get("builtInOverlays").forEach(function(overlay) {
+			    var layer = baseLayers.overlays[overlay.get("overlay")];
+			    layer.setOpacity(overlay.get("opacity"));
+			    if (overlay.get("enabled")) {
+				map.addLayer(layer);
+			    } else {
+				map.removeLayer(layer);
+			    }
+
 			});
 		    }
 
@@ -172,6 +191,15 @@ module.exports = function(errors, container, toolbar, map, layersControl, baseLa
 			    return {
 				layer: layerPrefix + layerName + layerFileExt,
 				opacity: l.options.opacity
+			    };
+			}),
+
+			builtInOverlays: Object.keys(baseLayers.overlays).map(function(key) {
+			    var layer = baseLayers.overlays[key];
+			    return {
+				overlay: key,
+				enabled: map.hasLayer(layer),
+				opacity: layer.options.opacity
 			    };
 			}),
 

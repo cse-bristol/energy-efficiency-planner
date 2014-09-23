@@ -24,6 +24,12 @@ var leaflet = require("leaflet"),
 	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
     });
 
+var nationalHeatMap = leaflet.tileLayer('http://test-tiles.0d9303a4.cdn.memsites.com/Total%20Heat%20Density/Z{z}/{y}/{x}.png', {
+    attribution: '<a href="http://tools.decc.gov.uk/nationalheatmap/">English National Heat Map</a>,',
+    minZoom: 2,
+    maxZoom: 17
+});
+
 module.exports = function(errors) {
     return {
 	dict: {
@@ -31,6 +37,9 @@ module.exports = function(errors) {
 	    "Stamen Toner" : Stamen_TonerBackground,
 	    "ESRI Relief": Esri_WorldShadedRelief,
 	    "ESRI World Imagery" : Esri_WorldImagery
+	},
+	overlays: {
+	    "English National Heat Map" : nationalHeatMap
 	},
 	current: function(map, layersControl, name) {
 	    var currentId = Object.keys(map._layers)[0],
