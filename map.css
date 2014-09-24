@@ -71,14 +71,6 @@ path.selected:hover {
     stroke: yellow;
 }
 
-.select-and-focus {
-    cursor: pointer;
-}
-
-.select-and-focus:hover {
-    text-decoration: underline;
-}
-
 #time {
     position: absolute;
     width: 20em;
@@ -218,4 +210,41 @@ th.reverse:after {
 .info {
     color: green;
     margin: 0.1em;
+}
+
+#layer-control {
+    left: calc(100% - 15em);
+    width: 12em;
+    top: 3em;
+    background: white;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    padding-left: 0.5em;
+}
+
+#layer-control label {
+    display: block;
+    cursor: pointer;
+}
+
+#layer-control form {
+    border-bottom: thin dotted grey;
+}
+
+#layer-control form:last-child {
+    border-bottom: none;
+}
+
+.shape-layer-delete {
+    float: right;
+    cursor: pointer;
+    font-family: monospace;
+}
+
+.shape-layer-name {
+    cursor: pointer;
+}
+
+.shape-layer-name:hover {
+    text-decoration: underline;
 }

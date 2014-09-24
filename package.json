@@ -12,7 +12,6 @@
 	,"proj4": "2.2.2"
 	,"lodash": "2.4.1"
 	
-	,"leaflet-opacity": "git://github.com/cse-bristol/Leaflet.Control.Layers.Opacity.git"
 	,"js-shapefile-to-geojson--": "git://github.com/GlennS/js-shapefile-to-geojson.git"
 	,"floating-dialogue": "git://github.com/cse-bristol/floating-dialogue.git"
 	,"gitit-interop": "git://github.com/cse-bristol/gitit-interop.git"

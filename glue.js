@@ -7,34 +7,6 @@
  We should aim to reduce its size.
 */
 
-var log2 = function(n) {
-    return Math.log(n) / Math.LN2;
-    
-};
-var zoomToLayer = function(l) {
-    if (l.boundingbox()) {
-	var x1 = l.boundingbox()[0],
-	    y1 = l.boundingbox()[1],
-	    x2 = l.boundingbox()[2],
-	    y2 = l.boundingbox()[3];
-
-	var boxSize = Math.max(
-	    Math.abs(x1 - x2),
-	    Math.abs(y1 - y2));
-
-	var newZoom = Math.round(
-	    log2(360 / boxSize) + 1.5);
-	console.log("new zoom " + newZoom);
-	console.log("new bounds " + [(y1 + y2) / 2, (x1 + x2) / 2]);
-	
-	map.setView(
-	    leaflet.latLng(
-		(y1 + y2) / 2,
-		(x1 + x2) / 2),	    
-	    newZoom);
-    }
-};
-
 var projectPoint = function(x, y) {
     var point = map.latLngToLayerPoint(new leaflet.LatLng(y, x));
     this.stream.point(point.x, point.y);
@@ -90,17 +62,14 @@ var startCoordinates = [0, 0],
     layers = require("./layers.js")(errors, sources),
     geometries = require("./geometries.js"),
 
-    baseLayers = require("./base-layers.js")(errors),
     title = require("./title.js")(body),
     transform = d3.geo.transform({point: projectPoint});
 
-require("leaflet-fancy-layer-control");
 require("./lib/d3-plugins/geo/tile/tile.js");
 
 var map = new leaflet.Map("map", {
     doubleClickZoom: false
 })
-	.addLayer(baseLayers.default())
 	.setView(startCoordinates, zoom);
 
 /* The map will make us an svg. It will automatically sort out its bounds for us. */
@@ -116,37 +85,15 @@ map.addControl(new geocoder({
     email: "research@cse.org.uk"
 }));
 
-var layerOpacity = leaflet.Control.Layers.Opacity(),
-    layerOrder = leaflet.Control.Layers.Order(),
-    layerDelete = leaflet.Control.Layers.Delete(map, undefined, function(layer) {
-	layers.remove(layer);
-    }),
-    layerSelect = require("./layer-select.js")(leaflet, zoomToLayer, layers, selection, getLayerObjects, function(layer, name, overlay) {
-	return layers.get(name) !== undefined;
-    }),
-    
-    layersControl = new leaflet.Control.Layers.Extensible(
-	baseLayers.dict,
-	baseLayers.overlays,
-	{
-	    hooks : [layerOpacity],
-	    baseHooks : [],
-	    overlayHooks : [layerOrder, layerDelete, layerSelect]
-	});
+var layersControl = require("./layer-control.js")(body, toolbar, map, layers, function(layerName) {
+    selection.select(getLayerObjects(layerName), false);
+});
 
-layersControl.addTo(map);
 layers.layerCreated(function(l){
-    map.addLayer(l);
-    layersControl.addOverlay(l, l.name());
+    layersControl.update();
 });
 
 var paint = require("./paint.js")(overlay, transform, sortedByZ);
-layerOpacity.opacityChanged(paint.redrawAll);
-
-layerOrder.orderChanged(function(){
-    paint.redrawAll();
-    paintDisplayColumn();
-});
 
 var worksheet = require("./worksheet.js")(
 	worksheetContainer,
@@ -183,10 +130,6 @@ var handlers = require("./file-handlers.js")(
     geometries, 
     layers, 
     sources, 
-    function(layer) {
-	zoomToLayer(layer);
-	selection.select(getLayerObjects(layer.name()), false);
-    }, 
     paint.redrawAll
 );
 require("./file-drop.js")(d3.select("body"), errors, handlers);
@@ -212,7 +155,6 @@ var wikiStore = require("./wiki-store.js")(
     toolbar,
     map,
     layersControl,
-    baseLayers,
     layers,
     worksheet,
     selection,

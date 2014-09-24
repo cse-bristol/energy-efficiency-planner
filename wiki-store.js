@@ -6,6 +6,7 @@ var _ = require("lodash"),
     d3 = require("d3"),
     leaflet = require("leaflet"),
     callbackFactory = require("./helpers.js").callbackHandler,
+    tileLayers = require("./tile-layers.js"),
     interopModule = require("gitit-interop"),
     layerPrefix = "layers/",
     layerFileExt = ".geojson",
@@ -22,7 +23,7 @@ var mapName = function(path) {
     return path.indexOf(mapPrefix) === 0 ? path.slice(mapPrefix.length) : path;
 };
 
-module.exports = function(errors, container, toolbar, map, layersControl, baseLayers, layers, worksheet, selection, title, findShapesByName, redraw) {
+module.exports = function(errors, container, toolbar, map, layersControl, layers, worksheet, selection, title, findShapesByName, redraw) {
     var onSave = callbackFactory(),
 	onLoad = callbackFactory();
 
@@ -47,9 +48,13 @@ module.exports = function(errors, container, toolbar, map, layersControl, baseLa
 	    }),
 	    builtInOverlays: multiple({
 		overlay: text,
-		opacity: float(0, 1),
-		enabled: boolean
+		opacity: float(0, 1)
 	    }),
+
+	    baseLayer: {
+		"base layer": choices(tileLayers.base.keys()),
+		opacity: float(0, 1)
+	    },
 
 	    selection: multiple({
 		selection: text
@@ -63,8 +68,7 @@ module.exports = function(errors, container, toolbar, map, layersControl, baseLa
 	    }),
 	    location: {
 		coordinates: tuple(float(), float()),
-		zoom: float(),
-		baseLayer: choices(Object.keys(baseLayers.dict))
+		zoom: float()
 	    },
 	    tools: {
 		"W": boolean,
@@ -92,21 +96,25 @@ module.exports = function(errors, container, toolbar, map, layersControl, baseLa
 		    if (loaded.has("layers")) {
 			loaded.get("layers").forEach(function(l) {
 			    var layer = layers.get(layerName(l.get("layer")));
-			    layer.setOpacity(l.get("opacity"));
+			    layersControl.setShapeOverlayOpacity(layer, l.get("opacity"));
 			});
 		    }
 
 		    if (loaded.has("builtInOverlays")) {
 			loaded.get("builtInOverlays").forEach(function(overlay) {
-			    var layer = baseLayers.overlays[overlay.get("overlay")];
-			    layer.setOpacity(overlay.get("opacity"));
-			    if (overlay.get("enabled")) {
-				map.addLayer(layer);
-			    } else {
-				map.removeLayer(layer);
-			    }
-
+			    var layer = tileLayers.overlays.get(
+				overlay.get("overlay"));
+			    layersControl.setTileOverlayOpacity(layer, overlay.get("opacity"));
 			});
+		    }
+
+		    if (loaded.has("baseLayer")) {
+			var base = loaded.get("baseLayer"),
+			    name = base.get("base layer"),
+			    layer = tileLayers.base.get(name);
+
+			layersControl.baseLayer(name);
+			layersControl.setBaseOpacity(layer, base.get("opacity"));
 		    }
 
 		    if (loaded.has("selection")) {
@@ -139,8 +147,6 @@ module.exports = function(errors, container, toolbar, map, layersControl, baseLa
 				animate: false
 			    }
 			);
-			
-			baseLayers.current(map, layersControl, location.get("baseLayer"));
 		    }
 
 		    if (loaded.has("tools")) {
@@ -194,23 +200,26 @@ module.exports = function(errors, container, toolbar, map, layersControl, baseLa
 			    };
 			}),
 
-			builtInOverlays: Object.keys(baseLayers.overlays).map(function(key) {
-			    var layer = baseLayers.overlays[key];
+			builtInOverlays: tileLayers.overlays.entries().map(function(e) {
+			    var layer = e.value;
 			    return {
-				overlay: key,
-				enabled: map.hasLayer(layer),
+				overlay: e.key,
 				opacity: layer.options.opacity
 			    };
 			}),
+
+			baseLayer: {
+			    "base layer": layersControl.baseLayer().name(),
+			    opacity: layersControl.baseLayer().options.opacity
+			},
 
 			location: {
 			    coordinates: [
 				map.getCenter().lat,
 				map.getCenter().lng
 			    ],
-			    zoom: map.getZoom(),
-			    baseLayer: baseLayers.current(map, layersControl)
-			},
+			    zoom: map.getZoom()
+			},			
 
 			sort: _.zip(
 			    worksheet.getSortProperties().properties, 

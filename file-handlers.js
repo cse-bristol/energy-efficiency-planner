@@ -8,7 +8,7 @@ var d3 = require("d3");
  Files is a list of dictionaries. Each dictionary has a file property and a binary property.
  e.g. [{file: "table.tsv", binary: false}, {file: "geometry.shp", binary: true}]
  */
-var batch = function(files, onLoad) {
+var batch = function(files, onBatchLoad) {
     var results = d3.map({});
     var filenames = files.map(function(f){
 	return f.file.name;
@@ -28,7 +28,7 @@ var batch = function(files, onLoad) {
 	    results.set(file, result);
 
 	    if (results.keys().length === files.length) {
-		onLoad(results);
+		onBatchLoad(results);
 	    }
 	}
     };
@@ -51,7 +51,7 @@ var makeFileFilter = function(mimes, extensions) {
 /*
  Make a handler which will process text files only in batches of 1.
  */
-var singleText = function(extension, mime, onLoad) {
+var singleText = function(extension, mime, onFileLoad) {
     var h = {
 	tryHandle : function(files) {
 	    var handled = files.filter(makeFileFilter([mime], [extension]));
@@ -67,7 +67,7 @@ var singleText = function(extension, mime, onLoad) {
 			var e = results.entries()[0];
 			var filename = e.key;
 			var data = e.value;
-			onLoad(filename, data);
+			onFileLoad(filename, data);
 		    }
 		);
 	    });
@@ -83,7 +83,7 @@ var singleTable = function(extension, mime, parser, sources){
     });
 };
 
-module.exports = function(errors, geometries, layers, sources, selectLayer, refresh) {
+module.exports = function(errors, geometries, layers, sources, refresh) {
     return [
 	singleTable("tsv", "test/tab-separated-values", d3.tsv.parse),
 	singleTable("csv", "text/csv", d3.csv.parse),
@@ -128,7 +128,6 @@ module.exports = function(errors, geometries, layers, sources, selectLayer, refr
 			var name = withoutExtension(shp.name);
 			var l = layers.create(name, geojson.features, geojson.bbox);
 			refresh();
-			selectLayer(l);
 		    }
 		);
 	    };

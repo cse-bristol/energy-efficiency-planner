@@ -2,6 +2,8 @@
 
 /*global require, module*/
 
+var d3 = require("d3");
+
 module.exports = {
     toArray: function(pseudoArray) {
 	return Array.prototype.slice.call(pseudoArray, 0);
@@ -38,5 +40,15 @@ module.exports = {
 	var a = document.createElement("a");
 	a.href = "/";
 	return a.href;
-    }
+    },
+    noDrag: d3.behavior.drag()
+	.on("dragstart", function(d, i) {
+	    d3.event.sourceEvent.stopPropagation();
+	})
+	.on("drag", function(d, i) {
+	    d3.event.sourceEvent.stopPropagation();
+	})
+	.on("dragend", function(d, i) {
+	    d3.event.sourceEvent.stopPropagation();
+	})
 };

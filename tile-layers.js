@@ -3,7 +3,7 @@
 /*global module, require*/
 
 var leaflet = require("leaflet"),
-
+    d3 = require("d3"),
     osmLayer = leaflet.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
     }),
@@ -30,43 +30,15 @@ var nationalHeatMap = leaflet.tileLayer('http://test-tiles.0d9303a4.cdn.memsites
     maxZoom: 17
 });
 
-module.exports = function(errors) {
-    return {
-	dict: {
-	    "Open Street Map" : osmLayer,
-	    "Stamen Toner" : Stamen_TonerBackground,
-	    "ESRI Relief": Esri_WorldShadedRelief,
-	    "ESRI World Imagery" : Esri_WorldImagery
-	},
-	overlays: {
-	    "English National Heat Map" : nationalHeatMap
-	},
-	current: function(map, layersControl, name) {
-	    var currentId = Object.keys(map._layers)[0],
-		current = layersControl._layers[currentId];
-
-	    if (name === undefined) {
-		return current.name;
-	    } else {
-		map.removeLayer(current.layer);
-
-		var found = false;
-		Object.keys(layersControl._layers).forEach(function(k) {
-		    var l = layersControl._layers[k];
-		    if (l.name === name) {
-			map.addLayer(l.layer);
-			found = true;
-		    }
-		});
-		if (!found) {
-		    errors.warnUser("Layer not found " + name);
-		}
-		return null;
-	    }
-	},
-	default: function() {
-	    return osmLayer;
-	}
-    };
+module.exports = {
+    base: d3.map({
+	"Open Street Map" : osmLayer,
+	"Stamen Toner" : Stamen_TonerBackground,
+	"ESRI Relief": Esri_WorldShadedRelief,
+	"ESRI World Imagery" : Esri_WorldImagery
+    }),
+    overlays: d3.map({
+	"English National Heat Map" : nationalHeatMap
+    }),
+    defaultBaseLayer: osmLayer
 };
-
