@@ -154,8 +154,7 @@ var worksheet = require("./worksheet.js")(
 	sources, 
 	errors),
     resultsTable = require("./results-table.js")(worksheetContainer.content()),
-    colour = require("./colour.js"),
-    calculationsDisplay = require("./calculations-display.js")(worksheetContainer.content());
+    colour = require("./colour.js");
 
 sources.onSourceLoad(worksheet.addSource);
 
@@ -204,7 +203,6 @@ time.onChange(worksheet.timeChanged);
 
 worksheet.dataChanged(function(){
     resultsTable.info(worksheet.propertyNames(), worksheet.allData(time.current()), worksheet.getSortProperties());
-    calculationsDisplay.update(worksheet.sources());
     paintDisplayColumn();
 });
 
