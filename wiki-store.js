@@ -47,7 +47,8 @@ module.exports = function(errors, container, toolbar, map, layersControl, layers
 		layer: fileLink,
 		opacity: optional(float(0, 1)),
 		colour: text,
-		sort: optional(list(tuple(text, choices(["ascending", "descending"]))))
+		sort: optional(list(tuple(text, choices(["ascending", "descending"])))),
+		"⊞": boolean
 	    }),
 	    builtInOverlays: multiple({
 		overlay: text,
@@ -97,6 +98,9 @@ module.exports = function(errors, container, toolbar, map, layersControl, layers
 			    var layer = layers.get(layerName(l.get("layer")));
 			    layersControl.setShapeOverlayOpacity(layer, l.get("opacity"));
 			    layer.worksheet.baseColour(l.get("colour"));
+			    if (l.get("⊞")) {
+				layer.resultsTable.el().show();				
+			    }
 
 			    if (l.has("sort")) {
 				l.get("sort").forEach(function(s) {
@@ -185,7 +189,8 @@ module.exports = function(errors, container, toolbar, map, layersControl, layers
 			    var page = {
 				layer: layerPrefix + layerName + layerFileExt,
 				opacity: l.options.opacity,
-				colour: l.worksheet.baseColour()
+				colour: l.worksheet.baseColour(),
+				"⊞": l.resultsTable.el().visible()
 			    };
 
 			    if (sort.properties.length > 0) {
