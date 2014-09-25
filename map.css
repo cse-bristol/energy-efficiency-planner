@@ -97,38 +97,22 @@ path.selected:hover {
     width: 95%;
 }
 
-#worksheet {
-    position: absolute;
-    top: 6em;
-    left: 50vw;
-    max-height: 85vh;
-    max-width: 46vw;
-    overflow: auto;
-    background-color: #F0F0F0;
-    opacity: 0.8;
-    padding: 0.3em;
-    font-size: x-small;
-}
-
-#worksheet:hover {
-    opacity: 0.9;
-}
-
 .results {
     text-align: right;
     left: 3em;
     top: 7em;
-    background-color: white;
     max-width: 70vw;
     max-height: 70vh;
+    font-size: x-small;
+    background-color: #F0F0F0;
 }
 
 .results .resize-dialogue {
-    background-color: white;
+    background-color: #F0F0F0;
 }
 
 .results .close-button {
-    background-color: white;
+    background-color: #F0F0F0;
 }
 
 .results .content {
