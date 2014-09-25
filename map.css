@@ -131,12 +131,16 @@ path.selected:hover {
     background-color: white;
 }
 
-.results-table thead tr th, #results table tbody tr td {
-    border-bottom: 1px solid gray;    
-    padding: 0.1em 0.4em 0.1em 0.4em;
+.results .content {
+    height: 100%;
     overflow: auto;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.results-table thead tr th, #results table tbody tr td {
+    border-bottom: 1px solid gray;    
+    padding: 0.1em 0.4em 0.1em 0.4em;
 }
 
 td {
