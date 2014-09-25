@@ -55,7 +55,6 @@ path {
 
 path.LineString {
     fill: none;
-    stroke: black !important;
     stroke-width: 3px !important;
 }
 
@@ -213,8 +212,8 @@ th.reverse:after {
 }
 
 #layer-control {
-    left: calc(100% - 15em);
-    width: 12em;
+    left: calc(100% - 18em);
+    width: 15em;
     top: 3em;
     background: white;
     padding-top: 0.5em;
@@ -242,9 +241,31 @@ th.reverse:after {
 }
 
 .shape-layer-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     cursor: pointer;
+    width: calc(100% - 1em);
+    float: left;
 }
 
 .shape-layer-name:hover {
     text-decoration: underline;
+}
+
+form .choose-colour {
+    width: 1em;
+    display: inline-block;
+    margin-left: 0.3em;
+    vertical-align: top;
+    font-size: large;
+}
+
+.choose-colour.element-visible {
+    border: thin solid black;
+}
+
+.colour-picker {
+    top: 3em;
+    left: calc(100% - 33em);
 }

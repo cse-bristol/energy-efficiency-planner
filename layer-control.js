@@ -17,6 +17,7 @@
 var d3 = require("d3"),
     dialogue = require("floating-dialogue"),
     leaflet = require("leaflet"),
+    colours = require("slippy-colors"),
     noDrag = require("./helpers.js").noDrag,
     tileLayers = require("./tile-layers.js"),
     opacityClass = "opacity-slider";
@@ -40,6 +41,19 @@ var opacitySlider = function(selection, initialValue, getLayer) {
 	.call(noDrag);
 };
 
+var baseColourPicker = function(shapes, newShapes, layers, picker) {
+    newShapes.append("span")
+	.classed("choose-colour", true)
+	.html("&nbsp;", true);
+
+    var colourButtons = shapes.selectAll(".choose-colour")
+	.style("background-color", function(d, i) {
+	    return layers.get(d).worksheet.baseColour();
+	});
+
+    picker.open(colourButtons);
+};
+
 var zoomToLayer = function(l, map) {
     if (l.boundingbox()) {
 	var x1 = l.boundingbox()[0],
@@ -59,12 +73,12 @@ var zoomToLayer = function(l, map) {
 	map.setView(
 	    leaflet.latLng(
 		(y1 + y2) / 2,
-		(x1 + x2) / 2),	    
+		(x1 + x2) / 2),
 	    newZoom);
     }
 };
 
-module.exports = function(container, buttonContainer, map, layers, selectLayer) {
+module.exports = function(container, buttonContainer, map, layers) {
     var baseLayer = tileLayers.defaultBaseLayer,
 
 	button = buttonContainer.append("span")
@@ -79,10 +93,10 @@ module.exports = function(container, buttonContainer, map, layers, selectLayer) 
 	    .content();
 
     var changeBaseLayer = function(layer) {
-	    map.removeLayer(baseLayer);
-	    baseLayer = layer;
-	    map.addLayer(baseLayer);
-	    baseLayer.setOpacity(baseOpacity.node().value);
+	map.removeLayer(baseLayer);
+	baseLayer = layer;
+	map.addLayer(baseLayer);
+	baseLayer.setOpacity(baseOpacity.node().value);
     };
 
     var baseLayersForm = control.append("form");
@@ -113,8 +127,8 @@ module.exports = function(container, buttonContainer, map, layers, selectLayer) 
 	baseLayerLabels
 	    .selectAll("input")
 	    .attr("checked", function(d, i) {
-	    return d.value === baseLayer ? "checked" : null;
-	});
+		return d.value === baseLayer ? "checked" : null;
+	    });
     };
 
     updateChecked();
@@ -137,9 +151,9 @@ module.exports = function(container, buttonContainer, map, layers, selectLayer) 
     var tileLayersForm = control.append("form");
 
     var tileLayerDivs = tileLayersForm.selectAll("div")
-	.data(tileLayers.overlays.entries())
-	.enter()
-	.append("div");
+	    .data(tileLayers.overlays.entries())
+	    .enter()
+	    .append("div");
 
     tileLayerDivs.append("span")
 	.text(function(d, i) {
@@ -154,15 +168,36 @@ module.exports = function(container, buttonContainer, map, layers, selectLayer) 
 	}
     );
 
+    var picker = dialogue(
+	container.append("div")
+	    .classed("colour-picker", true))
+	    .drag()
+	    .close()
+	    .hide();
+
+    picker
+	.content()
+	.call(colours()
+	      .width(200)
+	      .height(200)
+	     .on("mouseup", function(colour) {
+		 var button = picker.currentOpenButton()
+			 .style("background-color", colour);
+
+		 layers.get(button.datum())
+		     .worksheet
+		     .baseColour(colour);
+	     }));
+
     var shapeLayers = control.append("form");
 
     var updateShapes = function() {
 	var shapes = shapeLayers.selectAll("div")
-	    .data(
-		layers.names(),
-		function(d, i) {
-		    return d;
-		});
+		.data(
+		    layers.names(),
+		    function(d, i) {
+			return d;
+		    });
 
 	shapes.exit().remove();
 	var newShapes = shapes.enter().append("div");
@@ -173,7 +208,6 @@ module.exports = function(container, buttonContainer, map, layers, selectLayer) 
 		return d;
 	    })
 	    .on("click", function(d, i) {
-		selectLayer(d);
 		zoomToLayer(layers.get(d), map);
 	    });
 
@@ -192,6 +226,8 @@ module.exports = function(container, buttonContainer, map, layers, selectLayer) 
 		return layers.get(d);
 	    }
 	);
+
+	baseColourPicker(shapes, newShapes, layers, picker);
     };
 
     var m = {

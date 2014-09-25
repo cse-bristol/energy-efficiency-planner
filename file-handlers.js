@@ -76,14 +76,14 @@ var singleText = function(extension, mime, onFileLoad) {
     return h;
 };
 
-var singleTable = function(extension, mime, parser, sources){
+var singleTable = function(extension, mime, parser){
     return singleText(extension, mime, function(filename, text){
 	var data = parser(text);
 	sources.fromTable(withoutExtension(filename), data, filename);
     });
 };
 
-module.exports = function(errors, geometries, layers, sources, refresh) {
+module.exports = function(errors, geometries, layers, refresh) {
     return [
 	singleTable("tsv", "test/tab-separated-values", d3.tsv.parse),
 	singleTable("csv", "text/csv", d3.csv.parse),

@@ -23,7 +23,7 @@ var mapName = function(path) {
     return path.indexOf(mapPrefix) === 0 ? path.slice(mapPrefix.length) : path;
 };
 
-module.exports = function(errors, container, toolbar, map, layersControl, layers, worksheet, selection, title, findShapesByName, redraw) {
+module.exports = function(errors, container, toolbar, map, layersControl, layers, title, findShapesByName, redraw) {
     var onSave = callbackFactory(),
 	onLoad = callbackFactory();
 
@@ -117,25 +117,6 @@ module.exports = function(errors, container, toolbar, map, layersControl, layers
 			layersControl.setBaseOpacity(layer, base.get("opacity"));
 		    }
 
-		    if (loaded.has("selection")) {
-			selection.select(
-			    findShapesByName(
-				d3.set(
-				    loaded.get("selection").map(function(s) {
-					return s.get("selection");
-				    }))));
-		    }
-
-		    if (loaded.has("sort")) {
-			loaded.get("sort").forEach(function(s) {
-			    worksheet.sortProperty(s.get("sort"), true);
-			    if (s.get("reverse")) {
-				// Additional sort on the same property reverses it.
-				worksheet.sortProperty(s.get("sort"), true);
-			    }
-			});
-		    }
-
 		    if (loaded.has("location")) {
 			var location = loaded.get("location"),
 			    coords = location.get("coordinates");
@@ -182,13 +163,8 @@ module.exports = function(errors, container, toolbar, map, layersControl, layers
 	},
 
 	savePages = function() {
-	    var mapPage = mapPrefix + title.title();
+	    var mapPage = mapPrefix + title.title(),
 
-	    var selectedThings = selection.names()
-		    .map(function(s) {
-			return {selection: s};
-		    }),
-		
 		frontPage = {
 		    name: mapPage,
 		    content: {
@@ -221,36 +197,10 @@ module.exports = function(errors, container, toolbar, map, layersControl, layers
 			    zoom: map.getZoom()
 			},			
 
-			sort: _.zip(
-			    worksheet.getSortProperties().properties, 
-			    worksheet.getSortProperties().reverse)
-			    .map(function(pair) {
-				return {
-				    sort: pair[0],
-				    reverse: pair[1]
-				};
-			    }),
-
 			tools: saveTools()
 		    }
 		},
 		data = [frontPage];
-
-	    if (selectedThings.length > 10) {
-		frontPage.content.selectionPage = {
-		    "selection page": mapPage + "/selection"
-		};
-
-		data.push({
-		    name: mapPage + "/selection",
-		    content: {
-			selection: selectedThings
-		    }
-		});
-		
-	    } else {
-		frontPage.content.selection = selectedThings;
-	    }
 
 	    return data.map(function(d) {
 		return { 

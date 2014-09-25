@@ -5,7 +5,7 @@
 var d3 = require("d3"),
     callbackHandler = require("./helpers.js").callbackHandler;
 
-module.exports = function(errors, sources) {
+module.exports = function(errors) {
     var layers = d3.map([]);
     var createCallbacks = callbackHandler();
     var changeCallbacks = callbackHandler();
@@ -124,7 +124,6 @@ module.exports = function(errors, sources) {
 	},
 	create : function(namePreference, geometry, boundingbox) {
 	    var name = stripSpaces(namePreference);
-	    var layerSources = [];
 
 	    fixGeometryNames(geometry);
 
@@ -139,14 +138,6 @@ module.exports = function(errors, sources) {
 
 		geometry : function() {
 		    return geometry;
-		},
-
-		addSource : function(s) {
-		    layerSources.push(s);
-		},
-
-		sources : function() {
-		    return layerSources;
 		},
 
 		enabled : true,
@@ -187,8 +178,6 @@ module.exports = function(errors, sources) {
 		g.key = name + "/" + g.id;
 	    });
 	    
-	    layerSources.push(sources.fromGeometry(geometry, l));
-
 	    if (layers.has(l.name())) {
 		errors.warnUser("Layer with name " + l.name() + " already exists, and will be replaced.");
 	    }
