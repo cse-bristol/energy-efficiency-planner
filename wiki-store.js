@@ -44,7 +44,8 @@ module.exports = function(errors, container, toolbar, map, layersControl, layers
 	schema = {
 	    layers: multiple({
 		layer: fileLink,
-		opacity: optional(float(0, 1))
+		opacity: optional(float(0, 1)),
+		colour: text
 	    }),
 	    builtInOverlays: multiple({
 		overlay: text,
@@ -74,7 +75,7 @@ module.exports = function(errors, container, toolbar, map, layersControl, layers
 		"W": boolean,
 		"!": boolean,
 		"⌛": boolean,
-		"⊞": boolean
+		"L": boolean
 	    }
 	};
 
@@ -97,6 +98,7 @@ module.exports = function(errors, container, toolbar, map, layersControl, layers
 			loaded.get("layers").forEach(function(l) {
 			    var layer = layers.get(layerName(l.get("layer")));
 			    layersControl.setShapeOverlayOpacity(layer, l.get("opacity"));
+			    layersControl.setShapeOverlayColour(layer, l.get("colour"));
 			});
 		    }
 
@@ -172,7 +174,8 @@ module.exports = function(errors, container, toolbar, map, layersControl, layers
 			    var l = layers.get(layerName);
 			    return {
 				layer: layerPrefix + layerName + layerFileExt,
-				opacity: l.options.opacity
+				opacity: l.options.opacity,
+				colour: l.worksheet.baseColour()
 			    };
 			}),
 

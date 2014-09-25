@@ -271,11 +271,14 @@ module.exports = function(container, buttonContainer, map, layers) {
 	    } else {
 		layer.enabled = true;
 	    }
-
 	    shapeLayers.selectAll("div ." + opacityClass)
 		.each(function(d, i) {
 		    this.value = layers.get(d).options.opacity;
 		});
+	},
+	setShapeOverlayColour: function(layer, colour) {
+	    layer.worksheet.baseColour(colour);
+	    updateShapes();
 	},
 	update: updateShapes
     };
