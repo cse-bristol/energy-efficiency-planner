@@ -119,6 +119,9 @@ module.exports = function(errors) {
 	names : function() {
 	    return layers.keys();
 	},
+	all: function() {
+	    return layers.values();
+	},
 	get : function(name) {
 	    return layers.get(name);
 	},

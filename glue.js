@@ -64,17 +64,28 @@ var overlay = d3.select(map.getPanes().overlayPane)
     layersControl = require("./layer-control.js")(body, toolbar, map, layers),
     paint = require("./paint.js")(overlay, transform, sortedByZ),
     colour = require("./colour.js"),
-    shapeData = require("./shape-data.js")();
+    shapeData = require("./shape-data.js")(),
+    resultsTable = require("./results-table.js");
 
 layers.layerCreated(function(l) {
     l.worksheet = shapeData(l.geometry());
     l.worksheet.baseColourChanged(paint.redrawAll);
+    l.resultsTable = resultsTable(body);
+    l.resultsTable.info(
+	l.worksheet.headers(), 
+	l.worksheet.data(),
+	l.worksheet.getSortProperties());
     layersControl.update();
 });
 layers.layerChanged(function(l) {
+    l.resultsTable.info(
+	l.worksheet.headers(), 
+	l.worksheet.data(),
+	l.worksheet.getSortProperties());
     paint.redrawAll();
 });
 layers.layerRemoved(function(l) {
+    l.resultsTable.remove();
     paint.redrawAll();
 });
 

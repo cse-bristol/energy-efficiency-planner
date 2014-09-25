@@ -60,6 +60,19 @@ var baseColourPicker = function(shapes, newShapes, layers, picker) {
     picker.open(colourButtons);
 };
 
+var tables = function(shapes, newShapes, leavingShapes, layers) {
+    newShapes.each(function(d, i) {
+	var el = d3.select(this),
+	    button = el.append("span")
+		.classed("open-table", true)
+		.text("⊞");
+
+	button.each(function(d, i) {
+	    layers.get(d).resultsTable.el().open(d3.select(this));
+	});
+    });
+};
+
 var zoomToLayer = function(l, map) {
     if (l.boundingbox()) {
 	var x1 = l.boundingbox()[0],
@@ -205,8 +218,11 @@ module.exports = function(container, buttonContainer, map, layers) {
 			return d;
 		    });
 
-	shapes.exit().remove();
-	var newShapes = shapes.enter().append("div");
+	var leavingShapes = shapes.exit()
+		.remove();
+
+	var newShapes = shapes.enter().append("div")
+		.classed("shape-overlay-control", true);
 
 	newShapes.append("span")
 	    .classed("shape-layer-name", true)
@@ -234,6 +250,8 @@ module.exports = function(container, buttonContainer, map, layers) {
 	);
 
 	baseColourPicker(shapes, newShapes, layers, picker);
+
+	tables(shapes, newShapes, leavingShapes, layers);
     };
 
     var m = {

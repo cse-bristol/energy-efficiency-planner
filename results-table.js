@@ -3,6 +3,7 @@
 /*global module, require*/
 
 var helpers = require("./helpers.js"),
+    dialogue = require("floating-dialogue"),
     callbackHandler = helpers.callbackHandler,
     identity = helpers.identity;
 
@@ -12,12 +13,20 @@ var helpers = require("./helpers.js"),
  Call it with a container which it will make the panel inside.
  */
 module.exports = function(container) {
-    var table = container.append("table")
-	    .attr("id", "results");
-    var tHead = table.append("thead").append("tr");
-    var tBody = table.append("tbody");
-    var rowHandlers = callbackHandler();
-    var headHandlers = callbackHandler();
+    var div = dialogue(
+	container.append("div")
+	    .classed("results", true))
+	    .close()
+	    .resize()
+	    .drag()
+	    .hide(),
+	
+	table = div.content().append("table")
+	    .classed(".results-table", true),
+	tHead = table.append("thead").append("tr"),
+	tBody = table.append("tbody"),
+	rowHandlers = callbackHandler(),
+	headHandlers = callbackHandler();
 
     var transpose = function(arr){
 	if (arr.length === 0) {
@@ -134,6 +143,9 @@ module.exports = function(container) {
 	cells: function() {
 	    return tBody.selectAll("tr")
 		.selectAll("td");
+	},
+	el: function() {
+	    return div;
 	}
     };
 

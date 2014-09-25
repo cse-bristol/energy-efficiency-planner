@@ -6,7 +6,6 @@ body {
 }
 
 #toolbar .open-button {
-    position: static;
     display: block;
 }
 
@@ -115,20 +114,27 @@ path.selected:hover {
     opacity: 0.9;
 }
 
-.content {
-    overflow: auto;
-    height: 100%;
-}
-
-#results {
+.results {
     text-align: right;
+    left: 3em;
+    top: 7em;
+    background-color: white;
+    max-width: 70vw;
+    max-height: 70vh;
 }
 
-#results thead tr th, #results table tbody tr td {
+.results .resize-dialogue {
+    background-color: white;
+}
+
+.results .close-button {
+    background-color: white;
+}
+
+.results-table thead tr th, #results table tbody tr td {
     border-bottom: 1px solid gray;    
     padding: 0.1em 0.4em 0.1em 0.4em;
-    max-width: 15em;
-    overflow: hidden;
+    overflow: auto;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
@@ -149,37 +155,16 @@ th.reverse:after {
     content: "↓";
 }
 
-#results thead tr th:hover {
+.results thead tr th:hover {
     background-color: LightSlateGray;
 }
 
-#results tbody tr:hover {
+.results tbody tr:hover {
     background-color: LightSteelBlue;
 }
 
-#results tbody tr td:hover {
+.results tbody tr td:hover {
     background-color: LightSlateGray;
-}
-
-#calculations {
-    padding-left: 0;
-}
-
-#calculations li {
-    list-style-type: none;
-    border: 1px grey dashed;
-    margin: 0.2em;
-    padding: 0.2em;
-    opacity: 0.9;
-}
-
-#calculations li.disabled {
-    opacity: 0.6;
-}
-
-#calculations li:hover {
-    opacity: 1.0;
-    border-style: solid;
 }
 
 #messages {
@@ -253,12 +238,14 @@ th.reverse:after {
     text-decoration: underline;
 }
 
-form .choose-colour {
-    width: 1em;
-    display: inline-block;
+.shape-overlay-control .open-button {
     margin-left: 0.3em;
+    width: 1em;
     vertical-align: top;
+    display: inline-block;
     font-size: large;
+    /* Hide the extra thickness of a selected .choose-colour */
+    border: thin solid white;
 }
 
 .choose-colour.element-visible {
@@ -268,4 +255,5 @@ form .choose-colour {
 .colour-picker {
     top: 3em;
     left: calc(100% - 33em);
+    opacity: 0.8;
 }

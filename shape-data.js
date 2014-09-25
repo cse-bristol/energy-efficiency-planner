@@ -79,7 +79,7 @@ module.exports = function() {
 	    },
 
 	    data: function(columns) {
-		if (headers === undefined) {
+		if (columns === undefined) {
 		    return m.data(headers);
 		} else {
 		    return shapeData.map(function(s) {
