@@ -36,8 +36,7 @@ var startCoordinates = [0, 0],
     errors = require("./errors.js")(body, toolbar),
     time = require("./time-control.js")(body, toolbar, 2013, 2024, 2014),
     loader = require("./loader.js"),
-    sources = require("./sources.js")(errors),
-    layers = require("./layers.js")(errors, sources),
+    layers = require("./layers.js")(errors),
     geometries = require("./geometries.js"),
 
     title = require("./title.js")(body),
@@ -63,14 +62,25 @@ var overlay = d3.select(map.getPanes().overlayPane)
 
     layersControl = require("./layer-control.js")(body, toolbar, map, layers),
     paint = require("./paint.js")(overlay, transform, sortedByZ),
-    colour = require("./colour.js"),
     shapeData = require("./shape-data.js")(),
     resultsTable = require("./results-table.js");
 
 layers.layerCreated(function(l) {
     l.worksheet = shapeData(l.geometry());
     l.worksheet.baseColourChanged(paint.redrawAll);
+
     l.resultsTable = resultsTable(body);
+    l.resultsTable.headerClicked(function(p) {
+	    l.worksheet.sortProperty(p, d3.event.shiftKey);
+	});
+
+    l.worksheet.sortPropertyChanged(function() {
+	l.resultsTable.info(
+	    l.worksheet.headers(), 
+	    l.worksheet.data(),
+	    l.worksheet.getSortProperties());
+    });
+
     l.resultsTable.info(
 	l.worksheet.headers(), 
 	l.worksheet.data(),

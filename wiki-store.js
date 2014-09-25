@@ -38,6 +38,7 @@ module.exports = function(errors, container, toolbar, map, layersControl, layers
 	text = s.text,
 	pageLink = s.pageLink,
 	fileLink = s.fileLink,
+	list = s.list,
 	tuple = s.tuple,
 	choices = s.choices,
 
@@ -45,7 +46,8 @@ module.exports = function(errors, container, toolbar, map, layersControl, layers
 	    layers: multiple({
 		layer: fileLink,
 		opacity: optional(float(0, 1)),
-		colour: text
+		colour: text,
+		sort: optional(list(tuple(text, choices(["ascending", "descending"]))))
 	    }),
 	    builtInOverlays: multiple({
 		overlay: text,
@@ -63,10 +65,6 @@ module.exports = function(errors, container, toolbar, map, layersControl, layers
 	    selectionPage: {
 		"selection page": pageLink
 	    },
-	    sort: multiple({
-		sort: text,
-		reverse: boolean
-	    }),
 	    location: {
 		coordinates: tuple(float(), float()),
 		zoom: float()
@@ -99,6 +97,16 @@ module.exports = function(errors, container, toolbar, map, layersControl, layers
 			    var layer = layers.get(layerName(l.get("layer")));
 			    layersControl.setShapeOverlayOpacity(layer, l.get("opacity"));
 			    layer.worksheet.baseColour(l.get("colour"));
+
+			    if (l.has("sort")) {
+				l.get("sort").forEach(function(s) {
+				    layer.worksheet.sortProperty(s[0], true);
+				    if (s[1] === "descending") {
+					// set it a second time to reverse
+					layer.worksheet.sortProperty(s[0], true);					
+				    }
+				});
+			    }
 			});
 		    }
 
@@ -171,12 +179,22 @@ module.exports = function(errors, container, toolbar, map, layersControl, layers
 		    name: mapPage,
 		    content: {
 			layers: layers.names().map(function(layerName) {
-			    var l = layers.get(layerName);
-			    return {
+			    var l = layers.get(layerName),
+				sort = l.worksheet.getSortProperties();
+
+			    var page = {
 				layer: layerPrefix + layerName + layerFileExt,
 				opacity: l.options.opacity,
 				colour: l.worksheet.baseColour()
 			    };
+
+			    if (sort.properties.length > 0) {
+				page.sort = _.zip(sort.properties, sort.reverse.map(function(reverse) {
+				    return reverse ? "descending" : "ascending";
+				}));
+			    }
+
+			    return page;
 			}),
 
 			builtInOverlays: tileLayers.overlays.entries().map(function(e) {
