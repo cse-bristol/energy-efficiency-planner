@@ -44,7 +44,13 @@ var opacitySlider = function(selection, initialValue, getLayer) {
 var baseColourPicker = function(shapes, newShapes, layers, picker) {
     newShapes.append("span")
 	.classed("choose-colour", true)
-	.html("&nbsp;", true);
+	.html("&nbsp;", true)
+	.each(function(d, i) {
+	    var el = d3.select(this);
+	    layers.get(d).worksheet.baseColourChanged(function(colour) {
+		el.style("background-color", colour);
+	    });
+	});
 
     var colourButtons = shapes.selectAll(".choose-colour")
 	.style("background-color", function(d, i) {
@@ -275,10 +281,6 @@ module.exports = function(container, buttonContainer, map, layers) {
 		.each(function(d, i) {
 		    this.value = layers.get(d).options.opacity;
 		});
-	},
-	setShapeOverlayColour: function(layer, colour) {
-	    layer.worksheet.baseColour(colour);
-	    updateShapes();
 	},
 	update: updateShapes
     };

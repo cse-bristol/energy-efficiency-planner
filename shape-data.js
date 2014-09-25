@@ -41,7 +41,7 @@ module.exports = function() {
 		    return baseColour;
 		} else {
 		    baseColour = val;
-		    baseColourChanged();
+		    baseColourChanged(val);
 		    return m;
 		}
 	    },

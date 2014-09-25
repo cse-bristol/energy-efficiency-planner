@@ -98,7 +98,7 @@ module.exports = function(errors, container, toolbar, map, layersControl, layers
 			loaded.get("layers").forEach(function(l) {
 			    var layer = layers.get(layerName(l.get("layer")));
 			    layersControl.setShapeOverlayOpacity(layer, l.get("opacity"));
-			    layersControl.setShapeOverlayColour(layer, l.get("colour"));
+			    layer.worksheet.baseColour(l.get("colour"));
 			});
 		    }
 
