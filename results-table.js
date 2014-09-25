@@ -28,18 +28,6 @@ module.exports = function(container) {
 	rowHandlers = callbackHandler(),
 	headHandlers = callbackHandler();
 
-    var transpose = function(arr){
-	if (arr.length === 0) {
-	    return [];
-	}
-	
-	return arr[0].map(function(col, i) { 
-	    return arr.map(function(row) { 
-		return row[i];
-	    });
-	});
-    };
-
     var maybeNumber = function(n) {
 	var num = parseFloat(n);
 	if (isNaN(num) || !isFinite(n)) {
@@ -90,8 +78,7 @@ module.exports = function(container) {
 	 head should be a 1D array.
 	 body should be a 2D array.
 	 */
-	info : function(head, body, ordering) {
-	    var data = transpose(body);
+	info : function(head, data, ordering) {
 	    sort(head, data, ordering);
 
 	    var h = tHead.selectAll("th").data(head);
