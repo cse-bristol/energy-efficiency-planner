@@ -40,6 +40,8 @@ module.exports = function() {
 
 	var m = {
 	    baseColour: function(val) {
+		colourFun = undefined;
+
 		if (val === undefined) {
 		    return baseColour;
 		} else {
