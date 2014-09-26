@@ -5,7 +5,7 @@
 /*
  This file is where all the mess and wiring goes.
  We should aim to reduce its size.
-*/
+ */
 
 var projectPoint = function(x, y) {
     var point = map.latLngToLayerPoint(new leaflet.LatLng(y, x));
@@ -26,6 +26,7 @@ var getLayerObjects = function(layerName) {
 var startCoordinates = [0, 0],
     zoom = 2,
     d3 = require("d3"),
+    _ = require("lodash"),
     dialogue = require("floating-dialogue"),
     geocoder = require("leaflet-control-geocoder"),
     leaflet = require("leaflet"),
@@ -63,35 +64,62 @@ var overlay = d3.select(map.getPanes().overlayPane)
     layersControl = require("./layer-control.js")(body, toolbar, map, layers),
     paint = require("./paint.js")(overlay, transform, sortedByZ),
     worksheet = require("./worksheet.js")(),
-    resultsTable = require("./results-table.js");
+    resultsTable = require("./results-table.js"),
+    colours = require("./colour.js");
 
-layers.layerCreated(function(l) {
-    l.worksheet = worksheet(l.geometry());
-    l.worksheet.baseColourChanged(paint.redrawAll);
-
-    l.resultsTable = resultsTable(body);
-    l.resultsTable.headerClicked(function(p) {
-	    l.worksheet.sortProperty(p, d3.event.shiftKey);
-	});
-
-    l.worksheet.sortPropertyChanged(function() {
-	l.resultsTable.info(
-	    l.worksheet.headers(), 
-	    l.worksheet.data(),
-	    l.worksheet.getSortProperties());
-    });
-
+var updateResults = function(l) {
     l.resultsTable.info(
 	l.worksheet.headers(), 
 	l.worksheet.data(),
-	l.worksheet.getSortProperties());
+	l.worksheet.getSortProperties()
+    );
+};
+
+layers.layerCreated(function(l) {
+    var updateLResults = function() {
+	return updateResults(l);
+    };
+
+    var recolour = function() {
+	paint.redrawAll();
+
+	if (l.worksheet.getSortProperties().properties.length > 0) {
+	    var colour = l.worksheet.colour(),
+		col = l.worksheet.firstSortPropertyI();
+
+	    l.resultsTable.rows().each(function(d, i) {
+		d3.select(this)
+		    .selectAll("td")
+		    .each(function(d, i) {
+			var el = d3.select(this);
+			var background = i === col ? colour(d) : null,
+			    font = i === col ? colours.reverse(background) : null;
+
+			el
+			    .style("background-color", background)
+			    .style("color", font);
+		    });
+	    });
+	} else {
+	    l.resultsTable.cells().style("background-colour", null);
+	}
+    };
+
+    l.worksheet = worksheet(l.geometry());
+    l.resultsTable = resultsTable(body);
+    l.resultsTable.headerClicked(function(p) {
+	l.worksheet.sortProperty(p, d3.event.shiftKey);
+    });
+
+    // TODO: only redraw the layer which changed.
+    l.worksheet.baseColourChanged(recolour);
+    l.worksheet.sortPropertyChanged(_.compose(recolour, updateLResults));
+
+    updateResults(l);
     layersControl.update();
 });
 layers.layerChanged(function(l) {
-    l.resultsTable.info(
-	l.worksheet.headers(), 
-	l.worksheet.data(),
-	l.worksheet.getSortProperties());
+    updateResults(l);
     paint.redrawAll();
 });
 layers.layerRemoved(function(l) {

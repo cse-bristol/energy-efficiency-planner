@@ -86,7 +86,7 @@ module.exports = function(container) {
 	    h.enter().append("th");
 	    h.html(identity)
 		.on("click", function(event, index) {
-		    var column = body.map(function(row){
+		    var column = data.map(function(row) {
 			return row[index];
 		    });
 		    
@@ -123,14 +123,14 @@ module.exports = function(container) {
 	headerClicked : headHandlers.add,
 	rowClicked : rowHandlers.add,
 
-	column: function(n) {
-	    return tBody.selectAll("tr")
-		.selectAll("td:nth-child(" + (n + 1) + ")");
+	rows: function() {
+	    return tBody.selectAll("tr");
 	},
+
 	cells: function() {
-	    return tBody.selectAll("tr")
-		.selectAll("td");
+	    return tBody.selectAll("tr").selectAll("td");
 	},
+
 	el: function() {
 	    return div;
 	}

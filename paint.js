@@ -9,7 +9,7 @@ module.exports = function(container, projection, dataSource) {
 	    .projection(projection),
 	colours = d3.scale.category10(),
     	clickHandlers = [];
-    
+
     var module = {
 	/*
 	 Pass in a function to be called every time a geometry path on the map is clicked.
@@ -70,7 +70,7 @@ module.exports = function(container, projection, dataSource) {
 		    .attr("d", path)
 		    .each(function(d, i) {
 			var el = d3.select(this),
-			    colour = d.layer.worksheet.baseColour(),
+			    colour = d.layer.worksheet.shapeColour(),
 			    feature = undefined;
 
 			switch (d.geometry.type) {

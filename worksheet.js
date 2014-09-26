@@ -4,6 +4,7 @@
 
 var d3 = require("d3"),
     _ = require("lodash"),
+    colour = require("./colour.js"),
     callbackFactory = require("./helpers.js").callbackHandler;
 
 var shapeHeaders = function(shapeData) {
@@ -33,7 +34,9 @@ module.exports = function() {
 	    sortPropertyChanged = callbackFactory(),
 	    baseColourChanged = callbackFactory(),
 	    baseColour = nextColour(),
-	    sortColour = "black";
+	    sortColour = "black",
+	    /* Cache the colour funciton for this layer. Expires when the sort property changes. */
+	    colourFun;
 
 	var m = {
 	    baseColour: function(val) {
@@ -46,7 +49,38 @@ module.exports = function() {
 		}
 	    },
 
+	    colour: function() {
+		if (!colourFun) {
+		    if (sortProperties.length === 0) {
+			colourFun = baseColour;
+		    } else {
+			var column = sortProperties[0],
+			    data = m.data([column]),
+			    scale = colour.scale(data, baseColour);
+
+			colourFun = scale;
+		    }
+		}
+
+		return colourFun;
+	    },
+
+	    shapeColour: function() {
+		var colour = m.colour();
+		
+		if (sortProperties.length === 0) {
+		    return colour;
+		} else {
+		    var col = sortProperties[0];
+		    return function(d, i) {
+			return colour(d.properties[col]);
+		    };
+		}
+	    },
+
 	    sortProperty : function(property, additional) {
+		colourFun = undefined;
+
 		var i = sortProperties.indexOf(property);
 		if (i >= 0) {
 		    if (additional) {
@@ -76,6 +110,14 @@ module.exports = function() {
 		    "properties" : sortProperties, 
 		    "reverse" : reverseSort
 		};
+	    },
+
+	    firstSortPropertyI: function() {
+		if (sortProperties.length === 0) {
+		    throw new Error("No sort properties");
+		}
+
+		return headers.indexOf(sortProperties[0]);
 	    },
 
 	    data: function(columns) {
