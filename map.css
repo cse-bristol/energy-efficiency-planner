@@ -57,18 +57,6 @@ path.LineString {
     stroke-width: 3px !important;
 }
 
-path:hover {
-    stroke: green;
-}
-
-path.selected {
-    stroke: orange;
-}
-
-path.selected:hover {
-    stroke: yellow;
-}
-
 #time {
     position: absolute;
     width: 20em;
