@@ -29,6 +29,7 @@ var nationalHeatMap = leaflet.tileLayer('http://test-tiles.0d9303a4.cdn.memsites
     minZoom: 2,
     maxZoom: 17
 });
+nationalHeatMap.options.zIndex = 1;
 
 module.exports = {
     base: d3.map({
