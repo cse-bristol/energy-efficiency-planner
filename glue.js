@@ -62,11 +62,11 @@ var overlay = d3.select(map.getPanes().overlayPane)
 
     layersControl = require("./layer-control.js")(body, toolbar, map, layers),
     paint = require("./paint.js")(overlay, transform, sortedByZ),
-    shapeData = require("./shape-data.js")(),
+    worksheet = require("./worksheet.js")(),
     resultsTable = require("./results-table.js");
 
 layers.layerCreated(function(l) {
-    l.worksheet = shapeData(l.geometry());
+    l.worksheet = worksheet(l.geometry());
     l.worksheet.baseColourChanged(paint.redrawAll);
 
     l.resultsTable = resultsTable(body);
