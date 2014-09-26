@@ -270,8 +270,10 @@ module.exports = function(errors, container, toolbar, map, layersControl, layers
 	    }
 	);
 
-    title.onChange(display.wikiPage);
-    display.wikiPage(title.title());
+    title.onChange(function(title) {
+	display.wikiPage(mapPrefix + title);
+    });
+    display.wikiPage(mapPrefix + title.title());
 
     return {
 	loadPage: function(page) {
