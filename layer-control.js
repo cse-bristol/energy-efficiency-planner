@@ -26,7 +26,7 @@ var log2 = function(n) {
     return Math.log(n) / Math.LN2;
 };
 
-var opacitySlider = function(selection, initialValue, getLayer) {
+var opacitySlider = function(selection, initialValue, getLayer, setOpacity) {
     return selection.append("input")
 	.classed(opacityClass, true)
 	.attr("type", "range")
@@ -36,7 +36,7 @@ var opacitySlider = function(selection, initialValue, getLayer) {
 	.attr("value", initialValue)
 	.on("input", function(d, i) {
 	    var layer = getLayer(d, i);
-	    layer.setOpacity(this.value);
+	    setOpacity(layer, this.value);
 	})
 	.call(noDrag);
 };
@@ -53,9 +53,9 @@ var baseColourPicker = function(shapes, newShapes, layers, picker) {
 	});
 
     var colourButtons = shapes.selectAll(".choose-colour")
-	.style("background-color", function(d, i) {
-	    return layers.get(d).worksheet.baseColour();
-	});
+	    .style("background-color", function(d, i) {
+		return layers.get(d).worksheet.baseColour();
+	    });
 
     picker.open(colourButtons);
 };
@@ -118,6 +118,11 @@ module.exports = function(container, buttonContainer, map, layers) {
 	baseLayer.setOpacity(baseOpacity.node().value);
     };
 
+    var setBaseOpacity = function(layer, o) {
+	layer.setOpacity(o);
+	baseOpacity.node().value = o;
+    };
+
     var baseLayersForm = control.append("form");
 
     tileLayers.base.entries().forEach(function(e) {
@@ -162,12 +167,29 @@ module.exports = function(container, buttonContainer, map, layers) {
 	1,
 	function(d, i) {
 	    return baseLayer;
-	}
+	},
+	setBaseOpacity
     );
 
     map.addLayer(baseLayer);
     
     var tileLayersForm = control.append("form");
+
+    var setTileOverlayOpacity = function(layer, o) {
+	layer.setOpacity(o);
+	if (o === 0) {
+	    map.removeLayer(layer);
+	} else {
+	    if (!map.hasLayer(layer)) {
+		map.addLayer(layer);
+	    }
+	}
+	
+	tileLayerDivs.selectAll("." + opacityClass)
+	    .each(function(d, i) {
+		this.value = d.value.options.opacity;
+	    });
+    };
 
     var tileLayerDivs = tileLayersForm.selectAll("div")
 	    .data(tileLayers.overlays.entries())
@@ -184,7 +206,8 @@ module.exports = function(container, buttonContainer, map, layers) {
 	0,
 	function(d, i) {
 	    return d.value;
-	}
+	},
+	setTileOverlayOpacity
     );
 
     var picker = dialogue(
@@ -199,16 +222,30 @@ module.exports = function(container, buttonContainer, map, layers) {
 	.call(colours()
 	      .width(200)
 	      .height(200)
-	     .on("mouseup", function(colour) {
-		 var button = picker.currentOpenButton()
-			 .style("background-color", colour);
+	      .on("mouseup", function(colour) {
+		  var button = picker.currentOpenButton()
+			  .style("background-color", colour);
 
-		 layers.get(button.datum())
-		     .worksheet
-		     .baseColour(colour);
-	     }));
+		  layers.get(button.datum())
+		      .worksheet
+		      .baseColour(colour);
+	      }));
 
     var shapeLayers = control.append("form");
+
+    var setShapeOverlayOpacity = function(layer, o) {
+	layer.setOpacity(o);
+	
+	if (o === 0) {
+	    layer.enabled = false;
+	} else {
+	    layer.enabled = true;
+	}
+	shapeLayers.selectAll("div ." + opacityClass)
+	    .each(function(d, i) {
+		this.value = layers.get(d).options.opacity;
+	    });
+    };
 
     var updateShapes = function() {
 	var shapes = shapeLayers.selectAll("div")
@@ -246,7 +283,8 @@ module.exports = function(container, buttonContainer, map, layers) {
 	    1,
 	    function(d, i) {
 		return layers.get(d);
-	    }
+	    },
+	    setShapeOverlayOpacity
 	);
 
 	baseColourPicker(shapes, newShapes, layers, picker);
@@ -268,38 +306,9 @@ module.exports = function(container, buttonContainer, map, layers) {
 		}
 	    }
 	},
-	setBaseOpacity: function(layer, o) {
-	    layer.setOpacity(o);
-	    baseOpacity.node().value = o;
-	},
-	setTileOverlayOpacity: function(layer, o) {
-	    layer.setOpacity(o);
-	    if (o === 0) {
-		map.removeLayer(layer);
-	    } else {
-		if (!map.hasLayer(layer)) {
-		    map.addLayer(layer);
-		}
-	    }
-	    
-	    tileLayerDivs.selectAll("." + opacityClass)
-		.each(function(d, i) {
-		    this.value = d.value.options.opacity;
-		});
-	},
-	setShapeOverlayOpacity: function(layer, o) {
-	    layer.setOpacity(o);
-	    
-	    if (o === 0) {
-		layer.enabled = false;
-	    } else {
-		layer.enabled = true;
-	    }
-	    shapeLayers.selectAll("div ." + opacityClass)
-		.each(function(d, i) {
-		    this.value = layers.get(d).options.opacity;
-		});
-	},
+	setBaseOpacity: setBaseOpacity,
+	setTileOverlayOpacity: setTileOverlayOpacity,
+	setShapeOverlayOpacity: setShapeOverlayOpacity,
 	update: updateShapes
     };
     return m;
