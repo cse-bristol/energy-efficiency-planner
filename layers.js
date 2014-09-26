@@ -125,6 +125,16 @@ module.exports = function(errors) {
 	get : function(name) {
 	    return layers.get(name);
 	},
+
+	reorder: function(layersAndDisplacements) {
+	    if (layersAndDisplacements.length > 0) {
+		layersAndDisplacements.forEach(function(layerWithDisplacement) {
+		    layers.get(layerWithDisplacement[0])
+			.options.zIndex += layerWithDisplacement[1];
+		});
+		changeCallbacks();
+	    }
+	},
 	create : function(namePreference, geometry, boundingbox) {
 	    var name = stripSpaces(namePreference);
 
@@ -149,7 +159,8 @@ module.exports = function(errors) {
 		 Functions below here are for compatibility with leaflet.js layers.
 		 */
 		options : {
-		    zIndex : 0,
+		    // Layers added later go on top.
+		    zIndex : layers.size() + 1,
 		    opacity : 0.9
 		},
 		

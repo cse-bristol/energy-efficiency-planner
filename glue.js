@@ -119,7 +119,9 @@ layers.layerCreated(function(l) {
     layersControl.update();
 });
 layers.layerChanged(function(l) {
-    updateResults(l);
+    if (l) {
+	updateResults(l);
+    }
     paint.redrawAll();
 });
 layers.layerRemoved(function(l) {

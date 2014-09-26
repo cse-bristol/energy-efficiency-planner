@@ -20,7 +20,9 @@ var d3 = require("d3"),
     colours = require("slippy-colors"),
     noDrag = require("./helpers.js").noDrag,
     tileLayers = require("./tile-layers.js"),
+    sort = require("sort-children"),
     opacityClass = "opacity-slider";
+
 
 var log2 = function(n) {
     return Math.log(n) / Math.LN2;
@@ -50,7 +52,8 @@ var baseColourPicker = function(shapes, newShapes, layers, picker) {
 	    layers.get(d).worksheet.baseColourChanged(function(colour) {
 		el.style("background-color", colour);
 	    });
-	});
+	})
+	.call(noDrag);
 
     var colourButtons = shapes.selectAll(".choose-colour")
 	    .style("background-color", function(d, i) {
@@ -65,7 +68,8 @@ var tables = function(shapes, newShapes, leavingShapes, layers) {
 	var el = d3.select(this),
 	    button = el.append("span")
 		.classed("open-table", true)
-		.text("⊞");
+		.text("⊞")
+		.call(noDrag);
 
 	button.each(function(d, i) {
 	    layers.get(d).resultsTable.dialogue().open(d3.select(this));
@@ -268,7 +272,8 @@ module.exports = function(container, buttonContainer, map, layers) {
 	    })
 	    .on("click", function(d, i) {
 		zoomToLayer(layers.get(d), map);
-	    });
+	    })
+	    .call(noDrag);
 
 	newShapes.append("span")
 	    .classed("shape-layer-delete", true)
@@ -276,7 +281,22 @@ module.exports = function(container, buttonContainer, map, layers) {
 	    .on("click", function(d, i) {
 		layers.remove(layers.get(d));
 		updateShapes();
-	    });
+	    })
+	    .call(noDrag);
+
+	sort(
+	    newShapes,
+	    function(moved, movedDown, displaced) {
+		var direction = movedDown ? 1 : -1;
+
+		layers.reorder(
+		    [[d3.select(moved).datum(), direction * displaced.size()]]
+			.concat(displaced.data().map(function(layerName) {
+			    return [layerName, -direction];
+			}))
+		);
+	    }
+	);
 	
 	opacitySlider(
 	    newShapes,
