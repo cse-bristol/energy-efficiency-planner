@@ -123,7 +123,7 @@ layers.layerChanged(function(l) {
     paint.redrawAll();
 });
 layers.layerRemoved(function(l) {
-    l.resultsTable.remove();
+    l.resultsTable.el().remove();
     paint.redrawAll();
 });
 

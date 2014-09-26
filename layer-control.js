@@ -68,7 +68,7 @@ var tables = function(shapes, newShapes, leavingShapes, layers) {
 		.text("⊞");
 
 	button.each(function(d, i) {
-	    layers.get(d).resultsTable.el().open(d3.select(this));
+	    layers.get(d).resultsTable.dialogue().open(d3.select(this));
 	});
     });
 };

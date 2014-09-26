@@ -131,8 +131,12 @@ module.exports = function(container) {
 	    return tBody.selectAll("tr").selectAll("td");
 	},
 
-	el: function() {
+	dialogue: function() {
 	    return div;
+	},
+
+	el: function() {
+	    return div.el();
 	}
     };
 

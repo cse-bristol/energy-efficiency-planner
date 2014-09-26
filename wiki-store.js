@@ -99,7 +99,7 @@ module.exports = function(errors, container, toolbar, map, layersControl, layers
 			    layersControl.setShapeOverlayOpacity(layer, l.get("opacity"));
 			    layer.worksheet.baseColour(l.get("colour"));
 			    if (l.get("⊞")) {
-				layer.resultsTable.el().show();				
+				layer.resultsTable.dialogue().show();				
 			    }
 
 			    if (l.has("sort")) {
@@ -190,7 +190,7 @@ module.exports = function(errors, container, toolbar, map, layersControl, layers
 				layer: layerPrefix + layerName + layerFileExt,
 				opacity: l.options.opacity,
 				colour: l.worksheet.baseColour(),
-				"⊞": l.resultsTable.el().visible()
+				"⊞": l.resultsTable.dialogue().visible()
 			    };
 
 			    if (sort.properties.length > 0) {
