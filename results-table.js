@@ -123,6 +123,8 @@ module.exports = function(container) {
 		rowHandlers(head, event);
 	    });
 
+	    tr.order();
+
 	    var td = tr.selectAll("td").data(function(d, i){
 		return d;
 	    });
