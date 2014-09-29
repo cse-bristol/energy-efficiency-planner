@@ -107,30 +107,37 @@ path.LineString {
 .results .content {
     height: 100%;
     padding: 0.5em 0.5em 0 0.5em;
-    overflow: auto;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
-.results-table thead tr th, #results table tbody tr td {
+.results-table {
+    display:block;
+    height: 100%;
+    overflow: hidden;
+}
+
+.results-table thead {
+    display: block;
+}
+
+.results-table tbody {
+    display: block;
+    overflow: auto;
+    height: calc(100% - 3em);
+}
+
+.results-table thead tr th, .results-table tbody tr td {
     border-bottom: 1px solid gray;    
     padding: 0.1em 0.4em 0.1em 0.4em;
-}
-
-td {
+    overflow: hidden;
     cursor: pointer;
 }
 
-th {
-    cursor: pointer;
-}
-
-th.sorted:after {
+th.sorted:before {
     content: "↑";
     font-family: monospace;
 }
 
-th.reverse:after {
+th.reverse:before {
     content: "↓";
     font-family: monospace;
 }

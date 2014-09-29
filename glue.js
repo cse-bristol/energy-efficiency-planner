@@ -168,15 +168,8 @@ paint.addClickHandler(function(id, layer) {
 	var row = d3.select(this),
 	    chosen = row.datum()[0] === id;
 
-
-
 	if (chosen) {
-	    // Row is below table view.
-	    // if (((this.offsetTop + this.offsetHeight) > (container.scrollTop + container.offsetHeight))
-	    // 	// Row is above view.
-	    //    || (this.offsetTop < container.scrollTop)) {
-		container.scrollTop = this.offsetTop;
-	    // }
+	    container.scrollTop = this.offsetTop;
 	}
 
 	row.classed("selected", chosen);

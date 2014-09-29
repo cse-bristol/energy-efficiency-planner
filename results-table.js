@@ -2,7 +2,8 @@
 
 /*global module, require*/
 
-var helpers = require("./helpers.js"),
+var d3 = require("d3"),
+    helpers = require("./helpers.js"),
     dialogue = require("floating-dialogue"),
     callbackHandler = helpers.callbackHandler,
     identity = helpers.identity;
@@ -132,6 +133,15 @@ module.exports = function(container) {
 	    td.enter().append("td");
 	    td.exit().remove();
 	    td.html(withRounding);
+
+	    tBody.select("tr")
+		.selectAll("td")
+		.each(function(d, i) {
+		    var width = d3.select(this).style("width");
+		    d3.select(h[0][i])
+			.style("width", width)
+			.style("max-width", width);
+		});
 
 	    if (!gotSize) {
 		/*
