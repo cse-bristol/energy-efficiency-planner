@@ -162,22 +162,32 @@ var wikiStore = require("./wiki-store.js")(
 );
 
 paint.addClickHandler(function(id, layer) {
-    var container = layer.resultsTable.dialogue().content().node();
+    var tbody = layer.resultsTable.tbody().node();
 
     layer.resultsTable.rows().each(function(d, i) {
 	var row = d3.select(this),
 	    chosen = row.datum()[0] === id;
 
 	if (chosen) {
-	    container.scrollTop = this.offsetTop;
+	    tbody.scrollTop = this.offsetTop - 
+		// Fudge factor found by experimentation, appears to work at different zoom levels.
+		// I don't know why this difference is here.
+		(2.7 * this.offsetHeight);
 	}
 
 	row.classed("selected", chosen);
     });
 
-
-
     layer.resultsTable.dialogue().show();
+});
+
+paint.addHoverHandler(function(id, layer) {
+    layer.resultsTable.setExtraRow(
+	layer.resultsTable.rows().filter(function(d, i) {
+	    return d3.select(this)
+		.datum()[0] === id;
+	})
+    );
 });
 
 require("./query-string.js")(wikiStore, title);

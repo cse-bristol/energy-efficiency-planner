@@ -24,11 +24,14 @@ module.exports = function(container) {
 	
 	table = div.content().append("table")
 	    .classed("results-table", true),
-	tHead = table.append("thead").append("tr"),
+	tHead = table.append("thead"),
+	headers = tHead.append("tr")
+	    .classed("headers", true),
 	tBody = table.append("tbody"),
 	rowHandlers = callbackHandler(),
 	headHandlers = callbackHandler(),
 	resetHandlers = callbackHandler(),
+	extraRow,
 	gotSize = false;
 
     div.el().append("span")
@@ -78,6 +81,17 @@ module.exports = function(container) {
 	    return +n.toFixed(2);
 	}
     };
+
+    var setColumnWidths = function(cellSelection) {
+	tBody.select("tr")
+	    .selectAll("td")
+	    .each(function(d, i) {
+		var width = d3.select(this).style("width");
+		d3.select(cellSelection[0][i])
+		    .style("min-width", width)
+		    .style("max-width", width);
+	    });
+    };
     
     var module = {
 
@@ -89,7 +103,7 @@ module.exports = function(container) {
 	info : function(head, data, ordering) {
 	    sort(head, data, ordering);
 
-	    var h = tHead.selectAll("th").data(head);
+	    var h = headers.selectAll("th").data(head);
 	    h.exit().remove();
 	    h.enter().append("th");
 	    h.html(identity)
@@ -134,14 +148,7 @@ module.exports = function(container) {
 	    td.exit().remove();
 	    td.html(withRounding);
 
-	    tBody.select("tr")
-		.selectAll("td")
-		.each(function(d, i) {
-		    var width = d3.select(this).style("width");
-		    d3.select(h[0][i])
-			.style("width", width)
-			.style("max-width", width);
-		});
+	    setColumnWidths(h);
 
 	    if (!gotSize) {
 		/*
@@ -159,6 +166,21 @@ module.exports = function(container) {
 	rowClicked : rowHandlers.add,
 	resetClicked: resetHandlers.add,
 
+	setExtraRow: function(row) {
+	    if (extraRow) {
+		extraRow.remove();
+	    }
+
+	    extraRow = d3.select(row.node().cloneNode(true));
+
+	    setColumnWidths(
+		extraRow
+		    .classed("extra-row", true)
+		    .selectAll("td"));
+	    
+	    tHead.node().appendChild(extraRow.node());
+	},
+
 	rows: function() {
 	    return tBody.selectAll("tr");
 	},
@@ -173,6 +195,10 @@ module.exports = function(container) {
 
 	el: function() {
 	    return div.el();
+	},
+
+	tbody: function() {
+	    return tBody;
 	}
     };
 
