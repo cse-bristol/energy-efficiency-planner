@@ -22,7 +22,7 @@ module.exports = function(container) {
 	    .hide(),
 	
 	table = div.content().append("table")
-	    .classed(".results-table", true),
+	    .classed("results-table", true),
 	tHead = table.append("thead").append("tr"),
 	tBody = table.append("tbody"),
 	rowHandlers = callbackHandler(),
