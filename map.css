@@ -126,10 +126,12 @@ th {
 
 th.sorted:after {
     content: "↑";
+    font-family: monospace;
 }
 
 th.reverse:after {
     content: "↓";
+    font-family: monospace;
 }
 
 .results thead tr th:hover {
