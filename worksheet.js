@@ -74,6 +74,12 @@ module.exports = function() {
 		    return colour;
 		} else {
 		    var col = sortProperties[0];
+		    if (col === "id") {
+			return function(d, i) {
+			    return colour(d.id);
+			};
+		    }
+
 		    return function(d, i) {
 			return colour(d.properties[col]);
 		    };
