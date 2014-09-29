@@ -27,7 +27,8 @@ module.exports = function(container) {
 	tBody = table.append("tbody"),
 	rowHandlers = callbackHandler(),
 	headHandlers = callbackHandler(),
-	resetHandlers = callbackHandler();
+	resetHandlers = callbackHandler(),
+	gotSize = false;
 
     div.el().append("span")
 	.classed("reset-results", true)
@@ -110,7 +111,12 @@ module.exports = function(container) {
 		    return this.reverse;
 		});
 
-	    var tr = tBody.selectAll("tr").data(data);
+	    var tr = tBody.selectAll("tr").data(
+		data,
+		function(d, i) {
+		    return d[0];
+		}
+	    );
 	    tr.enter().append("tr");
 	    tr.exit().remove();
 	    tr.on("click", function(event, index){
@@ -124,6 +130,17 @@ module.exports = function(container) {
 	    td.enter().append("td");
 	    td.exit().remove();
 	    td.html(withRounding);
+
+	    if (!gotSize) {
+		/*
+		 Setting the size here allows us to autoresize the table's containing element to the content the first time,
+		 but still provides scrollbars if it overflows the max-height.
+		 */
+
+		gotSize = true;
+		div.el().style("height", div.el().node().offsetHeight + "px");
+		div.el().style("width", div.el().node().offsetWidth + "px");
+	    }
 	},
 
 	headerClicked : headHandlers.add,
@@ -147,6 +164,5 @@ module.exports = function(container) {
 	}
     };
 
-    module.info([], [], {properties: [], reverse: []});
     return module;
 };

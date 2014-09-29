@@ -161,4 +161,30 @@ var wikiStore = require("./wiki-store.js")(
     paint.redrawAll
 );
 
+paint.addClickHandler(function(id, layer) {
+    var container = layer.resultsTable.dialogue().content().node();
+
+    layer.resultsTable.rows().each(function(d, i) {
+	var row = d3.select(this),
+	    chosen = row.datum()[0] === id;
+
+
+
+	if (chosen) {
+	    // Row is below table view.
+	    // if (((this.offsetTop + this.offsetHeight) > (container.scrollTop + container.offsetHeight))
+	    // 	// Row is above view.
+	    //    || (this.offsetTop < container.scrollTop)) {
+		container.scrollTop = this.offsetTop;
+	    // }
+	}
+
+	row.classed("selected", chosen);
+    });
+
+
+
+    layer.resultsTable.dialogue().show();
+});
+
 require("./query-string.js")(wikiStore, title);

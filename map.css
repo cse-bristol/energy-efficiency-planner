@@ -50,6 +50,7 @@ path {
     stroke-linejoin: round;
     stroke-linecap: round;
     stroke-width: 1px;
+    cursor: pointer;
 }
 
 path.LineString {
@@ -146,6 +147,10 @@ th.reverse:after {
     background-color: LightSlateGray;
 }
 
+.selected {
+    outline: 1px solid red;
+}
+
 .reset-results {
     position: absolute;
     bottom: 0.5em;
@@ -238,12 +243,10 @@ th.reverse:after {
     vertical-align: top;
     display: inline-block;
     font-size: large;
-    /* Hide the extra thickness of a selected .choose-colour */
-    border: thin solid white;
 }
 
 .choose-colour.element-visible {
-    border: thin solid black;
+    outline: thin solid black;
 }
 
 .colour-picker {
