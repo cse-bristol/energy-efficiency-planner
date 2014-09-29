@@ -215,6 +215,12 @@ th.reverse:after {
     text-decoration: underline;
 }
 
+.shape-layer-name.disabled {
+    text-decoration: none;
+    color: grey;
+    pointer-events: none;
+}
+
 .shape-overlay-control .open-button {
     margin-left: 0.3em;
     width: 1em;

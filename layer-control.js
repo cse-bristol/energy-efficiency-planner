@@ -240,7 +240,7 @@ module.exports = function(container, buttonContainer, map, layers) {
     var setShapeOverlayOpacity = function(layer, o) {
 	layer.setOpacity(o);
 	
-	if (o === 0) {
+	if (parseFloat(o) === 0) {
 	    layer.enabled = false;
 	} else {
 	    layer.enabled = true;
@@ -248,6 +248,11 @@ module.exports = function(container, buttonContainer, map, layers) {
 	shapeLayers.selectAll("div ." + opacityClass)
 	    .each(function(d, i) {
 		this.value = layers.get(d).options.opacity;
+	    });
+
+	shapeLayers.selectAll(".shape-layer-name")
+	    .classed("disabled", function(d, i) {
+		return !layers.get(d).enabled;
 	    });
     };
 
