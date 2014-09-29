@@ -101,7 +101,9 @@ layers.layerCreated(function(l) {
 		    });
 	    });
 	} else {
-	    l.resultsTable.cells().style("background-color", null);
+	    l.resultsTable.cells()
+		.style("background-color", null)
+		.style("color", null);
 	}
     };
 
