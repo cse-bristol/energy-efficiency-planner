@@ -10,28 +10,6 @@ module.exports = function(container, projection, dataSource) {
 	colours = d3.scale.category10(),
     	clickHandlers = [];
 
-    // var reorder = function(selection, lessThan) {
-    // 	/*
-    // 	 TODO: think about this http://stackoverflow.com/questions/11681114/min-no-of-moves-to-sort-an-array
-    // 	 Based on selection sort, since moves are expensive.
-    // 	 */
-    // 	var n = selection.size(),
-    // 	    data = selection.data();
-
-    // 	for (var i = 1; i <= n; i++) {
-    // 	    var k = i;
-    // 	    for (var j = i + 1; j <= n; j++) {
-    // 		if (lessThan(data[j], data[k])) {
-		    
-
-    // 		    var temp = data[j];
-    // 		    data[j] = data[k];
-    // 		    data[k] = temp;
-    // 		}
-    // 	    }
-    // 	}
-    // };
-
     var module = {
 	/*
 	 Pass in a function to be called every time a geometry path on the map is clicked.
@@ -48,6 +26,7 @@ module.exports = function(container, projection, dataSource) {
 			    return d.name();
 			}
 		    );
+
 
 	    l.enter().append("g")
 		.classed("leaflet-zoom-hide", true);
@@ -115,6 +94,8 @@ module.exports = function(container, projection, dataSource) {
 			    .style(feature, colour);
 		    });
 	    });
+
+	    l.order();
 	}
     };
     
