@@ -134,6 +134,7 @@ path.LineString {
 .results-table thead tr th {
     padding: 0.1em 0.4em 0.1em 0.4em;
     cursor: pointer;
+    overflow: hidden;
 }
 
 .results-table tbody tr td {
