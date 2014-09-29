@@ -146,6 +146,15 @@ th.reverse:after {
     background-color: LightSlateGray;
 }
 
+.reset-results {
+    position: absolute;
+    bottom: 0.5em;
+    left: 0.5em;
+    font-family: monospace;
+    font-weight: bold;
+    cursor: pointer;
+}
+
 #messages {
     position: absolute;
     top: 0.6em;

@@ -83,26 +83,33 @@ module.exports = function() {
 	    sortProperty : function(property, additional) {
 		colourFun = undefined;
 
-		var i = sortProperties.indexOf(property);
-		if (i >= 0) {
-		    if (additional) {
-			/* reverse this property */
-			reverseSort[i] = !reverseSort[i];
+		if (property) {
+
+		    var i = sortProperties.indexOf(property);
+		    if (i >= 0) {
+			if (additional) {
+			    /* reverse this property */
+			    reverseSort[i] = !reverseSort[i];
+			} else {
+			    /* sort on just this property, reversed  */
+			    sortProperties = [property];
+			    reverseSort = [!reverseSort[i]];
+			}
 		    } else {
-			/* sort on just this property, reversed  */
-			sortProperties = [property];
-			reverseSort = [!reverseSort[i]];
+			if (additional) {
+			    /* add new property with normal sort  */
+			    sortProperties.push(property);
+			    reverseSort.push(false);
+			} else {
+			    /* sort on just this property */
+			    sortProperties = [property];
+			    reverseSort = [false];
+			}
 		    }
-		} else {
-		    if (additional) {
-			/* add new property with normal sort  */
-			sortProperties.push(property);
-			reverseSort.push(false);
-		    } else {
-			/* sort on just this property */
-			sortProperties = [property];
-			reverseSort = [false];
-		    }
+		} else if (sortProperties.length > 0) {
+		    // Clear sort properties;
+		    sortProperties = [];
+		    reverseSort = [];
 		}
 		sortPropertyChanged();
 	    },

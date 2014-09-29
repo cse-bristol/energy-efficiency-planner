@@ -26,7 +26,13 @@ module.exports = function(container) {
 	tHead = table.append("thead").append("tr"),
 	tBody = table.append("tbody"),
 	rowHandlers = callbackHandler(),
-	headHandlers = callbackHandler();
+	headHandlers = callbackHandler(),
+	resetHandlers = callbackHandler();
+
+    div.el().append("span")
+	.classed("reset-results", true)
+	.text("RESET")
+	.on("click", resetHandlers);
 
     var maybeNumber = function(n) {
 	var num = parseFloat(n);
@@ -122,6 +128,7 @@ module.exports = function(container) {
 
 	headerClicked : headHandlers.add,
 	rowClicked : rowHandlers.add,
+	resetClicked: resetHandlers.add,
 
 	rows: function() {
 	    return tBody.selectAll("tr");

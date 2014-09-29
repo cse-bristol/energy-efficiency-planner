@@ -101,7 +101,7 @@ layers.layerCreated(function(l) {
 		    });
 	    });
 	} else {
-	    l.resultsTable.cells().style("background-colour", null);
+	    l.resultsTable.cells().style("background-color", null);
 	}
     };
 
@@ -109,6 +109,9 @@ layers.layerCreated(function(l) {
     l.resultsTable = resultsTable(body);
     l.resultsTable.headerClicked(function(p) {
 	l.worksheet.sortProperty(p, d3.event.shiftKey);
+    });
+    l.resultsTable.resetClicked(function() {
+	l.worksheet.sortProperty();
     });
 
     // TODO: only redraw the layer which changed.
