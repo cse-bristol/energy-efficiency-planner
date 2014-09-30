@@ -18,9 +18,39 @@ var sortedByZ = function() {
     });
 };
 
+var getLayerEl = function(layerName) {
+    return d3.select("#map svg g#" + layerName);
+};
+
 var getLayerObjects = function(layerName) {
-    return d3.select("#map svg g#" + layerName)
+    return getLayerEl(layerName)
 	.selectAll("path");
+};
+
+var log2 = function(n) {
+    return Math.log(n) / Math.LN2;
+};
+
+var zoomTo = function(bbox, map) {
+    var x1 = bbox[0],
+	y1 = bbox[1],
+	x2 = bbox[2],
+	y2 = bbox[3];
+
+    var boxSize = Math.max(
+	Math.abs(x1 - x2),
+	Math.abs(y1 - y2));
+
+    var newZoom = Math.round(
+	log2(360 / boxSize) + 1.5);
+    console.log("new zoom " + newZoom);
+    console.log("new bounds " + [(y1 + y2) / 2, (x1 + x2) / 2]);
+    
+    map.setView(
+	leaflet.latLng(
+	    (y1 + y2) / 2,
+	    (x1 + x2) / 2),
+	newZoom);
 };
 
 var startCoordinates = [0, 0],
@@ -61,7 +91,7 @@ var overlay = d3.select(map.getPanes().overlayPane)
 	.select("svg")
 	.attr("id", "overlay"),
 
-    layersControl = require("./layer-control.js")(body, toolbar, map, layers),
+    layersControl = require("./layer-control.js")(body, toolbar, map, layers, zoomTo),
     paint = require("./paint.js")(overlay, transform, sortedByZ),
     worksheet = require("./worksheet.js")(),
     resultsTable = require("./results-table.js"),
@@ -111,6 +141,26 @@ layers.layerCreated(function(l) {
     l.resultsTable = resultsTable(body);
     l.resultsTable.headerClicked(function(p) {
 	l.worksheet.sortProperty(p, d3.event.shiftKey);
+    });
+    l.resultsTable.rowClicked(function(d, i) {
+	var id = d[0];
+
+	d3.select("#map svg g#" + l.name() + " path#" + id)
+	    .each(function(d, i) {
+		zoomTo(d.bbox, map);
+	    });
+
+	l.resultsTable.rows().
+	    classed("selected", function(d, i) {
+		return d[0] === id;
+	    });
+    });
+    l.resultsTable.rowHovered(function(d, i) {
+	var id = d[0];
+	
+	getLayerObjects(l.name()).classed("highlight", function(d, i) {
+	    return d.id === id;
+	});
     });
     l.resultsTable.resetClicked(function() {
 	l.worksheet.sortProperty();

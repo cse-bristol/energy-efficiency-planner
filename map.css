@@ -53,6 +53,10 @@ path {
     cursor: pointer;
 }
 
+path.highlight {
+    stroke: pink;
+}
+
 path.LineString {
     fill: none;
     stroke-width: 3px !important;

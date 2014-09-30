@@ -28,16 +28,17 @@ module.exports = function(container) {
 	headers = tHead.append("tr")
 	    .classed("headers", true),
 	tBody = table.append("tbody"),
-	rowHandlers = callbackHandler(),
-	headHandlers = callbackHandler(),
-	resetHandlers = callbackHandler(),
+	rowClickHandler = callbackHandler(),
+	headClickHandler = callbackHandler(),
+	rowHoverHandler = callbackHandler(),
+	resetHandler = callbackHandler(),
 	extraRow,
 	gotSize = false;
 
     div.el().append("span")
 	.classed("reset-results", true)
 	.text("RESET")
-	.on("click", resetHandlers);
+	.on("click", resetHandler);
 
     var maybeNumber = function(n) {
 	var num = parseFloat(n);
@@ -107,12 +108,12 @@ module.exports = function(container) {
 	    h.exit().remove();
 	    h.enter().append("th");
 	    h.html(identity)
-		.on("click", function(event, index) {
+		.on("click", function(d, i) {
 		    var column = data.map(function(row) {
-			return row[index];
+			return row[i];
 		    });
 		    
-		    headHandlers(event, column);
+		    headClickHandler(d, column);
 		});
 	    h.each(function(d, i){
 		var j = ordering.properties.indexOf(d);
@@ -134,11 +135,10 @@ module.exports = function(container) {
 	    );
 	    tr.enter().append("tr");
 	    tr.exit().remove();
-	    tr.on("click", function(event, index){
-		rowHandlers(head, event);
-	    });
-
-	    tr.order();
+	    tr
+		.on("click", rowClickHandler)
+		.on("mouseenter", rowHoverHandler)
+		.order();
 
 	    var td = tr.selectAll("td").data(function(d, i){
 		return d;
@@ -162,9 +162,10 @@ module.exports = function(container) {
 	    }
 	},
 
-	headerClicked : headHandlers.add,
-	rowClicked : rowHandlers.add,
-	resetClicked: resetHandlers.add,
+	headerClicked : headClickHandler.add,
+	rowClicked : rowClickHandler.add,
+	rowHovered: rowHoverHandler.add,
+	resetClicked: resetHandler.add,
 
 	setExtraRow: function(row) {
 	    if (extraRow) {

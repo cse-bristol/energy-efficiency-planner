@@ -23,11 +23,6 @@ var d3 = require("d3"),
     sort = require("sort-children"),
     opacityClass = "opacity-slider";
 
-
-var log2 = function(n) {
-    return Math.log(n) / Math.LN2;
-};
-
 var opacitySlider = function(selection, initialValue, getLayer, setOpacity) {
     return selection.append("input")
 	.classed(opacityClass, true)
@@ -77,31 +72,7 @@ var tables = function(shapes, newShapes, leavingShapes, layers) {
     });
 };
 
-var zoomToLayer = function(l, map) {
-    if (l.boundingbox()) {
-	var x1 = l.boundingbox()[0],
-	    y1 = l.boundingbox()[1],
-	    x2 = l.boundingbox()[2],
-	    y2 = l.boundingbox()[3];
-
-	var boxSize = Math.max(
-	    Math.abs(x1 - x2),
-	    Math.abs(y1 - y2));
-
-	var newZoom = Math.round(
-	    log2(360 / boxSize) + 1.5);
-	console.log("new zoom " + newZoom);
-	console.log("new bounds " + [(y1 + y2) / 2, (x1 + x2) / 2]);
-	
-	map.setView(
-	    leaflet.latLng(
-		(y1 + y2) / 2,
-		(x1 + x2) / 2),
-	    newZoom);
-    }
-};
-
-module.exports = function(container, buttonContainer, map, layers) {
+module.exports = function(container, buttonContainer, map, layers, zoomTo) {
     var baseLayer = tileLayers.defaultBaseLayer,
 
 	button = buttonContainer.append("span")
@@ -276,7 +247,10 @@ module.exports = function(container, buttonContainer, map, layers) {
 		return d;
 	    })
 	    .on("click", function(d, i) {
-		zoomToLayer(layers.get(d), map);
+		var l = layers.get(d);
+		if (l.boundingbox) {
+		    zoomTo(l.boundingbox(), map);
+		}
 	    })
 	    .call(noDrag);
 
