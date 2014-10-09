@@ -66,7 +66,10 @@ module.exports.overlays.values().forEach(function(tileLayer) {
 			cache.drawImage(this, 0, 0);
 		    }
 
-		    var colourData = cache.getImageData(d3.event.offsetX, d3.event.offsetY, 1, 1).data;
+		    var rect = this.getBoundingClientRect(),
+			x = d3.event.offsetX ? d3.event.offsetX : d3.event.clientX - rect.left,
+			y = d3.event.offsetY ? d3.event.offsetY : d3.event.clientY - rect.top,
+			colourData = cache.getImageData(x, y, 1, 1).data;
 
 		    if (colourData[3] > 0) {
 			colourChanged(d3.rgb(colourData[0], colourData[1], colourData[2]));
