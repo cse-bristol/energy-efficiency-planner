@@ -282,3 +282,11 @@ th.reverse:before {
     left: calc(100% - 33em);
     opacity: 0.8;
 }
+
+.leaflet-overlay-pane {
+    pointer-events: none;
+}
+
+.leaflet-zoom-hide {
+    pointer-events: all;
+}
