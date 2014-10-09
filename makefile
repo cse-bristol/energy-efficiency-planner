@@ -1,3 +1,3 @@
-build: ; npm install; mkdir -p bin; sudo browserify glue.js -o ./bin/main.js
+build: ; npm install; mkdir -p bin; browserify glue.js -o ./bin/main.js
 
 clean: ; rm -rf ./bin/*
