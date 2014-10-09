@@ -18,6 +18,7 @@ var d3 = require("d3"),
     dialogue = require("floating-dialogue"),
     leaflet = require("leaflet"),
     colours = require("slippy-colors"),
+    reverseColour = require("./colour.js").reverse,
     noDrag = require("./helpers.js").noDrag,
     tileLayers = require("./tile-layers.js"),
     sort = require("sort-children"),
@@ -169,7 +170,8 @@ module.exports = function(container, buttonContainer, map, layers, zoomTo) {
     var tileLayerDivs = tileLayersForm.selectAll("div")
 	    .data(tileLayers.overlays.entries())
 	    .enter()
-	    .append("div");
+	    .append("div")
+	    .classed("tile-overlay-control", true);
 
     tileLayerDivs.append("span")
 	.text(function(d, i) {
@@ -184,6 +186,21 @@ module.exports = function(container, buttonContainer, map, layers, zoomTo) {
 	},
 	setTileOverlayOpacity
     );
+
+    tileLayerDivs.append("span")
+	.classed("tile-overlay-status", true)
+	.each(function(d, i) {
+	    var status = d3.select(this),
+		layer = d.value;
+
+	    layer.colourChanged(function(colour) {
+		status.style("background-color", colour);
+		if (layer.legend) {
+		    status.style("color", reverseColour(colour));
+		    status.text(layer.legend(colour));
+		}
+	    });
+	});
 
     var picker = dialogue(
 	container.append("div")

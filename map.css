@@ -266,6 +266,13 @@ th.reverse:before {
     font-size: large;
 }
 
+.tile-overlay-status {
+    display: inline-block;
+    width: 6.5em;
+    height: 1.3em;
+    margin: 0.05em
+}
+
 .choose-colour.element-visible {
     outline: thin solid black;
 }
