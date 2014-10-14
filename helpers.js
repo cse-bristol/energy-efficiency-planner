@@ -13,7 +13,7 @@ module.exports = {
     },
     rounded: function(maybeNumber) {
 	if (module.exports.isNum(maybeNumber)) {
-	    return +maybeNumber.toFixed(2);
+	    return +maybeNumber.toPrecision(2);
 	} else {
 	    return maybeNumber;
 	}
