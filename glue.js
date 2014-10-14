@@ -91,7 +91,8 @@ var overlay = d3.select(map.getPanes().overlayPane)
 	.select("svg")
 	.attr("id", "overlay"),
 
-    layersControl = require("./layer-control.js")(body, toolbar, map, layers, zoomTo),
+    tileLayers = require("./tile-layers.js")(map, errors),
+    layersControl = require("./layer-control.js")(body, toolbar, map, layers, tileLayers, zoomTo),
     paint = require("./paint.js")(overlay, transform, sortedByZ),
     worksheet = require("./worksheet.js")(),
     resultsTable = require("./results-table.js"),
@@ -201,6 +202,7 @@ var wikiStore = require("./wiki-store.js")(
     map,
     layersControl,
     layers,
+    tileLayers,
     title,
     function findShapesByName(names) {
 	return d3.selectAll("#map svg g path")

@@ -20,7 +20,6 @@ var d3 = require("d3"),
     colours = require("slippy-colors"),
     reverseColour = require("./colour.js").reverse,
     noDrag = require("./helpers.js").noDrag,
-    tileLayers = require("./tile-layers.js"),
     sort = require("sort-children"),
     opacityClass = "opacity-slider";
 
@@ -73,7 +72,7 @@ var tables = function(shapes, newShapes, leavingShapes, layers) {
     });
 };
 
-module.exports = function(container, buttonContainer, map, layers, zoomTo) {
+module.exports = function(container, buttonContainer, map, layers, tileLayers, zoomTo) {
     var baseLayer = tileLayers.defaultBaseLayer,
 
 	button = buttonContainer.append("span")

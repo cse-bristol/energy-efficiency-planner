@@ -268,9 +268,11 @@ th.reverse:before {
 
 .tile-overlay-status {
     display: inline-block;
-    width: 6.5em;
+    width: 6.2em;
     height: 1.3em;
-    margin: 0.05em
+    margin: 0.1em;
+    padding-left: 0.2em;
+    vertical-align: top;
 }
 
 .choose-colour.element-visible {

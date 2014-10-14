@@ -6,7 +6,8 @@ var d3 = require("d3"),
     helpers = require("./helpers.js"),
     dialogue = require("floating-dialogue"),
     callbackHandler = helpers.callbackHandler,
-    identity = helpers.identity;
+    identity = helpers.identity,
+    rounded = helpers.rounded;
 
 /*
  Make an info panel for a polygon on the map.
@@ -74,15 +75,6 @@ module.exports = function(container) {
 	});
     };
 
-    var withRounding = function(maybeNumber) {
-	var n = parseFloat(maybeNumber);
-	if (isNaN(n) || !isFinite(maybeNumber)) {
-	    return maybeNumber;
-	} else {
-	    return +n.toFixed(2);
-	}
-    };
-
     var setColumnWidths = function(cellSelection) {
 	tBody.select("tr")
 	    .selectAll("td")
@@ -146,7 +138,7 @@ module.exports = function(container) {
 
 	    td.enter().append("td");
 	    td.exit().remove();
-	    td.html(withRounding);
+	    td.html(rounded);
 
 	    setColumnWidths(h);
 

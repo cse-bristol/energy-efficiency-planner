@@ -6,7 +6,6 @@ var _ = require("lodash"),
     d3 = require("d3"),
     leaflet = require("leaflet"),
     callbackFactory = require("./helpers.js").callbackHandler,
-    tileLayers = require("./tile-layers.js"),
     interopModule = require("gitit-interop"),
     layerPrefix = "layers/",
     layerFileExt = ".geojson",
@@ -23,7 +22,7 @@ var mapName = function(path) {
     return path.indexOf(mapPrefix) === 0 ? path.slice(mapPrefix.length) : path;
 };
 
-module.exports = function(errors, container, toolbar, map, layersControl, layers, title, findShapesByName, redraw) {
+module.exports = function(errors, container, toolbar, map, layersControl, layers, tileLayers, title, findShapesByName, redraw) {
     var onSave = callbackFactory(),
 	onLoad = callbackFactory();
 

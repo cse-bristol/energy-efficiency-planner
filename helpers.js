@@ -11,6 +11,13 @@ module.exports = {
     isNum: function (n) {
 	return !isNaN(parseFloat(n)) && isFinite(n);
     },
+    rounded: function(maybeNumber) {
+	if (module.exports.isNum(maybeNumber)) {
+	    return +maybeNumber.toFixed(2);
+	} else {
+	    return maybeNumber;
+	}
+    },
     callbackHandler: function() {
 	var callbacks = [];
 	
