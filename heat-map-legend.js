@@ -20,10 +20,16 @@ module.exports = function(map, errors) {
 		    var legend = d3.map();
 
 		    data.legend.forEach(function(range) {
+			var min = rounded(range.min),
+			    max = rounded(range.max);
+
 			legend.set(
 			    // Must be American spelling here
 			    range.color, 
-			    rounded(range.min) + " to " + rounded(range.max));
+			    min === max ?
+				min :
+				min + " to " + max
+			);
 		    });
 
 		    legendByZoom.set(z, legend);
@@ -42,6 +48,6 @@ module.exports = function(map, errors) {
 	    }
 	}
 
-	return "unknown";
+	return "";
     };
 };
