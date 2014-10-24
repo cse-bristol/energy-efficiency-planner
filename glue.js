@@ -12,12 +12,6 @@ var projectPoint = function(x, y) {
     this.stream.point(point.x, point.y);
 };
 
-var sortedByZ = function() {
-    return layers.enabled().slice(0).sort(function(a, b){
-	return a.options.zIndex - b.options.zIndex;
-    });
-};
-
 var getLayerEl = function(layerName) {
     return d3.select("#map svg g#" + layerName);
 };
@@ -93,7 +87,7 @@ var overlay = d3.select(map.getPanes().overlayPane)
 
     tileLayers = require("./tile-layers.js")(map, errors),
     layersControl = require("./layer-control.js")(body, toolbar, map, layers, tileLayers, zoomTo),
-    paint = require("./paint.js")(overlay, transform, sortedByZ),
+    paint = require("./paint.js")(overlay, transform, layers.sortedByZ),
     worksheet = require("./worksheet.js")(),
     resultsTable = require("./results-table.js"),
     colours = require("./colour.js");

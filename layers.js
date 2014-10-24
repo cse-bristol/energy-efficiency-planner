@@ -109,11 +109,18 @@ module.exports = function(errors) {
 	    errors.informUser("No 'id' property found. Inventing names for each shape.");
 	}
     };
+
+    var enabled = function() {
+	return layers.values().filter(function(l){
+	    return l.enabled;
+	});
+    };
     
     return {
-	enabled : function() {
-	    return layers.values().filter(function(l){
-		return l.enabled;
+	enabled : enabled,
+	sortedByZ: function() {
+	    return enabled().slice(0).sort(function(a, b){
+		return a.options.zIndex - b.options.zIndex;
 	    });
 	},
 	names : function() {
