@@ -24,6 +24,10 @@ var leaflet = require("leaflet"),
 
     Esri_WorldImagery = leaflet.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
 	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    }),
+
+    Esri_WorldTopoMap = leaflet.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
     });
 
 //http://test-tiles.0d9303a4.cdn.memsites.com/Total%20Heat%20Density/Z{z}/{y}/{x}.png
@@ -77,7 +81,9 @@ module.exports = function(map, errors) {
 	    "Open Street Map" : osmLayer,
 	    "Stamen Toner" : Stamen_TonerBackground,
 	    "ESRI Relief": Esri_WorldShadedRelief,
-	    "ESRI World Imagery" : Esri_WorldImagery
+	    "ESRI World Imagery" : Esri_WorldImagery,
+	    "ESRI World Topography": Esri_WorldTopoMap
+	    
 	}),
 	overlays: overlays,
 	defaultBaseLayer: osmLayer
