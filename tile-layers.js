@@ -53,7 +53,11 @@ module.exports = function(map, errors) {
 		d3.select(e.tile)
 		    .on("mousemove", function() {
 			if (cache === undefined) {
-			    cache = document.createElement("canvas").getContext("2d");
+			    var canvas = document.createElement("canvas");
+			    canvas.width = this.width;
+			    canvas.height = this.height;
+
+			    var cache = canvas.getContext("2d");
 			    cache.drawImage(this, 0, 0);
 			}
 
@@ -62,9 +66,7 @@ module.exports = function(map, errors) {
 			    y = d3.event.offsetY ? d3.event.offsetY : d3.event.clientY - rect.top,
 			    colourData = cache.getImageData(x, y, 1, 1).data;
 
-			if (colourData[3] > 0) {
-			    colourChanged(d3.rgb(colourData[0], colourData[1], colourData[2]));
-			}
+			colourChanged(d3.rgb(colourData[0], colourData[1], colourData[2]));
 		    });
 	    });
 	}
