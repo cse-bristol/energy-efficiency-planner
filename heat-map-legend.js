@@ -51,6 +51,6 @@ module.exports = function(map, errors) {
 	    }
 	}
 
-	return "";
+	return "n/a";
     };
 };
