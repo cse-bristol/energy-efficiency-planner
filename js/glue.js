@@ -67,7 +67,7 @@ var startCoordinates = [0, 0],
     title = require("./title.js")(body),
     transform = d3.geo.transform({point: projectPoint});
 
-require("./lib/d3-plugins/geo/tile/tile.js");
+require("../lib/d3-plugins/geo/tile/tile.js");
 
 var map = new leaflet.Map("map", {
     doubleClickZoom: false
