@@ -5,23 +5,11 @@ body {
     overflow: hidden;
 }
 
-#toolbar .open-button {
-    display: block;
-}
-
-#title {
-    font-size: x-large;
-    background-color: transparent;
-    border: none;
-    font-weight: bolder;
-    color: darkslategrey;
+.file-menu {
     position: absolute;
-    top: 0.3em;
-    left: 2em;
-    text-overflow: ellipsis;
-    padding: 0.1em;
-    margin: 0;
-    width: 14em;
+    top: 0.6em;
+    left: 3em;
+    z-index: 1;
 }
 
 #toolbar {
@@ -29,6 +17,10 @@ body {
     position: absolute;
     top: 5em;
     left: 0.6em;
+}
+
+#toolbar .open-button {
+    display: block;
 }
 
 #toolbar:hover {

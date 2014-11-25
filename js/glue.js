@@ -13,6 +13,12 @@ var d3 = require("d3"),
     leaflet = require("leaflet"),
 
     body = d3.select("body"),
+    menuBar = body.append("div").classed("file-menu", true),
+    update = function() {
+	layerControl.update();
+	paint.redrawAll();
+    },
+    
     toolbar = require("./toolbar.js")(body),
     errors = require("./errors.js")(body, toolbar),
     loader = require("./loader.js"),
@@ -30,9 +36,9 @@ var d3 = require("d3"),
 	map.zoomTo,
 	paint.onClickShape,
 	paint.onHoverShape,
-	paint.redrawAll
+	update
     ),    
-    state = require("./state.js")(errors, map, toolbar, tableForLayer, paint.redrawAll),
+    state = require("./state.js")(errors, map, toolbar, tableForLayer, update),
     dataTransfer = require("./data-transfer.js")(errors, state.fresh),
     menu = require("multiuser-file-menu")(
 	"maps",
@@ -45,7 +51,7 @@ var d3 = require("d3"),
     layerControl = require("./layer-control.js")(body, toolbar, state.getLayers, state.getTileLayers, map.zoomTo);
 
 // TODO extra buttons
-menu.buildMenu(body, []);
+menu.buildMenu(menuBar, []);
 
 map.onViewReset(paint.redrawAll);
 
@@ -53,6 +59,6 @@ var handlers = require("./file-handlers.js")(
     errors, 
     geometries, 
     state.getLayers, 
-    paint.redrawAll
+    update
 );
 require("./file-drop.js")(d3.select("body"), errors, handlers);
