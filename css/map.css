@@ -17,6 +17,7 @@ body {
     position: absolute;
     top: 5em;
     left: 0.6em;
+    z-index: 1;
 }
 
 #toolbar .open-button {
