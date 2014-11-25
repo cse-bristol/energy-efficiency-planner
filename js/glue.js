@@ -17,7 +17,6 @@ var d3 = require("d3"),
     errors = require("./errors.js")(body, toolbar),
     loader = require("./loader.js"),
     geometries = require("./geometries.js"),
-    dataTransfer = require("./data-transfer.js")(errors),
     map = require("./map.js")(body),
     paint = require("./paint.js")(
 	map.overlay,
@@ -34,6 +33,7 @@ var d3 = require("d3"),
 	paint.redraw
     ),    
     state = require("./state.js")(errors, map, toolbar, tableForLayer, paint.redraw),
+    dataTransfer = require("./data-transfer.js")(errors, state.fresh),
     menu = require("multiuser-file-menu")(
 	"maps",
 	dataTransfer.serialize,

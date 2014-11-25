@@ -78,20 +78,22 @@ module.exports = function(container) {
 		newZoom);
 	},
 
-	setView: map.setView,
+	setView: _.bind(map.setView, map),
 
-	getZoom: map.getZoom,
+	getZoom: _.bind(map.getZoom, map),
 
-	eachLayer: map.eachLayer,
+	eachLayer: _.bind(map.eachLayer, map),
 
-	addLayer: map.addLayer,
+	addLayer: _.bind(map.addLayer, map),
 
-	removeLayer: map.removeLayer,
+	removeLayer: _.bind(map.removeLayer, map),
 
 	projectTile: projectTile,
 
 	overlay: overlay,
 
-	onViewReset: _.curry(map.on)("viewReset")
+	onViewReset: function(callback) {
+	    map.on("viewReset", callback);
+	}
     };
 };

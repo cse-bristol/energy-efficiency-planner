@@ -40,6 +40,14 @@ module.exports = function(getZoom, errors) {
 	Esri_WorldTopoMap = leaflet.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
 	    attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
 	}),
+
+	baseLayers = d3.map({
+	    "Open Street Map" : osmLayer,
+	    "Stamen Toner" : Stamen_TonerBackground,
+	    "ESRI Relief": Esri_WorldShadedRelief,
+	    "ESRI World Imagery" : Esri_WorldImagery,
+	    "ESRI World Topography": Esri_WorldTopoMap
+	}),
 	
 	nationalHeatMap = leaflet.tileLayer('/heat-map-cdn/Total%20Heat%20Density/Z{z}/{y}/{x}.png', {
 	    attribution: '<a href="http://tools.decc.gov.uk/nationalheatmap/">English National Heat Map</a>,',
@@ -54,11 +62,20 @@ module.exports = function(getZoom, errors) {
     nationalHeatMap.options.zIndex = 1;
     nationalHeatMap.legend = heatMapLegendFactory(getZoom, errors);
 
+    baseLayers.forEach(function(name, baseLayer) {
+	baseLayer.name = function() {
+	    return name;
+	};
+    });
+    
     /*
      Initialize overlay tiles to opacity 0.
      */
-    overlays.values().forEach(function(tileLayer) {
+    overlays.forEach(function(name, tileLayer) {
 	tileLayer.setOpacity(0);
+	tileLayer.name = function() {
+	    return name;
+	};
     });
     
     /*
@@ -99,13 +116,7 @@ module.exports = function(getZoom, errors) {
 	onSetBaseLayer = callbacks();
 
     return {
-	base: d3.map({
-	    "Open Street Map" : osmLayer,
-	    "Stamen Toner" : Stamen_TonerBackground,
-	    "ESRI Relief": Esri_WorldShadedRelief,
-	    "ESRI World Imagery" : Esri_WorldImagery,
-	    "ESRI World Topography": Esri_WorldTopoMap
-	}),
+	base: baseLayers,
 	
 	overlays: overlays,
 	getBaseLayer: function() {

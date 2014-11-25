@@ -37,7 +37,7 @@ module.exports = function(errors, map, toolbar, tableForLayer, redraw) {
 	    return {
 		layers: layers,
 		tileLayers: tileLayers,
-		startCoordinate: startCoordinates,
+		startCoordinates: startCoordinates,
 		startZoom: startZoom,
 		tools: toolbar.visibility()
 	    };
