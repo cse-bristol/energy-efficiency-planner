@@ -87,7 +87,7 @@ module.exports = function(container, toolbar, getLayers, getTileLayers, zoomTo) 
 	tilesForm = control.append("form"),
 	shapesForm = control.append("form"),
 
-	picker = dialogue(
+	picker = floatingDialogue(
 	    container.append("div")
 		.classed("colour-picker", true))
 	    .drag()

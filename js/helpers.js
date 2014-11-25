@@ -38,6 +38,12 @@ module.exports = {
 	    }
 	};
 
+	f.clear = function() {
+	    while (callbacks.length > 0) {
+		callbacks.pop();
+	    }
+	};
+
 	return f;
     },
     identity: function(x) {

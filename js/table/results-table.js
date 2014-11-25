@@ -3,9 +3,9 @@
 /*global module, require*/
 
 var d3 = require("d3"),
-    helpers = require("./helpers.js"),
     dialogue = require("floating-dialogue"),
-    callbackHandler = helpers.callbackHandler,
+    helpers = require("../helpers.js"),
+    callbacks = helpers.callbackHandler,
     identity = helpers.identity,
     rounded = helpers.rounded;
 
@@ -29,10 +29,10 @@ module.exports = function(container) {
 	headers = tHead.append("tr")
 	    .classed("headers", true),
 	tBody = table.append("tbody"),
-	rowClickHandler = callbackHandler(),
-	headClickHandler = callbackHandler(),
-	rowHoverHandler = callbackHandler(),
-	resetHandler = callbackHandler(),
+	rowClickHandler = callbacks(),
+	headClickHandler = callbacks(),
+	rowHoverHandler = callbacks(),
+	resetHandler = callbacks(),
 	extraRow,
 	gotSize = false;
 

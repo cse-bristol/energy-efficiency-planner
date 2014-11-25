@@ -9,11 +9,6 @@ var d3 = require("d3"),
     
     log2 = function(n) {
 	return Math.log(n) / Math.LN2;
-    },
-
-    projectPoint = function(x, y) {
-	var point = map.latLngToLayerPoint(new leaflet.LatLng(y, x));
-	this.stream.point(point.x, point.y);
     };
 
 /*
@@ -24,18 +19,37 @@ require("../lib/d3-plugins/geo/tile/tile.js");
 /*
  Wraps a Leaflet map. Exposes some things about the map which we care about.
  */
-module.exports = function(startCoordinates, zoom) {
-    var map = new leaflet.Map("map", {
-	doubleClickZoom: false
-    }),
+module.exports = function(container) {
+    // Remove any existing map.
+    container.select("#map").remove();
+    
+    var mapDiv = container.append("div").attr("id", "map"),
+	map = new leaflet.Map(
+	    mapDiv.node(),
+	    {
+		doubleClickZoom: false
+	    }
+	)
+    // We need to set the view in order for _initPathRoot() to work.
+	    .setView(
+		leaflet.latLng(0, 0),
+		2
+	    ),
 
+	projectPoint = function(x, y) {
+	    var point = map.latLngToLayerPoint(leaflet.latLng(y, x));
+	    this.stream.point(point.x, point.y);
+	},
+	
 	projectTile = d3.geo.transform({point: projectPoint});
-
+    
     /* The map will make us an overlay svg. It will automatically sort out its bounds for us. */
     map._initPathRoot();
     var overlay = d3.select(map.getPanes().overlayPane)
 	    .select("svg")
 	    .attr("id", "overlay");
+
+    map.setView(leaflet.latLng(0, 0), 2);
     
     map.addControl(new geocoder({
 	email: "research@cse.org.uk"

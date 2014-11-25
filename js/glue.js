@@ -13,14 +13,27 @@ var d3 = require("d3"),
     leaflet = require("leaflet"),
 
     body = d3.select("body"),
-    mapDiv = body.append("div").attr("id", "map"),
     toolbar = require("./toolbar.js")(body),
     errors = require("./errors.js")(body, toolbar),
     loader = require("./loader.js"),
     geometries = require("./geometries.js"),
-    dataTransfer = require("./data-transfer.js"),
-    map = require("./map.js")(),
-    state = require("./state.js")(errors, map, toolbar),
+    dataTransfer = require("./data-transfer.js")(errors),
+    map = require("./map.js")(body),
+    paint = require("./paint.js")(
+	map.overlay,
+	map.projectTile,
+	function() {
+	    return state.getLayers().sortedByZ();
+	}
+    ),
+    tableForLayer = require("./table/table-for-layer.js")(
+	body,
+	map.zoomTo,
+	paint.onClickShape,
+	paint.onHoverShape,
+	paint.redraw
+    ),    
+    state = require("./state.js")(errors, map, toolbar, tableForLayer, paint.redraw),
     menu = require("multiuser-file-menu")(
 	"maps",
 	dataTransfer.serialize,
@@ -29,27 +42,12 @@ var d3 = require("d3"),
 	state.set,
 	state.fresh
     ),
-    layerControl = require("./layer-control.js")(body, toolbar, state.getLayers, state.getTileLayers, map.zoomTo),
-    paint = require("./paint.js")(
-	map.overlay,
-	map.projectTile,
-	function() {
-	    return state.getLayers().sortedByZ();
-	}
-    );
+    layerControl = require("./layer-control.js")(body, toolbar, state.getLayers, state.getTileLayers, map.zoomTo);
 
 // TODO extra buttons
 menu.buildMenu(body, []);
 
-layers.onCreate(function(l) {
-    // TODO thing
-});
-
-layers.onReorder(function(l) {
-    paint.redrawAll();
-});
-
-map.onViewreset(paint.redrawAll);
+map.onViewReset(paint.redrawAll);
 
 var handlers = require("./file-handlers.js")(
     errors, 

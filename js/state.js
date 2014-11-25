@@ -3,17 +3,15 @@
 /*global module, require*/
 
 var leaflet = require("leaflet"),
-    helpers = require("./helpers.js"),
-    callbacks = helpers.callbackHandler,
     layersFactory = require("./layers.js"),
+    worksheet = require("./table/worksheet.js")(),
     tileLayersFactory = require("./tile-layers.js");
 
 /*
  Bundles together all aspect of the state of the map into a Javascript object.
  */
-module.exports = function(errors, map, toolbar) {
-    var onSet = callbacks(),
-	layers,
+module.exports = function(errors, map, toolbar, tableForLayer, redraw) {
+    var layers,
 	tileLayers,
 	baseLayer,
 	startCoordinates,
@@ -57,26 +55,39 @@ module.exports = function(errors, map, toolbar) {
 	set: function(state) {
 	    layers = state.layers;
 	    tileLayers = state.tileLayers;
-	    
+
 	    map.eachLayer(function(layer) {
 		map.removeLayer(layer);
 	    });
 	    
 	    map.addLayer(tileLayers.getBaseLayer());
-	    tileLayers.getBaseLayer().onSetOpacity(update);
+	    tileLayers.getBaseLayer().onSetOpacity(redraw);
 	    
 	    tileLayers.onSetBaseLayer(function(oldBaseLayer, baseLayer) {
 		map.removeLayer(oldBaseLayer);
 		map.addLayer(baseLayer);
 
-		baseLayer.onSetOpacity(update);
-		update();
+		oldBaseLayer.clearSetOpacity();
+		baseLayer.onSetOpacity(redraw);
+		redraw();
 	    });
 
 	    tileLayers.overlays.forEach(function(name, layer) {
 		map.addLayer(layer);
-		layer.onSetOpacity(update);
+		layer.onSetOpacity(redraw);
 	    });
+
+	    var setupLayer = function(layer) {
+		layer.worksheet = worksheet(layer.geometry());
+		tableForLayer(layer);
+	    };
+	    
+	    layers.all().forEach(setupLayer);
+
+	    layers.onCreate(setupLayer);
+	    layers.onCreate(redraw);
+
+	    layers.onReorder(redraw);
 
 	    Object.keys(state.visibility)
 		.forEach(function(tool) {
@@ -99,10 +110,8 @@ module.exports = function(errors, map, toolbar) {
 		state.startZoom
 	    );
 
-	    onSet();
+	    redraw();
 	},
-
-	onSet: onSet.add,
 
 	fresh: fresh
     };

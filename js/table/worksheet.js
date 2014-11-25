@@ -4,8 +4,8 @@
 
 var d3 = require("d3"),
     _ = require("lodash"),
-    colour = require("./colour.js"),
-    callbacks = require("./helpers.js").callbackHandler;
+    colour = require("../colour.js"),
+    callbacks = require("../helpers.js").callbackHandler;
 
 var shapeHeaders = function(shapeData) {
     var headers = ["id"];
