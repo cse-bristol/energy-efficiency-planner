@@ -23,7 +23,7 @@ var d3 = require("d3"),
     sort = require("sort-children"),
     opacityClass = "opacity-slider";
 
-var opacitySlider = function(selection) {
+var opacitySlider = function(selection, getLayer) {
     return selection.append("input")
 	.classed(opacityClass, true)
 	.attr("type", "range")
@@ -31,32 +31,36 @@ var opacitySlider = function(selection) {
 	.attr("max", 1)
 	.attr("step", 0.05)
 	.on("input", function(d, i) {
-	    d.setOpacity(this.value);
+	    getLayer(d).setOpacity(this.value);
 	})
 	.call(noDrag);
 };
 
-var baseColourPicker = function(shapes, newShapes, picker) {
+var baseColourPicker = function(shapes, newShapes, picker, getLayers) {
     newShapes.append("span")
 	.classed("choose-colour", true)
 	.html("&nbsp;", true)
 	.each(function(d, i) {
 	    var el = d3.select(this);
-	    d.worksheet.baseColourChanged(function(colour) {
-		el.style("background-color", colour);
-	    });
+	    getLayers().get(d)
+		.worksheet.baseColourChanged(
+		    function(colour) {
+			el.style("background-color", colour);
+		    }
+		);
 	})
 	.call(noDrag);
 
     var colourButtons = shapes.selectAll(".choose-colour")
 	    .style("background-color", function(d, i) {
-		return d.worksheet.baseColour();
+		return getLayers().get(d)
+		    .worksheet.baseColour();
 	    });
 
     picker.open(colourButtons);
 };
 
-var tables = function(shapes, newShapes) {
+var tables = function(shapes, newShapes, getLayers) {
     newShapes.each(function(d, i) {
 	var el = d3.select(this),
 	    button = el.append("span")
@@ -65,7 +69,8 @@ var tables = function(shapes, newShapes) {
 		.call(noDrag);
 
 	button.each(function(d, i) {
-	    d.resultsTable.dialogue().open(d3.select(this));
+	    getLayers().get(d)
+		.resultsTable.dialogue().open(d3.select(this));
 	});
     });
 };
@@ -83,7 +88,9 @@ module.exports = function(container, toolbar, getLayers, getTileLayers, zoomTo) 
 
 	baseForm = control.append("form"),
 	baseDiv = baseForm.append("div"),
-	baseOpacitySlider = opacitySlider(baseForm),
+	baseOpacitySlider = opacitySlider(baseForm, function() {
+	    return getTileLayers().getBaseLayer();
+	}),
 	tilesForm = control.append("form"),
 	shapesForm = control.append("form"),
 
@@ -103,7 +110,7 @@ module.exports = function(container, toolbar, getLayers, getTileLayers, zoomTo) 
 		  var button = picker.currentOpenButton()
 			  .style("background-color", colour);
 
-		  button.datum()
+		  getLayers().get(button.datum())
 		      .worksheet
 		      .baseColour(colour);
 	      }));
@@ -114,9 +121,9 @@ module.exports = function(container, toolbar, getLayers, getTileLayers, zoomTo) 
 	var baseLabels = baseDiv
 		.selectAll("label")
 		.data(
-		    getTileLayers().base.values(),
+		    getTileLayers().base.keys(),
 		    function(d, i) {
-			return d.name();
+			return d;
 		    });
 
 	baseLabels.exit().remove();
@@ -129,23 +136,25 @@ module.exports = function(container, toolbar, getLayers, getTileLayers, zoomTo) 
 	    .attr("type", "radio")
 	    .attr("name", "base-layer")
 	    .attr("value", function(d, i) {
-		return d.name();
+		return d;
 	    })
 	    .on("click", function(d, i) {
-		getTileLayers().setBaseLayer(d);
+		var tileLayers = getTileLayers();
+		tileLayers.setBaseLayer(
+		    tileLayers.base.get(d));
 	    });
 
 	newBaseLabels.append("span")
 	    .text(function(d, i) {
-		return d.name();
+		return d;
 	    });
 
 	baseLabels.selectAll("input")
 	    .attr("checked", function(d, i) {
-		return d.value === getTileLayers().getBaseLayer() ? "checked" : null;
+		return d === getTileLayers().getBaseLayer().name() ? "checked" : null;
 	    });
 
-	baseOpacitySlider.datum(getTileLayers().getBaseLayer());
+	baseOpacitySlider.datum(getTileLayers().getBaseLayer().name());
 	
 	baseOpacitySlider.node().value = getTileLayers().getBaseLayer().options.opacity;
     };
@@ -154,9 +163,9 @@ module.exports = function(container, toolbar, getLayers, getTileLayers, zoomTo) 
 	var tileDivs = tilesForm
 	    .selectAll("div")
 		.data(
-		    getTileLayers().overlays.values(),
+		    getTileLayers().overlays.keys(),
 		    function(d, i) {
-			return d.name();
+			return d;
 		    });
 
 	tileDivs.exit().remove();
@@ -168,37 +177,46 @@ module.exports = function(container, toolbar, getLayers, getTileLayers, zoomTo) 
 
 	newTileDivs.append("span")
 	    .text(function(d, i) {
-		return d.name();
+		return d;
 	    });
 
-	opacitySlider(newTileDivs);
+	opacitySlider(newTileDivs, function(name) {
+	    return getTileLayers().overlays.get(name);
+	});
 
 	newTileDivs.append("span")
 	    .classed("tile-overlay-status", true)
 	    .each(function(d, i) {
-		var status = d3.select(this);
+		var status = d3.select(this),
+		    layer = getTileLayers().overlays.get(d);
 		
-		d.colourChanged(function(colour) {
+		layer.colourChanged(function(colour) {
 		    status.style("background-color", colour);
-		    if (d.legend) {
+		    if (layer.legend) {
 			status.style("color", reverseColour(colour));
-			status.text(d.legend(colour));
+			status.text(layer.legend(colour));
 		    }
 		});
 	    });
 
 	tileDivs.selectAll("." + opacityClass)
 	    .each(function(d, i) {
-		this.value = d.options.opacity;
+		this.value = getTileLayers().overlays.get(d)
+		    .options.opacity;
 	    });
     };
 
     var updateShapes = function() {
 	var shapes = shapesForm.selectAll("div")
 		.data(
-		    getLayers().sortedByZ().reverse(),
+		    getLayers()
+			.sortedByZ()
+			.reverse()
+			.map(function(layer) {
+			    return layer.name();
+			}),
 		    function(d, i) {
-			return d.name();
+			return d;
 		    });
 
 	shapes.exit().remove();
@@ -209,11 +227,12 @@ module.exports = function(container, toolbar, getLayers, getTileLayers, zoomTo) 
 	newShapes.append("span")
 	    .classed("shape-layer-name", true)
 	    .text(function(d, i) {
-		return d.name();
+		return d;
 	    })
 	    .on("click", function(d, i) {
-		if (d.boundingbox) {
-		    zoomTo(d.boundingbox());
+		var layer = getLayers().get(d);
+		if (layer.boundingbox) {
+		    zoomTo(layer.boundingbox());
 		}
 	    })
 	    .call(noDrag);
@@ -222,11 +241,14 @@ module.exports = function(container, toolbar, getLayers, getTileLayers, zoomTo) 
 	    .classed("shape-layer-delete", true)
 	    .text("X")
 	    .on("click", function(d, i) {
-		d.remove();
+		var layer = getLayers().get(d);
+		layer.remove();
 	    })
 	    .call(noDrag);
 
-	opacitySlider(newShapes);
+	opacitySlider(newShapes, function(name) {
+	    return getLayers().get(name);
+	});
 
 	sort(
 	    newShapes,
@@ -234,9 +256,9 @@ module.exports = function(container, toolbar, getLayers, getTileLayers, zoomTo) 
 		var direction = movedDown ? -1 : 1;
 
 		getLayers().reorder(
-		    [[d3.select(moved).datum().name(), direction * displaced.size()]]
-			.concat(displaced.data().map(function(layer) {
-			    return [layer.name(), -direction];
+		    [[d3.select(moved).datum(), direction * displaced.size()]]
+			.concat(displaced.data().map(function(name) {
+			    return [name, -direction];
 			}))
 		);
 	    }
@@ -244,14 +266,15 @@ module.exports = function(container, toolbar, getLayers, getTileLayers, zoomTo) 
 
 	shapes.selectAll("." + opacityClass)
 	    .each(function(d, i) {
-		this.value = d.options.opacity;
+		var layer = getLayers().get(d);
+		this.value = layer.options.opacity;
 	    });
 
 	shapes.order();
 
-	baseColourPicker(shapes, newShapes, picker);
+	baseColourPicker(shapes, newShapes, picker, getLayers);
 
-	tables(shapes, newShapes);
+	tables(shapes, newShapes, getLayers);
     };
 
     return {
