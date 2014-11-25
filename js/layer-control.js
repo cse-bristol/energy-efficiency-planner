@@ -171,10 +171,12 @@ module.exports = function(container, toolbar, getLayers, getTileLayers, zoomTo) 
 		return d.name();
 	    });
 
+	opacitySlider(newTileDivs);
+
 	newTileDivs.append("span")
 	    .classed("tile-overlay-status", true)
 	    .each(function(d, i) {
-		var status = this;
+		var status = d3.select(this);
 		
 		d.colourChanged(function(colour) {
 		    status.style("background-color", colour);
@@ -184,8 +186,6 @@ module.exports = function(container, toolbar, getLayers, getTileLayers, zoomTo) 
 		    }
 		});
 	    });
-
-	opacitySlider(newTileDivs);
 
 	tileDivs.selectAll("." + opacityClass)
 	    .each(function(d, i) {
