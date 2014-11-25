@@ -11,6 +11,13 @@ module.exports = {
     isNum: function (n) {
 	return !isNaN(parseFloat(n)) && isFinite(n);
     },
+    asNum: function(n) {
+	if (module.exports.isNum(n)) {
+	    return (+n);
+	} else {
+	    throw new Error("Not a number " + n);
+	}
+    },
     rounded: function(maybeNumber) {
 	if (module.exports.isNum(maybeNumber)) {
 	    return (+maybeNumber).toPrecision(5);

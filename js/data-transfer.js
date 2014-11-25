@@ -2,7 +2,9 @@
 
 /*global module, require*/
 
-var leaflet = require("leaflet");
+var leaflet = require("leaflet"),
+    helpers = require("./helpers.js"),
+    asNum = helpers.asNum;
 
 /*
  Converts between the state of the world (as defined in state.js) and data transfer objects which can be turned into JSON and sent out across the wire.
@@ -47,7 +49,7 @@ module.exports = function(errors, freshState) {
   	}
 	
 	if (serialized.baseOpacity) {
-	    tileLayers.getBaseLayer().setOpacity(serialized.opacity);
+	    tileLayers.getBaseLayer().setOpacity(asNum(serialized.baseOpacity));
 	}
 
 	if (serialized.overlays) {
@@ -58,7 +60,7 @@ module.exports = function(errors, freshState) {
 			var overlay = tileLayers.overlays.get(name);
 
 			if (serializedOverlay.opacity) {
-			    overlay.setOpacity(serializedOverlay.opacity);
+			    overlay.setOpacity(asNum(serializedOverlay.opacity));
 			}
 		    }
 		}
@@ -91,12 +93,12 @@ module.exports = function(errors, freshState) {
 
 	    if (serialized.startCoordinates) {
 		state.startCoordinates = leaflet.latLng(
-		    serialized.startCoordinates[0],
-		    serialized.startCoordinates[1]);
+		    asNum(serialized.startCoordinates[0]),
+		    asNum(serialized.startCoordinates[1]));
 	    }
 
 	    if (serialized.startZoom) {
-		state.startZoom = serialized.startZoom;
+		state.startZoom = asNum(serialized.startZoom);
 	    }
 
 	    if (serialized.tools) {
@@ -104,9 +106,6 @@ module.exports = function(errors, freshState) {
 	    }
 
 	    return state;
-
-	    
-	    throw new Error("Not implemented");
 	}
     };
 };
