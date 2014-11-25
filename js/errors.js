@@ -6,16 +6,12 @@ var float = require("floating-dialogue"),
     d3 = require("d3");
 
 module.exports = function(container, toolbar) {
-    var messagesOpenClose = toolbar.append("span")
-	    .html("!"),
-
-	dialogue = float(
-	    container.append("div")
-		.attr("id", "messages"))
+    var dialogue = float(
+	container.append("div")
+	    .attr("id", "messages"))
 	    .drag()
 	    .resize()
 	    .close()
-	    .open(messagesOpenClose)
 	    .hide(),
 
 	messages = dialogue
@@ -24,6 +20,8 @@ module.exports = function(container, toolbar) {
 	noErrors = messages.append("div")
 	    .classed("info", true)
 	    .text("No errors.");
+
+    toolbar.add("!", dialogue);
 
     var hideNoErrors = function() {
 	noErrors.style("display", "none");

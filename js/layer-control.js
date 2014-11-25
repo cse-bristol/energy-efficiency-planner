@@ -15,7 +15,7 @@
  */
 
 var d3 = require("d3"),
-    dialogue = require("floating-dialogue"),
+    floatingDialogue = require("floating-dialogue"),
     leaflet = require("leaflet"),
     colours = require("slippy-colors"),
     reverseColour = require("./colour.js").reverse,
@@ -23,22 +23,20 @@ var d3 = require("d3"),
     sort = require("sort-children"),
     opacityClass = "opacity-slider";
 
-var opacitySlider = function(selection, initialValue, getLayer, setOpacity) {
+var opacitySlider = function(selection) {
     return selection.append("input")
 	.classed(opacityClass, true)
 	.attr("type", "range")
 	.attr("min", 0)
 	.attr("max", 1)
 	.attr("step", 0.05)
-	.attr("value", initialValue)
 	.on("input", function(d, i) {
-	    var layer = getLayer(d, i);
-	    setOpacity(layer, this.value);
+	    d.setOpacity(this.value);
 	})
 	.call(noDrag);
 };
 
-var baseColourPicker = function(shapes, newShapes, layers, picker) {
+var baseColourPicker = function(shapes, newShapes, picker) {
     newShapes.append("span")
 	.classed("choose-colour", true)
 	.html("&nbsp;", true)
@@ -58,7 +56,7 @@ var baseColourPicker = function(shapes, newShapes, layers, picker) {
     picker.open(colourButtons);
 };
 
-var tables = function(shapes, newShapes, leavingShapes, layers) {
+var tables = function(shapes, newShapes) {
     newShapes.each(function(d, i) {
 	var el = d3.select(this),
 	    button = el.append("span")
@@ -72,138 +70,26 @@ var tables = function(shapes, newShapes, leavingShapes, layers) {
     });
 };
 
-module.exports = function(container, buttonContainer, map, layers, tileLayers, zoomTo) {
-    var baseLayer = tileLayers.defaultBaseLayer,
-
-	button = buttonContainer.append("span")
-	    .text("L"),
-	
-	control = dialogue(container.append("div")
-			   .attr("id", "layer-control"))
+module.exports = function(container, toolbar, getLayers, getTileLayers, zoomTo) {
+    var dialogue = floatingDialogue(
+	container.append("div")
+	    .attr("id", "layer-control"))
 	    .close()
 	    .drag()
-	    .open(button)
-	    .show()
-	    .content();
-
-    var changeBaseLayer = function(layer) {
-	map.removeLayer(baseLayer);
-	baseLayer = layer;
-	map.addLayer(baseLayer);
-	baseLayer.setOpacity(baseOpacity.node().value);
-    };
-
-    var setBaseOpacity = function(layer, o) {
-	layer.setOpacity(o);
-	baseOpacity.node().value = o;
-    };
-
-    var baseLayersForm = control.append("form");
-
-    tileLayers.base.entries().forEach(function(e) {
-	e.value.name = function() {
-	    return e.key;
-	};
-    });
-
-    var baseLayerLabels = baseLayersForm.selectAll("label")
-	    .data(tileLayers.base.entries());
-
-    baseLayerLabels
-	.enter()
-	.append("label")
-	.append("input")
-	.attr("type", "radio")
-	.attr("name", "base-layer")
-	.attr("value", function(d, i) {
-	    return d.key;
-	})
-	.on("click", function(d, i) {
-	    changeBaseLayer(d.value);
-	});
-
-    var updateChecked = function() {
-	baseLayerLabels
-	    .selectAll("input")
-	    .attr("checked", function(d, i) {
-		return d.value === baseLayer ? "checked" : null;
-	    });
-    };
-
-    updateChecked();
-
-    baseLayerLabels.append("span")
-	.text(function(d, i) {
-	    return d.key;
-	});
-
-    var baseOpacity = opacitySlider(
-	baseLayersForm,
-	1,
-	function(d, i) {
-	    return baseLayer;
-	},
-	setBaseOpacity
-    );
-
-    map.addLayer(baseLayer);
-    
-    var tileLayersForm = control.append("form");
-
-    var setTileOverlayOpacity = function(layer, o) {
-	layer.setOpacity(o);
-	if (o === 0) {
-	    map.removeLayer(layer);
-	} else {
-	    if (!map.hasLayer(layer)) {
-		map.addLayer(layer);
-	    }
-	}
+	    .show(),
 	
-	tileLayerDivs.selectAll("." + opacityClass)
-	    .each(function(d, i) {
-		this.value = d.value.options.opacity;
-	    });
-    };
+	control = dialogue
+	    .content(),
 
-    var tileLayerDivs = tileLayersForm.selectAll("div")
-	    .data(tileLayers.overlays.entries())
-	    .enter()
-	    .append("div")
-	    .classed("tile-overlay-control", true);
+	baseForm = control.append("form"),
+	baseDiv = baseForm.append("div"),
+	baseOpacitySlider = opacitySlider(baseForm),
+	tilesForm = control.append("form"),
+	shapesForm = control.append("form"),
 
-    tileLayerDivs.append("span")
-	.text(function(d, i) {
-	    return d.key;
-	});
-
-    opacitySlider(
-	tileLayerDivs, 
-	0,
-	function(d, i) {
-	    return d.value;
-	},
-	setTileOverlayOpacity
-    );
-
-    tileLayerDivs.append("span")
-	.classed("tile-overlay-status", true)
-	.each(function(d, i) {
-	    var status = d3.select(this),
-		layer = d.value;
-
-	    layer.colourChanged(function(colour) {
-		status.style("background-color", colour);
-		if (layer.legend) {
-		    status.style("color", reverseColour(colour));
-		    status.text(layer.legend(colour));
-		}
-	    });
-	});
-
-    var picker = dialogue(
-	container.append("div")
-	    .classed("colour-picker", true))
+	picker = dialogue(
+	    container.append("div")
+		.classed("colour-picker", true))
 	    .drag()
 	    .close()
 	    .hide();
@@ -222,37 +108,100 @@ module.exports = function(container, buttonContainer, map, layers, tileLayers, z
 		      .baseColour(colour);
 	      }));
 
-    var shapeLayers = control.append("form");
+    toolbar.add("L", dialogue);
 
-    var setShapeOverlayOpacity = function(layer, o) {
-	layer.setOpacity(o);
-	
-	if (parseFloat(o) === 0) {
-	    layer.enabled = false;
-	} else {
-	    layer.enabled = true;
-	}
-	shapeLayers.selectAll("div ." + opacityClass)
-	    .each(function(d, i) {
-		this.value = d.options.opacity;
-	    });
-
-	shapeLayers.selectAll(".shape-layer-name")
-	    .classed("disabled", function(d, i) {
-		return !d.enabled;
-	    });
-    };
-
-    var updateShapes = function() {
-	var shapes = shapeLayers.selectAll("div")
+    var updateBase = function() {
+	var baseLabels = baseDiv
+		.selectAll("label")
 		.data(
-		    layers.sortedByZ().reverse(),
+		    getTileLayers().base.values(),
 		    function(d, i) {
 			return d.name();
 		    });
 
-	var leavingShapes = shapes.exit()
-		.remove();
+	baseLabels.exit().remove();
+
+	var newBaseLabels = baseLabels
+		.enter()
+		.append("label");
+
+	newBaseLabels.append("input")
+	    .attr("type", "radio")
+	    .attr("name", "base-layer")
+	    .attr("value", function(d, i) {
+		return d.name();
+	    })
+	    .on("click", function(d, i) {
+		getTileLayers().setBaseLayer(d);
+	    });
+
+	newBaseLabels.append("span")
+	    .text(function(d, i) {
+		return d.name();
+	    });
+
+	baseLabels.selectAll("input")
+	    .attr("checked", function(d, i) {
+		return d.value === getTileLayers().getBaseLayer() ? "checked" : null;
+	    });
+
+	baseOpacitySlider.datum(getTileLayers().getBaseLayer());
+	
+	baseOpacitySlider.node().value = getTileLayers().getBaseLayer().options.opacity;
+    };
+
+    var updateTiles = function() {
+	var tileDivs = tilesForm
+	    .selectAll("div")
+		.data(
+		    getTileLayers().overlays.values(),
+		    function(d, i) {
+			return d.name();
+		    });
+
+	tileDivs.exit().remove();
+
+	var newTileDivs = tileDivs
+		.enter()
+		.append("div")
+		.classed("tile-overlay-control", true);
+
+	newTileDivs.append("span")
+	    .text(function(d, i) {
+		return d.name();
+	    });
+
+	newTileDivs.append("span")
+	    .classed("tile-overlay-status", true)
+	    .each(function(d, i) {
+		var status = this;
+		
+		d.colourChanged(function(colour) {
+		    status.style("background-color", colour);
+		    if (d.legend) {
+			status.style("color", reverseColour(colour));
+			status.text(d.legend(colour));
+		    }
+		});
+	    });
+
+	opacitySlider(newTileDivs);
+
+	tileDivs.selectAll("." + opacityClass)
+	    .each(function(d, i) {
+		this.value = d.options.opacity;
+	    });
+    };
+
+    var updateShapes = function() {
+	var shapes = shapesForm.selectAll("div")
+		.data(
+		    getLayers().sortedByZ().reverse(),
+		    function(d, i) {
+			return d.name();
+		    });
+
+	shapes.exit().remove();
 
 	var newShapes = shapes.enter().append("div")
 		.classed("shape-overlay-control", true);
@@ -264,7 +213,7 @@ module.exports = function(container, buttonContainer, map, layers, tileLayers, z
 	    })
 	    .on("click", function(d, i) {
 		if (d.boundingbox) {
-		    zoomTo(d.boundingbox(), map);
+		    zoomTo(d.boundingbox());
 		}
 	    })
 	    .call(noDrag);
@@ -273,17 +222,18 @@ module.exports = function(container, buttonContainer, map, layers, tileLayers, z
 	    .classed("shape-layer-delete", true)
 	    .text("X")
 	    .on("click", function(d, i) {
-		layers.remove(d);
-		updateShapes();
+		d.remove();
 	    })
 	    .call(noDrag);
+
+	opacitySlider(newShapes);
 
 	sort(
 	    newShapes,
 	    function(moved, movedDown, displaced) {
 		var direction = movedDown ? -1 : 1;
 
-		layers.reorder(
+		getLayers().reorder(
 		    [[d3.select(moved).datum().name(), direction * displaced.size()]]
 			.concat(displaced.data().map(function(layer) {
 			    return [layer.name(), -direction];
@@ -292,40 +242,23 @@ module.exports = function(container, buttonContainer, map, layers, tileLayers, z
 	    }
 	);
 
+	shapes.selectAll("." + opacityClass)
+	    .each(function(d, i) {
+		this.value = d.options.opacity;
+	    });
+
 	shapes.order();
-	
-	opacitySlider(
-	    newShapes,
-	    1,
-	    function(d, i) {
-		return d;
-	    },
-	    setShapeOverlayOpacity
-	);
 
-	baseColourPicker(shapes, newShapes, layers, picker);
+	baseColourPicker(shapes, newShapes, picker);
 
-	tables(shapes, newShapes, leavingShapes, layers);
+	tables(shapes, newShapes);
     };
 
-    var m = {
-	baseLayer: function(name) {
-	    if (name === undefined) {
-		return baseLayer;
-	    } else {
-		if (tileLayers.base.has(name)) {
-		    changeBaseLayer(tileLayers.base.get(name));
-		    updateChecked();
-		    return m;
-		} else {
-		    throw new Error("Unknown base layer " + name);
-		}
-	    }
-	},
-	setBaseOpacity: setBaseOpacity,
-	setTileOverlayOpacity: setTileOverlayOpacity,
-	setShapeOverlayOpacity: setShapeOverlayOpacity,
-	update: updateShapes
+    return {
+	update: function() {
+	    updateBase();
+	    updateTiles();
+	    updateShapes();
+	}
     };
-    return m;
 };

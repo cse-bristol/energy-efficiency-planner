@@ -15,7 +15,7 @@
 	
 	,"js-shapefile-to-geojson--": "git://github.com/GlennS/js-shapefile-to-geojson.git"
 	,"floating-dialogue": "git://github.com/cse-bristol/floating-dialogue.git"
-	,"wiki-interop": "git://github.com/cse-bristol/wiki-interop.git#v0.1.0"
+	,"wiki-interop": "git://github.com/cse-bristol/multiuser-file-menu"
 	,"sort-children": "git://github.com/cse-bristol/sort-children.git"
     }
 }

@@ -1,7 +1,5 @@
-* Open Data Map
+* Energy Efficiency Planner
 A web-based mapping tool. Use it to plan an energy intervention in an area, then share that plan with local stakeholders. Create alternative versions of plans which have been shared with you.
-
-Name of the project is subject to change, since it is currently not very descriptive.
   
 ** Features
  + Import shapes onto a map by dragging and dropping geoJSON, topoJSON or Shapefile, along with data describing attributes of those shapes as tsv.
@@ -9,7 +7,7 @@ Name of the project is subject to change, since it is currently not very descrip
  + Colour the shapes on the map according to the data.
 
 ** Source Code
-The source code for Open Data Map is not currently publically available. We intend to release it under an open-source license in the near future.
+Get [[https://github.com/cse-bristol/energy-efficiency-planner][the source code]]. 
 
 ** Installation
 To install, clone the repository then serve using any web server, for example using python3 on a Debian system:
@@ -37,9 +35,9 @@ Then run the following:
  + Add energy saving or generating technologies to the map to form an energy plan.
  + Calculate cost and energy savings/production of your planned interventions.
  + Examine and modify the assumptions behind the calculations.
- + Save to and load from a wiki.
  + Compare different versions of plans using a key-frame animation.
  + View the progress of a plan over time.
+
 *** TODO UK Regions
 It would be useful to display some regions on the map and attach some data to them.
 

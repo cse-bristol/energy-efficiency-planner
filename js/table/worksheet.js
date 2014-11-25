@@ -5,7 +5,7 @@
 var d3 = require("d3"),
     _ = require("lodash"),
     colour = require("./colour.js"),
-    callbackFactory = require("./helpers.js").callbackHandler;
+    callbacks = require("./helpers.js").callbackHandler;
 
 var shapeHeaders = function(shapeData) {
     var headers = ["id"];
@@ -19,6 +19,9 @@ var shapeHeaders = function(shapeData) {
     return headers;
 };
 
+/*
+ Data about a single shape layer's table and colouring.
+ */
 module.exports = function() {
     var colours = d3.scale.category10(),
 	colourI = 0;
@@ -31,8 +34,8 @@ module.exports = function() {
 	var headers = shapeHeaders(shapeData),
 	    sortProperties = [],
 	    reverseSort = [],
-	    sortPropertyChanged = callbackFactory(),
-	    baseColourChanged = callbackFactory(),
+	    sortPropertyChanged = callbacks(),
+	    baseColourChanged = callbacks(),
 	    baseColour = nextColour(),
 	    sortColour = "black",
 	    /* Cache the colour funciton for this layer. Expires when the sort property changes. */

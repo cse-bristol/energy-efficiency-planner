@@ -3,13 +3,18 @@
 /*global module, require*/
 
 var d3 = require("d3"),
-    callbackHandler = require("./helpers.js").callbackHandler;
+    helpers = require("./helpers.js"),
+    callbacks = helpers.callbackHandler;
 
+/*
+ A collection of shape (GeoJSON vector) layers which will be drawn as map overlays.
+
+ These are designed to be mostly compatible with Leaflet's layers API.
+ */
 module.exports = function(errors) {
-    var layers = d3.map([]);
-    var createCallbacks = callbackHandler();
-    var changeCallbacks = callbackHandler();
-    var removeCallbacks = callbackHandler();
+    var layers = d3.map([]),
+	onCreate = callbacks(),
+	onReorder = callbacks();
 
     var stripRegex = new RegExp(" ", "g");
     var stripSpaces = function(s) {
@@ -139,11 +144,13 @@ module.exports = function(errors) {
 		    layers.get(layerWithDisplacement[0])
 			.options.zIndex += layerWithDisplacement[1];
 		});
-		changeCallbacks();
+		onReorder();
 	    }
 	},
 	create : function(namePreference, geometry, boundingbox) {
-	    var name = stripSpaces(namePreference);
+	    var name = stripSpaces(namePreference),
+		onChange = callbacks(),
+		onRemove = callbacks();
 
 	    fixGeometryNames(geometry);
 
@@ -173,25 +180,25 @@ module.exports = function(errors) {
 		
 		setOpacity : function(o) {
 		    l.options.opacity = o;
-		    changeCallbacks(l);
+		    onChange();
 		},
 		
 		setZIndex : function(z) {
 		    l.options.zIndex = z;
-		    changeCallbacks(l);
+		    onChange();
 		},
 
-		onAdd : function() {
-		    l.enabled = true;
-		    changeCallbacks(l);
+		overlay : true,
+
+		remove: function() {
+		    if (layers.has(l.name())) {
+			layers.remove(l.name());
+			onRemove();
+		    }
 		},
 
-		onRemove : function() {
-		    l.enabled = false;
-		    changeCallbacks(l);
-		},
-
-		overlay : true	
+		onChange: onChange.add,
+		onRemove: onRemove.add
 	    };	    
 
 	    geometry.forEach(function(g){
@@ -205,31 +212,18 @@ module.exports = function(errors) {
 	    
 	    layers.set(l.name(), l);
 
-	    createCallbacks(l);
+	    onCreate(l);
 	    
 	    return l;
-	},
-
-	remove : function(layer) {
-	    if(layer && layer.name && layers.has(layer.name())) {
-		layers.remove(layer.name());
-
-		removeCallbacks(layer);
-	    }
 	},
 
 	/*
 	 callback is a function which will be called every time a new layer is created.
 	 It will be passed the layer as an argument.
 	 */
-	layerCreated: createCallbacks.add,
+	onCreate: onCreate.add,
 
-	/*
-	 Callbacks passed here will be called with a layer every time some aspect of its physical display changes (opacity, z-index, enabled).
-	 */
-	layerChanged: changeCallbacks.add,
-
-	layerRemoved: removeCallbacks.add
+	onReorder: onReorder.add
     };
 };
 

@@ -7,7 +7,7 @@ var d3 = require("d3"),
     rounded = require("./helpers.js").rounded,
     maxZoom = 17;
 
-module.exports = function(map, errors) {
+module.exports = function(getZoom, errors) {
     var legendByZoom = d3.map();
 
     // loop over the zoom levels
@@ -37,7 +37,7 @@ module.exports = function(map, errors) {
     });
 
     return function(colour) {
-	var z = map.getZoom();
+	var z = getZoom();
 
 	if (z > maxZoom) {
 	    z = maxZoom;
