@@ -10,7 +10,7 @@ var leaflet = require("leaflet"),
 /*
  Bundles together all aspect of the state of the map into a Javascript object.
  */
-module.exports = function(errors, map, toolbar, tableForLayer, redraw) {
+module.exports = function(errors, map, toolbar, tableForLayer, update) {
     var layers,
 	tileLayers,
 	baseLayer,
@@ -61,20 +61,20 @@ module.exports = function(errors, map, toolbar, tableForLayer, redraw) {
 	    });
 	    
 	    map.addLayer(tileLayers.getBaseLayer());
-	    tileLayers.getBaseLayer().onSetOpacity(redraw);
+	    tileLayers.getBaseLayer().onSetOpacity(update);
 	    
 	    tileLayers.onSetBaseLayer(function(oldBaseLayer, baseLayer) {
 		map.removeLayer(oldBaseLayer);
 		map.addLayer(baseLayer);
 
 		oldBaseLayer.clearOnSetOpacity();
-		baseLayer.onSetOpacity(redraw);
-		redraw();
+		baseLayer.onSetOpacity(update);
+		update();
 	    });
 
 	    tileLayers.overlays.forEach(function(name, layer) {
 		map.addLayer(layer);
-		layer.onSetOpacity(redraw);
+		layer.onSetOpacity(update);
 	    });
 
 	    var setupLayer = function(layer) {
@@ -85,9 +85,9 @@ module.exports = function(errors, map, toolbar, tableForLayer, redraw) {
 	    layers.all().forEach(setupLayer);
 
 	    layers.onCreate(setupLayer);
-	    layers.onCreate(redraw);
+	    layers.onCreate(update);
 
-	    layers.onReorder(redraw);
+	    layers.onReorder(update);
 
 	    Object.keys(state.tools)
 		.forEach(function(tool) {
@@ -110,7 +110,7 @@ module.exports = function(errors, map, toolbar, tableForLayer, redraw) {
 		state.startZoom
 	    );
 
-	    redraw();
+	    update();
 	},
 
 	fresh: fresh
