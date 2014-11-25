@@ -30,9 +30,9 @@ var d3 = require("d3"),
 	map.zoomTo,
 	paint.onClickShape,
 	paint.onHoverShape,
-	paint.redraw
+	paint.redrawAll
     ),    
-    state = require("./state.js")(errors, map, toolbar, tableForLayer, paint.redraw),
+    state = require("./state.js")(errors, map, toolbar, tableForLayer, paint.redrawAll),
     dataTransfer = require("./data-transfer.js")(errors, state.fresh),
     menu = require("multiuser-file-menu")(
 	"maps",

@@ -8,6 +8,32 @@ var leaflet = require("leaflet"),
     callbacks = helpers.callbackHandler,
     heatMapLegendFactory = require("./heat-map-legend.js");
 
+var decorateTileLayers = function(tileLayers, opacity) {
+    tileLayers.forEach(function(name, layer) {
+	layer.name = function() {
+	    return name;
+	};
+
+	/*
+	 Add callback event to setOpacity method.
+	 */
+	var onSetOpacity = callbacks(),
+	    wrapped = layer.setOpacity;
+	
+	layer.setOpacity = function(opacity) {
+	    var result = wrapped.call(layer, opacity);
+	    onSetOpacity(opacity);
+	    return result;
+	};
+	layer.onSetOpacity = onSetOpacity.add;
+	layer.clearOnSetOpacity = onSetOpacity.clear;
+
+	if (opacity !== undefined) {
+	    layer.setOpacity(opacity);
+	}
+    });
+};
+
 /*
  Pre-defined raster layers, including base layers and overlays.
 
@@ -62,21 +88,8 @@ module.exports = function(getZoom, errors) {
     nationalHeatMap.options.zIndex = 1;
     nationalHeatMap.legend = heatMapLegendFactory(getZoom, errors);
 
-    baseLayers.forEach(function(name, baseLayer) {
-	baseLayer.name = function() {
-	    return name;
-	};
-    });
-    
-    /*
-     Initialize overlay tiles to opacity 0.
-     */
-    overlays.forEach(function(name, tileLayer) {
-	tileLayer.setOpacity(0);
-	tileLayer.name = function() {
-	    return name;
-	};
-    });
+    decorateTileLayers(baseLayers);
+    decorateTileLayers(overlays, 0);
     
     /*
      Set up hover to see the value of a tile's pixel.

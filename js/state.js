@@ -67,7 +67,7 @@ module.exports = function(errors, map, toolbar, tableForLayer, redraw) {
 		map.removeLayer(oldBaseLayer);
 		map.addLayer(baseLayer);
 
-		oldBaseLayer.clearSetOpacity();
+		oldBaseLayer.clearOnSetOpacity();
 		baseLayer.onSetOpacity(redraw);
 		redraw();
 	    });
@@ -89,9 +89,9 @@ module.exports = function(errors, map, toolbar, tableForLayer, redraw) {
 
 	    layers.onReorder(redraw);
 
-	    Object.keys(state.visibility)
+	    Object.keys(state.tools)
 		.forEach(function(tool) {
-		    var vis = state.visibility[tool];
+		    var vis = state.tools[tool];
 
 		    if (vis !== undefined) {
 			if (vis) {
