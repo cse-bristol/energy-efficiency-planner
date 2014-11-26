@@ -11,13 +11,11 @@ var d3 = require("d3"),
     },
 
     getShapes = function(layer) {
-	return getLayerEl(layer.name())
-	    .selectAll("path");
+	return d3.selectAll("g#" + layer.name() + " path");
     },
 
     getShapeById = function(layer, id) {
-	return getLayerEl(layer)
-	    .select("path#" + id);
+	return d3.select("g#" + layer.name() + " path#" + id);
     };
 
 /*
@@ -84,11 +82,7 @@ module.exports = function(container, zoomTo, onClickShape, onHoverShape, redraw)
 	     Highlight that row on the table, and hide all the others.
 	     */
 	    var id = d[0];
-
-	    getShapeById(l, id)
-		.each(function(d, i) {
-		    zoomTo(d.bbox);
-		});
+	    zoomTo(getShapeById(l, id).datum().bbox);
 
 	    l.resultsTable.rows().
 		classed("selected", function(d, i) {
