@@ -16,8 +16,8 @@ module.exports = function(errors, freshState) {
     var serializeShapeLayers = function(layers) {
 	var result = {};
 	
-	return layers.all().forEach(function(layer) {
-	    result[layer.name] = {
+	layers.all().forEach(function(layer) {
+	    result[layer.name()] = {
 		opacity: layer.options.opacity,
 		z: layer.options.zIndex
 	    };
@@ -86,7 +86,7 @@ module.exports = function(errors, freshState) {
     return {
 	serialize: function(state) {
 	    return {
-		layers: serializeShapeLayers(state.layers),
+		shapeLayers: serializeShapeLayers(state.layers),
 		tileLayers: serializeTileLayers(state.tileLayers),
 		startCoordinates: [state.startCoordinates.lat, state.startCoordinates.lng],
 		startZoom: state.startZoom,

@@ -137,7 +137,7 @@ module.exports = function(container, zoomTo, onClickShape, onHoverShape, redraw)
 	    layer.resultsTable.dialogue().show();
 	});
 
-	onHoverShape.addHoverHandler(function(id, layer) {
+	onHoverShape(function(id, layer) {
 	    /*
 	     Show the shape we're hovering the mouse cursor over as an extra layer in the table.
 	     */
@@ -154,7 +154,9 @@ module.exports = function(container, zoomTo, onClickShape, onHoverShape, redraw)
 	l.worksheet.baseColourChanged(recolour);
 
 	l.onChange(redraw);
-	l.onRemove(l.resultsTable.el().remove());
+	l.onRemove(function() {
+	    l.resultsTable.el().remove();
+	});
 	l.onRemove(redraw);
 
 	updateResultsTable();

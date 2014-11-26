@@ -9,15 +9,15 @@ module.exports = function(container, projection, dataSource) {
     var path = d3.geo.path()
 	    .projection(projection),
 	colours = d3.scale.category10(),
-    	clickHandlers = handlerFactory(),
-	hoverHandlers = handlerFactory();
+    	onClick = handlerFactory(),
+	onHover = handlerFactory();
 
     var module = {
 	/*
 	 Pass in a function to be called every time a geometry path on the map is clicked.
 	 */
-	addClickHandler : clickHandlers.add,
-	addHoverHandler: hoverHandlers.add,
+	onClick : onClick.add,
+	onHover: onHover.add,
 	redrawAll : function() {
 	    var l = container.selectAll("g")
 		    .data(
@@ -58,10 +58,10 @@ module.exports = function(container, projection, dataSource) {
 
 		p.enter().append("path")
 		    .on("click", function(d, i) {
-			clickHandlers(d.id, d.layer);
+			onClick(d.id, d.layer);
 		    })
 		    .on("mouseenter", function(d, i) {
-			hoverHandlers(d.id, d.layer);
+			onHover(d.id, d.layer);
 		    })
 		    .attr("id", function(d, i){
 			return d.id;

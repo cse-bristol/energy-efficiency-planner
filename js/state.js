@@ -5,7 +5,9 @@
 var leaflet = require("leaflet"),
     layersFactory = require("./layers.js"),
     worksheet = require("./table/worksheet.js")(),
-    tileLayersFactory = require("./tile-layers.js");
+    tileLayersFactory = require("./tile-layers.js"),
+    helpers = require("./helpers.js"),
+    callbacks = helpers.callbackHandler;
 
 /*
  Bundles together all aspect of the state of the map into a Javascript object.
@@ -16,6 +18,7 @@ module.exports = function(errors, map, toolbar, tableForLayer, update) {
 	baseLayer,
 	startCoordinates,
 	startZoom,
+	onSet = callbacks(),
 	
 	fresh = function() {
 	    var t = tileLayersFactory(map.getZoom, errors);
@@ -80,6 +83,7 @@ module.exports = function(errors, map, toolbar, tableForLayer, update) {
 	    var setupLayer = function(layer) {
 		layer.worksheet = worksheet(layer.geometry());
 		tableForLayer(layer);
+		layer.onRemove(update);
 	    };
 	    
 	    layers.all().forEach(setupLayer);
@@ -110,9 +114,12 @@ module.exports = function(errors, map, toolbar, tableForLayer, update) {
 		state.startZoom
 	    );
 
+	    onSet();
 	    update();
 	},
 
-	fresh: fresh
+	fresh: fresh,
+
+	onSet: onSet.add
     };
 };

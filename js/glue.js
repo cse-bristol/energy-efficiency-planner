@@ -34,8 +34,8 @@ var d3 = require("d3"),
     tableForLayer = require("./table/table-for-layer.js")(
 	body,
 	map.zoomTo,
-	paint.onClickShape,
-	paint.onHoverShape,
+	paint.onClick,
+	paint.onHover,
 	update
     ),    
     state = require("./state.js")(errors, map, toolbar, tableForLayer, update),
@@ -50,9 +50,11 @@ var d3 = require("d3"),
     ),
     fetchLayers = require("./fetch-layers.js")(
 	menu.backend.isUp,
-	menu.backend.waitForConnection,
+	menu.backend.waitForConnect,
 	menu.backend.load,
-	dataTransfer.onDeserializeLayer
+	dataTransfer.onDeserializeLayer,
+	state.getLayers,
+	state.onSet
     ),
     layerControl = require("./layer-control.js")(body, toolbar, state.getLayers, state.getTileLayers, map.zoomTo);
 
