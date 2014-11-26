@@ -9,7 +9,6 @@ body {
     position: absolute;
     top: 0.6em;
     left: 3em;
-    z-index: 1;
 }
 
 #toolbar {
@@ -17,7 +16,6 @@ body {
     position: absolute;
     top: 5em;
     left: 0.6em;
-    z-index: 1;
 }
 
 #toolbar .open-button {
@@ -36,6 +34,7 @@ body {
 #map {
     width: 100vw;
     height: 100vh;
+    z-index: -1;
 }
 
 path {
