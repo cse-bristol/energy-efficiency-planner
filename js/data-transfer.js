@@ -11,18 +11,23 @@ var leaflet = require("leaflet"),
  */
 module.exports = function(errors, freshState) {
     var serializeShapeLayers = function(layers) {
-	return layers.all().map(function(layer) {
-	    return {
-		name: layer.name,
+	var result = {};
+	
+	return layers.all().forEach(function(layer) {
+	    result[layer.name] = {
 		opacity: layer.options.opacity,
 		z: layer.options.zIndex
 	    };
 	});
+
+	return result;
     };
 
     var deserializeShapeLayers = function(layers, serializedLayers) {
-	serializedLayers.forEach(function(serializedLayer) {
-	    // TODO go and fetch these from the database.
+	Object.keys(serializedLayers).forEach(function(layerName) {
+	    var layerData = serializedLayers[layerName],
+		opacity = layerData.opacity,
+		z = layerData.z;
 	});
     };
 
