@@ -30,7 +30,15 @@ module.exports = function() {
 	tHead = table.append("thead"),
 	headers = tHead.append("tr")
 	    .classed("headers", true),
-	tBody = table.append("tbody"),
+	tBody = table.append("tbody")
+	    .on("scroll", function(d, i) {
+		/*
+		 Scroll the header with the body.
+		 I would prefer to set scrollLeft on the header, but this only works if it has its own scrollbar.
+		 Instead we have this negative-margin hack.
+		 */
+		tHead.style("margin-left", (-this.scrollLeft) + "px");
+	    }),
 	rowClickHandler = callbacks(),
 	headClickHandler = callbacks(),
 	rowHoverHandler = callbacks(),
@@ -77,15 +85,28 @@ module.exports = function() {
 	});
     };
 
-    var setColumnWidths = function(cellSelection) {
+    var setColumnWidths = function(headers) {
+	var widths = [],
+	    getWidth = function(d, i) {
+		return widths[i];
+	    },
+	    styleIt = function(selection) {
+		selection.style("min-width", getWidth);
+		selection.style("max-width", getWidth);		
+	    };
+	
+	
 	tBody.select("tr")
 	    .selectAll("td")
 	    .each(function(d, i) {
-		var width = d3.select(this).style("width");
-		d3.select(cellSelection[0][i])
-		    .style("min-width", width)
-		    .style("max-width", width);
+		widths[i] = d3.select(this).style("width");
 	    });
+
+	styleIt(headers);
+	
+	styleIt(
+	    tBody.selectAll("tr")
+		.selectAll("td"));
     };
     
     var module = {
