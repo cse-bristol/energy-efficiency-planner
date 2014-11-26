@@ -70,5 +70,6 @@ module.exports = {
 	})
 	.on("dragend", function(d, i) {
 	    d3.event.sourceEvent.stopPropagation();
-	})
+	}),
+    noop: function() {}
 };

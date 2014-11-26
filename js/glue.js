@@ -48,10 +48,17 @@ var d3 = require("d3"),
 	state.set,
 	state.fresh
     ),
+    fetchLayers = require("./fetch-layers.js")(
+	menu.backend.isUp,
+	menu.backend.waitForConnection,
+	menu.backend.load,
+	dataTransfer.onDeserializeLayer
+    ),
     layerControl = require("./layer-control.js")(body, toolbar, state.getLayers, state.getTileLayers, map.zoomTo);
 
-// TODO extra buttons
-menu.buildMenu(menuBar, []);
+menu.buildMenu(menuBar, [
+    require("./load-layer-button.js")(fetchLayers.collection, state.getLayers, fetchLayers.load)
+]);
 
 map.onViewReset(paint.redrawAll);
 

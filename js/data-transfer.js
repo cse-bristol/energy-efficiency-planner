@@ -4,12 +4,15 @@
 
 var leaflet = require("leaflet"),
     helpers = require("./helpers.js"),
+    callbacks = helpers.callbackHandler,
     asNum = helpers.asNum;
 
 /*
  Converts between the state of the world (as defined in state.js) and data transfer objects which can be turned into JSON and sent out across the wire.
  */
 module.exports = function(errors, freshState) {
+    var onDeserializeLayer = callbacks();
+    
     var serializeShapeLayers = function(layers) {
 	var result = {};
 	
@@ -25,9 +28,15 @@ module.exports = function(errors, freshState) {
 
     var deserializeShapeLayers = function(layers, serializedLayers) {
 	Object.keys(serializedLayers).forEach(function(layerName) {
-	    var layerData = serializedLayers[layerName],
-		opacity = layerData.opacity,
-		z = layerData.z;
+	    var layerData = serializedLayers[layerName];
+
+	    /*
+	     Schedule the layer's geometry to be loaded from the database. When it is, fill in the created layer.
+	     */
+	    onDeserializeLayer(layers, layerName, function(layer) {
+		layer.setOpacity(layerData.opacity);
+		layer.setZIndex(layerData.z);
+	    });
 	});
     };
 
@@ -111,6 +120,8 @@ module.exports = function(errors, freshState) {
 	    }
 
 	    return state;
-	}
+	},
+
+	onDeserializeLayer: onDeserializeLayer.add
     };
 };
