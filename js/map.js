@@ -93,7 +93,7 @@ module.exports = function(container) {
 	overlay: overlay,
 
 	onViewReset: function(callback) {
-	    map.on("viewReset", callback);
+	    map.on("viewreset", callback);
 	}
     };
 };
