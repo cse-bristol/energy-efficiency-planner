@@ -6,10 +6,6 @@ var d3 = require("d3"),
     colours = require("../colour.js"),
     resultsTable = require("./results-table.js"),
 
-    getLayerEl = function(layer) {
-	return d3.select("#map svg g#" + layer.name());
-    },
-
     getShapes = function(layer) {
 	return d3.selectAll("g#" + layer.name() + " path");
     },
