@@ -95,7 +95,7 @@ module.exports = function(errors) {
 	    geometry.forEach(function(shape){
 		var id = stripSpaces(shape.properties[nameProp]);
 
-		while (ids.has(id)) {
+		while (ids.has(id) || id === "") {
 		    /* Prevent duplicate names. */
 		    id = incrementName(id);
 		}
