@@ -2,7 +2,8 @@
 
 /*global module, require*/
 
-var leaflet = require("leaflet"),
+var _ = require("lodash"),
+    leaflet = require("leaflet"),
     helpers = require("./helpers.js"),
     callbacks = helpers.callbackHandler,
     asNum = helpers.asNum;
@@ -12,14 +13,34 @@ var leaflet = require("leaflet"),
  */
 module.exports = function(errors, freshState) {
     var onDeserializeLayer = callbacks();
+
+    var serializeResultsTable = function(table) {
+	var result = {
+	    visible: table.visible()
+	};
+
+	if (table.manuallySized()) {
+	    result.size = table.size();
+	}
+	if (table.manuallyPositioned()) {
+	    result.position = table.position();
+	}
+
+	return result;
+    };
     
     var serializeShapeLayers = function(layers) {
 	var result = {};
 	
 	layers.all().forEach(function(layer) {
+	    var table = layer.resultsTable.dialogue();
+
 	    result[layer.name()] = {
 		opacity: layer.options.opacity,
-		z: layer.options.zIndex
+		z: layer.options.zIndex,
+		colour: layer.worksheet.baseColour(),
+		sort: layer.worksheet.getSortProperties(),
+		table: serializeResultsTable(layer.resultsTable.dialogue())
 	    };
 	});
 
@@ -36,6 +57,34 @@ module.exports = function(errors, freshState) {
 	    onDeserializeLayer(layers, layerName, function(layer) {
 		layer.setOpacity(layerData.opacity);
 		layer.setZIndex(layerData.z);
+		layer.worksheet.baseColour(layerData.colour);
+
+		var first = true;
+		_.zip(layerData.sort.properties, layerData.sort.reverse)
+		    .forEach(function(sort) {
+			layer.worksheet.sortProperty(sort[0], true);
+
+			/*
+			 In order to reverse the sort order, sort again by the same property.
+			 */
+			if (sort[1]) {
+			    layer.worksheet.sortProperty(sort[1], true);
+			}
+		    });
+		
+		var table = layer.resultsTable.dialogue();
+		if (layerData.table.visible) {
+		    table.show();
+		} else {
+		    table.hide();
+		}
+		
+		if (layerData.table.size !== undefined) {
+		    table.size(layerData.table.size);
+		}
+		if (layerData.table.position !== undefined) {
+		    table.position(layerData.table.position);
+		}
 	    });
 	});
     };

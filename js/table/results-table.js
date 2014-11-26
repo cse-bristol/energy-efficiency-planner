@@ -3,7 +3,7 @@
 /*global module, require*/
 
 var d3 = require("d3"),
-    dialogue = require("floating-dialogue"),
+    floatingDialogue = require("floating-dialogue"),
     helpers = require("../helpers.js"),
     callbacks = helpers.callbackHandler,
     identity = helpers.identity,
@@ -14,16 +14,18 @@ var d3 = require("d3"),
  
  Call it with a container which it will make the panel inside.
  */
-module.exports = function(container) {
-    var div = dialogue(
-	container.append("div")
+module.exports = function() {
+    var dialogue = floatingDialogue(
+	d3.select(
+	    document.createElement("div")
+	)
 	    .classed("results", true))
 	    .close()
 	    .resize()
 	    .drag()
 	    .hide(),
 	
-	table = div.content().append("table")
+	table = dialogue.content().append("table")
 	    .classed("results-table", true),
 	tHead = table.append("thead"),
 	headers = tHead.append("tr")
@@ -36,7 +38,7 @@ module.exports = function(container) {
 	extraRow,
 	gotSize = false;
 
-    div.el().append("span")
+    dialogue.el().append("span")
 	.classed("reset-results", true)
 	.text("RESET")
 	.on("click", resetHandler);
@@ -149,8 +151,8 @@ module.exports = function(container) {
 		 */
 
 		gotSize = true;
-		div.el().style("height", div.el().node().offsetHeight + "px");
-		div.el().style("width", div.el().node().offsetWidth + "px");
+		dialogue.el().style("height", dialogue.el().node().offsetHeight + "px");
+		dialogue.el().style("width", dialogue.el().node().offsetWidth + "px");
 	    }
 	},
 
@@ -183,15 +185,20 @@ module.exports = function(container) {
 	},
 
 	dialogue: function() {
-	    return div;
+	    return dialogue;
 	},
 
 	el: function() {
-	    return div.el();
+	    return dialogue.el();
 	},
 
 	tbody: function() {
 	    return tBody;
+	},
+
+	addToContainer: function(container) {
+	    container.node().appendChild(
+		dialogue.el().node());
 	}
     };
 

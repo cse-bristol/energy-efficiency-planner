@@ -4,7 +4,10 @@
 
 var d3 = require("d3"),
     helpers = require("./helpers.js"),
-    callbacks = helpers.callbackHandler;
+    callbacks = helpers.callbackHandler,
+    worksheetFactory = require("./table/worksheet.js")(),
+    resultsTableFactory = require("./table/results-table.js");
+
 
 /*
  A collection of shape (GeoJSON vector) layers which will be drawn as map overlays.
@@ -196,6 +199,9 @@ module.exports = function(errors) {
 			onRemove();
 		    }
 		},
+
+		worksheet: worksheetFactory(geometry),
+		resultsTable: resultsTableFactory(),
 
 		onChange: onChange.add,
 		onRemove: onRemove.add

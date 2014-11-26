@@ -4,7 +4,6 @@
 
 var leaflet = require("leaflet"),
     layersFactory = require("./layers.js"),
-    worksheet = require("./table/worksheet.js")(),
     tileLayersFactory = require("./tile-layers.js"),
     helpers = require("./helpers.js"),
     callbacks = helpers.callbackHandler;
@@ -33,6 +32,16 @@ module.exports = function(errors, map, toolbar, tableForLayer, update) {
 		    "!": false
 		}
 	    };
+	},
+	cleanUp = function() {
+	    if (layers) {
+		/*
+		 Clean out existing layers.
+		 */
+		layers.all().forEach(function(l) {
+		    l.remove();
+		});
+	    }
 	};
     
     return {
@@ -56,6 +65,8 @@ module.exports = function(errors, map, toolbar, tableForLayer, update) {
 
 
 	set: function(state) {
+	    cleanUp();
+	    
 	    layers = state.layers;
 	    tileLayers = state.tileLayers;
 
@@ -81,7 +92,6 @@ module.exports = function(errors, map, toolbar, tableForLayer, update) {
 	    });
 
 	    var setupLayer = function(layer) {
-		layer.worksheet = worksheet(layer.geometry());
 		tableForLayer(layer);
 		layer.onRemove(update);
 	    };

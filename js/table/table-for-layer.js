@@ -4,7 +4,6 @@
 
 var d3 = require("d3"),
     colours = require("../colour.js"),
-    resultsTable = require("./results-table.js"),
 
     getShapes = function(layer) {
 	return d3.selectAll("g#" + layer.name() + " path");
@@ -61,9 +60,13 @@ module.exports = function(container, zoomTo, onClickShape, onHoverShape, redraw)
 	if (!l.worksheet) {
 	    throw new Error("Layer did not have a worksheet " + l.name());
 	}
-	
-	l.resultsTable = resultsTable(container);
 
+	if (!l.resultsTable) {
+	    throw new Error("Layer did not have a results table " + l.name());
+	}
+
+	l.resultsTable.addToContainer(container);
+	
 	/*
 	 When we click a header in the table, sort by that column.
 	 */
