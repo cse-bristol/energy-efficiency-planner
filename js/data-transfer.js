@@ -27,110 +27,117 @@ module.exports = function(errors, freshState) {
 	}
 
 	return result;
-    };
-    
-    var serializeShapeLayers = function(layers) {
-	var result = {};
-	
-	layers.all().forEach(function(layer) {
+    },
+
+	serializeShapeLayer = function(layer) {
 	    var table = layer.resultsTable.dialogue();
 
-	    result[layer.name()] = {
+	    return {
 		opacity: layer.options.opacity,
 		z: layer.options.zIndex,
 		colour: layer.worksheet.baseColour(),
 		sort: layer.worksheet.getSortProperties(),
 		table: serializeResultsTable(layer.resultsTable.dialogue())
 	    };
-	});
-
-	return result;
-    };
-
-    var deserializeShapeLayers = function(layers, serializedLayers) {
-	Object.keys(serializedLayers).forEach(function(layerName) {
-	    var layerData = serializedLayers[layerName];
-
-	    /*
-	     Schedule the layer's geometry to be loaded from the database. When it is, fill in the created layer.
-	     */
-	    onDeserializeLayer(layers, layerName, function(layer) {
-		layer.setOpacity(layerData.opacity);
-		layer.setZIndex(layerData.z);
-		layer.worksheet.baseColour(layerData.colour);
-
-		var first = true;
-		_.zip(layerData.sort.properties, layerData.sort.reverse)
-		    .forEach(function(sort) {
-			layer.worksheet.sortProperty(sort[0], true);
-
-			/*
-			 In order to reverse the sort order, sort again by the same property.
-			 */
-			if (sort[1]) {
-			    layer.worksheet.sortProperty(sort[1], true);
-			}
-		    });
-		
-		var table = layer.resultsTable.dialogue();
-		if (layerData.table.visible) {
-		    table.show();
-		} else {
-		    table.hide();
-		}
-		
-		if (layerData.table.size !== undefined) {
-		    table.size(layerData.table.size);
-		}
-		if (layerData.table.position !== undefined) {
-		    table.position(layerData.table.position);
-		}
+	},
+	
+	serializeShapeLayers = function(layers) {
+	    var result = {};
+	    
+	    layers.all().forEach(function(layer) {
+		result[layer.name()] = serializeShapeLayer(layer);
 	    });
-	});
-    };
 
-    var serializeTileLayers = function(tileLayers) {
-	return {
-	    base: tileLayers.getBaseLayer().name(),
-	    baseOpacity: tileLayers.getBaseLayer().options.opacity,
-	    overlays: tileLayers.overlays.values()
-		.map(function(overlay) {
-		    return {
-			name: overlay.name(),
-			opacity: overlay.options.opacity
-		    };
-		})
-	};
-    };
+	    return result;
+	},
 
-    var deserializeTileLayers = function(tileLayers, serialized) {
-	if (serialized.base) {
-	    if (tileLayers.base.has(serialized.base)) {
-		var base = tileLayers.base.get(serialized.base);
-		tileLayers.setBaseLayer(base);
-	    }
-  	}
-	
-	if (serialized.baseOpacity) {
-	    tileLayers.getBaseLayer().setOpacity(asNum(serialized.baseOpacity));
-	}
+	deserializeShapeLayers = function(layers, serializedLayers) {
+	    Object.keys(serializedLayers).forEach(function(layerName) {
+		var layerData = serializedLayers[layerName];
 
-	if (serialized.overlays) {
-	    serialized.overlays.forEach(
-		function(serializedOverlay) {
-		    var name = serializedOverlay.name;
-		    if (tileLayers.overlays.has(name)) {
-			var overlay = tileLayers.overlays.get(name);
+		/*
+		 Schedule the layer's geometry to be loaded from the database. When it is, fill in the created layer.
+		 */
+		onDeserializeLayer(layers, layerName, function(layer) {
+		    layer.setOpacity(layerData.opacity);
+		    layer.setZIndex(layerData.z);
+		    layer.worksheet.baseColour(layerData.colour);
 
-			if (serializedOverlay.opacity) {
-			    overlay.setOpacity(asNum(serializedOverlay.opacity));
-			}
+		    var first = true;
+		    _.zip(layerData.sort.properties, layerData.sort.reverse)
+			.forEach(function(sort) {
+			    layer.worksheet.sortProperty(sort[0], true);
+
+			    /*
+			     In order to reverse the sort order, sort again by the same property.
+			     */
+			    if (sort[1]) {
+				layer.worksheet.sortProperty(sort[1], true);
+			    }
+			});
+		    
+		    var table = layer.resultsTable.dialogue();
+		    if (layerData.table.visible) {
+			table.show();
+		    } else {
+			table.hide();
 		    }
+		    
+		    if (layerData.table.size !== undefined) {
+			table.size(layerData.table.size);
+		    }
+		    if (layerData.table.position !== undefined) {
+			table.position(layerData.table.position);
+		    }
+		});
+	    });
+	},
+
+	serializeTileLayers = function(tileLayers) {
+	    var overlays = {};
+
+	    tileLayers.overlays.forEach(function(name, overlay) {
+		overlays[name] = {
+		    opacity: overlay.options.opacity
+		};
+	    });
+	    
+	    return {
+		base: tileLayers.getBaseLayer().name(),
+		baseOpacity: tileLayers.getBaseLayer().options.opacity,
+		overlays: overlays
+	    };
+	},
+
+	deserializeTileLayers = function(tileLayers, serialized) {
+	    if (serialized.base) {
+		if (tileLayers.base.has(serialized.base)) {
+		    var base = tileLayers.base.get(serialized.base);
+		    tileLayers.setBaseLayer(base);
 		}
-	    );
-	}
-	
-    };
+  	    }
+	    
+	    if (serialized.baseOpacity) {
+		tileLayers.getBaseLayer().setOpacity(asNum(serialized.baseOpacity));
+	    }
+
+	    if (serialized.overlays) {
+		Object.keys(serialized.overlays)
+		    .forEach(
+			function(overlayName) {
+			    if (tileLayers.overlays.has(overlayName)) {
+				var overlay = tileLayers.overlays.get(overlayName),
+				    serializedOverlay = serialized.overlays[overlayName];
+
+				if (serializedOverlay.opacity) {
+				    overlay.setOpacity(asNum(serializedOverlay.opacity));
+				}
+			    }
+			}
+		    );
+	    }
+	    
+	};
 
     return {
 	serialize: function(state) {
@@ -142,6 +149,8 @@ module.exports = function(errors, freshState) {
 		tools: state.tools
 	    };
 	},
+
+	serializeShapeLayer: serializeShapeLayer,
 
 	deserialize: function(serialized) {
 	    var state = freshState();

@@ -2,7 +2,9 @@
 
 /*global module, require*/
 
-var d3 = require("d3");
+var d3 = require("d3"),
+    helpers = require("./helpers.js"),
+    callbacks = helpers.callbackHandler;
 
 /*
  Holds an element which we will use to display a toolbar, along with providing a convenient way to look up the visibility status of the tools which belong in there.
@@ -11,7 +13,8 @@ var d3 = require("d3");
  */
 module.exports = function(container) {
     var el = container.append("div").attr("id", "toolbar"),
-	tools = d3.map();
+	tools = d3.map(),
+	onVisibilityChanged = callbacks();
 
     return {
 	add: function(toolText, dialogue) {
@@ -19,6 +22,10 @@ module.exports = function(container) {
 
 	    dialogue.open(icon);
 	    tools.set(toolText, dialogue);
+
+	    dialogue.onVisibilityChanged(function(visibility) {
+		onVisibilityChanged(toolText, visibility);
+	    });
 	},
 
 	visibility: function() {
@@ -30,6 +37,8 @@ module.exports = function(container) {
 
 	    return r;
 	},
+
+	onVisibilityChanged: onVisibilityChanged.add,
 
 	show: function(toolText) {
 	    if (tools.has(toolText)) {

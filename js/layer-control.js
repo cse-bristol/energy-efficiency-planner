@@ -41,13 +41,16 @@ var baseColourPicker = function(shapes, newShapes, picker, getLayers) {
 	.classed("choose-colour", true)
 	.html("&nbsp;", true)
 	.each(function(d, i) {
-	    var el = d3.select(this);
-	    getLayers().get(d)
-		.worksheet.baseColourChanged(
+	    var el = d3.select(this),
+		layer = getLayers().get(d);
+
+	    if (layer) {
+		layer.worksheet.baseColourChanged(
 		    function(colour) {
 			el.style("background-color", colour);
 		    }
 		);
+	    }
 	})
 	.call(noDrag);
 

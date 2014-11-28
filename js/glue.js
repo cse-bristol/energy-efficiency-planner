@@ -71,3 +71,4 @@ var handlers = require("./file-handlers.js")(
     update
 );
 require("./file-drop.js")(d3.select("body"), errors, handlers);
+require("./model-operations.js")(menu.store.writeOp, state.onSet, state.getTileLayers, state.getLayers, toolbar, dataTransfer.serializeShapeLayer);

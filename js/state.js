@@ -36,10 +36,10 @@ module.exports = function(errors, map, toolbar, tableForLayer, update) {
 	cleanUp = function() {
 	    if (layers) {
 		/*
-		 Clean out existing layers.
+		 Clean out these now unhelpful elements.
 		 */
 		layers.all().forEach(function(l) {
-		    l.remove();
+		    l.resultsTable.el().remove();
 		});
 	    }
 	};

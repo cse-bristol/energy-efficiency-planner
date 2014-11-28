@@ -146,7 +146,8 @@ module.exports = function(container, zoomTo, onClickShape, onHoverShape, redraw)
 	l.worksheet.sortPropertyChanged(recolour);
 	l.worksheet.baseColourChanged(recolour);
 
-	l.onChange(redraw);
+	l.onSetOpacity(redraw);
+	l.onSetZIndex(redraw);
 	l.onRemove(function() {
 	    l.resultsTable.el().remove();
 	});

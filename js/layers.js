@@ -152,7 +152,8 @@ module.exports = function(errors) {
 	},
 	create : function(namePreference, geometry, boundingbox) {
 	    var name = stripSpaces(namePreference),
-		onChange = callbacks(),
+		onSetOpacity = callbacks(),
+		onSetZIndex = callbacks(),
 		onRemove = callbacks();
 
 	    fixGeometryNames(geometry);
@@ -183,12 +184,12 @@ module.exports = function(errors) {
 		
 		setOpacity : function(o) {
 		    l.options.opacity = o;
-		    onChange();
+		    onSetOpacity(o);
 		},
 		
 		setZIndex : function(z) {
 		    l.options.zIndex = z;
-		    onChange();
+		    onSetZIndex(z);
 		},
 
 		overlay : true,
@@ -203,7 +204,8 @@ module.exports = function(errors) {
 		worksheet: worksheetFactory(geometry),
 		resultsTable: resultsTableFactory(),
 
-		onChange: onChange.add,
+		onSetOpacity: onSetOpacity.add,
+		onSetZIndex: onSetZIndex.add,
 		onRemove: onRemove.add
 	    };	    
 
