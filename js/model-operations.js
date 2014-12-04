@@ -4,8 +4,10 @@
 
 /*
  Sends changes we make to the map back to the server automatically.
+
+ The loading parameter is a function which returns true if we shouldn't write because we are currently reading in.
  */
-module.exports = function(writeOp, onStateReplaced, getTileLayers, getLayers, toolbar, serializeShapeLayer) {
+module.exports = function(writeOp, onStateReplaced, getTileLayers, getLayers, toolbar, serializeShapeLayer, loading) {
     /*
      A convenience device to help set up lots of hooks on an object hierarchy.
 
@@ -18,24 +20,25 @@ module.exports = function(writeOp, onStateReplaced, getTileLayers, getLayers, to
 	var path = p ? p : [];
 	
 	var f = function() {
-
-	    writeOp(
-		{
-		    p: path,
-		    oi: getter ? getter() : arguments[0]
-		}
-	    );
+	    if (!loading()) {
+		writeOp(
+		    {
+			p: path,
+			oi: getter ? getter() : arguments[0]
+		    }
+		);
+	    }
 	};
 	
-	f.p = function(p) {
-	    return module.exports(path.slice().concat([p], getter));
+	f.p = function(extraP) {
+	    return hook(path.slice().concat([extraP]), getter);
 	};
 
 	f.getter = function(newGetter) {
 	    if (getter) {
 		throw new Error("Builder with path " + path + " already has a getter.");
 	    } else {
-		return module.exports(path.slice(), newGetter);
+		return hook(path.slice(), newGetter);
 	    }
 	};
 
@@ -71,12 +74,12 @@ module.exports = function(writeOp, onStateReplaced, getTileLayers, getLayers, to
 	    shapeLayer.onSetZIndex(layerHook.p("z"));
 
 	    shapeLayer.worksheet.sortPropertyChanged(
-		tableHook
+		layerHook
 		    .p("sort")
 		    .getter(shapeLayer.worksheet.getSortProperties));
-	    
-	    shapeLayer.worksheet.baseColourChanged(tableHook.p("colour"));
 
+	    shapeLayer.worksheet.baseColourChanged(layerHook.p("colour"));
+	    
 	    table.onVisibilityChanged(tableHook.p("visible"));
 	    table.onSizeChanged(tableHook.p("size"));
 	    table.onPositionChanged(tableHook.p("position"));
@@ -90,7 +93,12 @@ module.exports = function(writeOp, onStateReplaced, getTileLayers, getLayers, to
 	},
 
 	hookShapeLayers = function(shapeLayers) {
+	    shapeLayers.all().forEach(function(l) {
+		hookShapeLayer(l);
+	    });
+	    
 	    shapeLayers.onCreate(function(l) {
+		hookShapeLayer(l);
 		writeOp({
 		    p: ["shapeLayers", l.name()],
 		    oi: serializeShapeLayer(l)

@@ -18,6 +18,7 @@ module.exports = function(errors, map, toolbar, tableForLayer, update) {
 	startCoordinates,
 	startZoom,
 	onSet = callbacks(),
+	loading = false,
 	
 	fresh = function() {
 	    var t = tileLayersFactory(map.getZoom, errors);
@@ -65,71 +66,81 @@ module.exports = function(errors, map, toolbar, tableForLayer, update) {
 
 
 	set: function(state) {
-	    cleanUp();
-	    
-	    layers = state.layers;
-	    tileLayers = state.tileLayers;
+	    loading = true;
 
-	    map.eachLayer(function(layer) {
-		map.removeLayer(layer);
-	    });
-	    
-	    map.addLayer(tileLayers.getBaseLayer());
-	    tileLayers.getBaseLayer().onSetOpacity(update);
-	    
-	    tileLayers.onSetBaseLayer(function(oldBaseLayer, baseLayer) {
-		map.removeLayer(oldBaseLayer);
-		map.addLayer(baseLayer);
+	    try {
+		cleanUp();
+		
+		layers = state.layers;
+		tileLayers = state.tileLayers;
 
-		oldBaseLayer.clearOnSetOpacity();
-		baseLayer.onSetOpacity(update);
-		update();
-	    });
+		map.eachLayer(function(layer) {
+		    map.removeLayer(layer);
+		});
+		
+		map.addLayer(tileLayers.getBaseLayer());
+		tileLayers.getBaseLayer().onSetOpacity(update);
+		
+		tileLayers.onSetBaseLayer(function(oldBaseLayer, baseLayer) {
+		    map.removeLayer(oldBaseLayer);
+		    map.addLayer(baseLayer);
 
-	    tileLayers.overlays.forEach(function(name, layer) {
-		map.addLayer(layer);
-		layer.onSetOpacity(update);
-	    });
-
-	    var setupLayer = function(layer) {
-		tableForLayer(layer);
-		layer.onRemove(update);
-	    };
-	    
-	    layers.all().forEach(setupLayer);
-
-	    layers.onCreate(setupLayer);
-	    layers.onCreate(update);
-
-	    layers.onReorder(update);
-
-	    Object.keys(state.tools)
-		.forEach(function(tool) {
-		    var vis = state.tools[tool];
-
-		    if (vis !== undefined) {
-			if (vis) {
-			    toolbar.show(tool);
-			} else {
-			    toolbar.hide(tool);
-			}
-		    }
+		    oldBaseLayer.clearOnSetOpacity();
+		    baseLayer.onSetOpacity(update);
+		    update();
 		});
 
-	    startCoordinates = state.startCoordinates;
-	    startZoom = state.startZoom;
-	    
-	    map.setView(
-		state.startCoordinates,
-		state.startZoom
-	    );
+		tileLayers.overlays.forEach(function(name, layer) {
+		    map.addLayer(layer);
+		    layer.onSetOpacity(update);
+		});
 
-	    onSet();
-	    update();
+		var setupLayer = function(layer) {
+		    tableForLayer(layer);
+		    layer.onRemove(update);
+		};
+		
+		layers.all().forEach(setupLayer);
+
+		layers.onCreate(setupLayer);
+		layers.onCreate(update);
+
+		layers.onReorder(update);
+
+		Object.keys(state.tools)
+		    .forEach(function(tool) {
+			var vis = state.tools[tool];
+
+			if (vis !== undefined) {
+			    if (vis) {
+				toolbar.show(tool);
+			    } else {
+				toolbar.hide(tool);
+			    }
+			}
+		    });
+
+		startCoordinates = state.startCoordinates;
+		startZoom = state.startZoom;
+		
+		map.setView(
+		    state.startCoordinates,
+		    state.startZoom
+		);
+
+		onSet();
+		update();
+	    } finally {
+		loading = false;
+	    }
 	},
 
 	fresh: fresh,
 
-	onSet: onSet.add
+	onSet: onSet.add,
+
+	loading: function() {
+	    return loading;
+	}
     };
 };

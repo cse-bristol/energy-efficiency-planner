@@ -23,9 +23,12 @@ module.exports = function(isUp, waitForConnection, load, onDeserializeLayer, get
 		    var snapshot = loaded.getSnapshot();
 		    if (snapshot) {
 			loading = true;
-			var layer = layers.create(layerName, snapshot.geometry, snapshot.boundingbox);
-			loading = false;
-			callback(layer);			    
+			try {
+			    var layer = layers.create(layerName, snapshot.geometry, snapshot.boundingbox);
+			    callback(layer);			    
+			} finally {
+			    loading = false;
+			}
 			
 		    } else {
 			throw new Error("Attempted to load Layer which does not exist " + layerName);
@@ -79,6 +82,10 @@ module.exports = function(isUp, waitForConnection, load, onDeserializeLayer, get
 	 */
 	save: saveLayer,
 
-	collection: collection
+	collection: collection,
+
+	loading: function() {
+	    return loading;
+	}
     };
 };
