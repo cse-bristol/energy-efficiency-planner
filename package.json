@@ -1,11 +1,14 @@
 {
-    "name": "open-data-map",
+    "name": "energy-efficiency-planner",
     "version": "0.5.0",
     "description": "",
     "keywords": ["map", "d3", "leaflet", "energy planning"],
     
     "dependencies": {
-	"d3": "3.4.11"
+	/*
+	  Warning: this must be the same version of the version of d3 used by multiuser-file-menu. Otherwise, events will not be passed between them.
+	 */
+	"d3": "3.4.13"
 	,"topojson": "1.6.18"
 	,"leaflet": "0.7.3"
 	,"leaflet-control-geocoder": "0.2.1"
@@ -15,7 +18,7 @@
 	
 	,"js-shapefile-to-geojson--": "git://github.com/GlennS/js-shapefile-to-geojson.git"
 	,"floating-dialogue": "git://github.com/cse-bristol/floating-dialogue.git"
-	,"wiki-interop": "git://github.com/cse-bristol/multiuser-file-menu"
+	,"multiuser-file-menu": "git://github.com/cse-bristol/multiuser-file-menu"
 	,"sort-children": "git://github.com/cse-bristol/sort-children.git"
     }
 }
