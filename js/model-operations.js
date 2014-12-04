@@ -7,43 +7,47 @@
 
  The loading parameter is a function which returns true if we shouldn't write because we are currently reading in.
  */
-module.exports = function(writeOp, onStateReplaced, getTileLayers, getLayers, toolbar, serializeShapeLayer, loading) {
-    /*
-     A convenience device to help set up lots of hooks on an object hierarchy.
-
-     Call p() to selecte a property further into the hierarchy.
-     Call .getter() to choose a way to get your property. Defaults to looking at the first callback argument.
-     
-     Pass the resulting function into your desired callback.
-     */
-    var hook = function(p, getter) {
-	var path = p ? p : [];
+module.exports = function(doWriteOp, onStateReplaced, getTileLayers, getLayers, toolbar, serializeShapeLayer, loading) {
+    var writeOp = function(op) {
+	if (!loading()) {
+	    doWriteOp(op);
+	}
+    },
 	
-	var f = function() {
-	    if (!loading()) {
+	/*
+	 A convenience device to help set up lots of hooks on an object hierarchy.
+
+	 Call p() to selecte a property further into the hierarchy.
+	 Call .getter() to choose a way to get your property. Defaults to looking at the first callback argument.
+	 
+	 Pass the resulting function into your desired callback.
+	 */
+	hook = function(p, getter) {
+	    var path = p ? p : [];
+	    
+	    var f = function() {
 		writeOp(
 		    {
 			p: path,
 			oi: getter ? getter() : arguments[0]
 		    }
 		);
-	    }
-	};
-	
-	f.p = function(extraP) {
-	    return hook(path.slice().concat([extraP]), getter);
-	};
+	    };
+	    
+	    f.p = function(extraP) {
+		return hook(path.slice().concat([extraP]), getter);
+	    };
 
-	f.getter = function(newGetter) {
-	    if (getter) {
-		throw new Error("Builder with path " + path + " already has a getter.");
-	    } else {
-		return hook(path.slice(), newGetter);
-	    }
-	};
+	    f.getter = function(newGetter) {
+		if (getter) {
+		    throw new Error("Builder with path " + path + " already has a getter.");
+		} else {
+		    return hook(path.slice(), newGetter);
+		}
+	    };
 
-	return f;
-    },
+	    return f;
+	},
 
 	hookBaseOpacity = hook(["tileLayers", "baseOpacity"]),
 
