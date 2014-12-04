@@ -1,5 +1,8 @@
 "use strict";
 
+var _ = require("lodash"),
+    userDelay = 300;
+
 /*global module, require*/
 
 /*
@@ -19,20 +22,25 @@ module.exports = function(doWriteOp, onStateReplaced, getTileLayers, getLayers, 
 
 	 Call p() to selecte a property further into the hierarchy.
 	 Call .getter() to choose a way to get your property. Defaults to looking at the first callback argument.
+	 Call .delay() when you want to limit the number of saves which are made.
 	 
 	 Pass the resulting function into your desired callback.
 	 */
-	hook = function(p, getter) {
-	    var path = p ? p : [];
+	hook = function(p, getter, delay) {
+	    var path = p ? p : [],
 	    
-	    var f = function() {
-		writeOp(
-		    {
-			p: path,
-			oi: getter ? getter() : arguments[0]
-		    }
-		);
-	    };
+		f = function() {
+		    writeOp(
+			{
+			    p: path,
+			    oi: getter ? getter() : arguments[0]
+			}
+		    );
+		};
+
+	    if (delay) {
+		f = _.debounce(f, userDelay);
+	    }
 	    
 	    f.p = function(extraP) {
 		return hook(path.slice().concat([extraP]), getter);
@@ -46,10 +54,14 @@ module.exports = function(doWriteOp, onStateReplaced, getTileLayers, getLayers, 
 		}
 	    };
 
+	    f.delay = function() {
+		return hook(path, getter, true);
+	    };
+
 	    return f;
 	},
 
-	hookBaseOpacity = hook(["tileLayers", "baseOpacity"]),
+	hookBaseOpacity = hook(["tileLayers", "baseOpacity"]).delay(),
 
 	hookTileLayers = function(tileLayers) {
 	    tileLayers.getBaseLayer().onSetOpacity(hookBaseOpacity);
@@ -74,7 +86,7 @@ module.exports = function(doWriteOp, onStateReplaced, getTileLayers, getLayers, 
 		tableHook = layerHook.p("table"),
 		table = shapeLayer.resultsTable.dialogue();
 	    
-	    shapeLayer.onSetOpacity(layerHook.p("opacity"));
+	    shapeLayer.onSetOpacity(layerHook.p("opacity").delay());
 	    shapeLayer.onSetZIndex(layerHook.p("z"));
 
 	    shapeLayer.worksheet.sortPropertyChanged(
@@ -85,8 +97,8 @@ module.exports = function(doWriteOp, onStateReplaced, getTileLayers, getLayers, 
 	    shapeLayer.worksheet.baseColourChanged(layerHook.p("colour"));
 	    
 	    table.onVisibilityChanged(tableHook.p("visible"));
-	    table.onSizeChanged(tableHook.p("size"));
-	    table.onPositionChanged(tableHook.p("position"));
+	    table.onSizeChanged(tableHook.p("size").delay());
+	    table.onPositionChanged(tableHook.p("position").delay());
 
 	    shapeLayer.onRemove(function() {
 		writeOp({
