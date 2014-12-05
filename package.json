@@ -5,9 +5,6 @@
     "keywords": ["map", "d3", "leaflet", "energy planning"],
     
     "dependencies": {
-	/*
-	  Warning: this must be the same version of the version of d3 used by multiuser-file-menu. Otherwise, events will not be passed between them.
-	 */
 	"d3": "3.4.13"
 	,"topojson": "1.6.18"
 	,"leaflet": "0.7.3"
