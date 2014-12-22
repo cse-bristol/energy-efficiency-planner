@@ -198,6 +198,11 @@ module.exports = function(container, toolbar, getLayers, getTileLayers, zoomTo) 
 		    if (layer.legend) {
 			status.style("color", reverseColour(colour));
 			status.text(layer.legend(colour));
+			if (layer.legend.units) {
+			    status.append("span")
+				.classed("legend-units", true)
+				.html(layer.legend.units);
+			}
 		    }
 		});
 	    });

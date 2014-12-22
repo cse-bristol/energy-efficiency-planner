@@ -21,8 +21,8 @@ module.exports = function(getZoom, errors) {
 		    var legend = d3.map();
 
 		    data.legend.forEach(function(range) {
-			var min = rounded(range.min),
-			    max = rounded(range.max);
+			var min = rounded(range.min, 2),
+			    max = rounded(range.max, 2);
 
 			legend.set(
 			    // Must be American spelling here
@@ -36,7 +36,7 @@ module.exports = function(getZoom, errors) {
 	    });
     });
 
-    return function(colour) {
+    var f = function(colour) {
 	var z = getZoom();
 
 	if (z > maxZoom) {
@@ -53,4 +53,7 @@ module.exports = function(getZoom, errors) {
 
 	return "n/a";
     };
+
+    f.units = 'kWh/m<sup>2</sup>/year<sup>1</sup>';
+    return f;
 };

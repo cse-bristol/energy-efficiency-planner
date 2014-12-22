@@ -267,6 +267,11 @@ th.reverse:before {
     font-size: small;
 }
 
+.legend-units {
+    font-size: x-small;
+    display: block;
+}
+
 .choose-colour.element-visible {
     outline: thin solid black;
 }

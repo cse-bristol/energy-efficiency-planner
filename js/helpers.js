@@ -18,9 +18,9 @@ module.exports = {
 	    throw new Error("Not a number " + n);
 	}
     },
-    rounded: function(maybeNumber) {
+    rounded: function(maybeNumber, precision) {
 	if (module.exports.isNum(maybeNumber)) {
-	    return (+maybeNumber).toPrecision(5);
+	    return (+maybeNumber).toPrecision(precision ? precision : 5);
 	} else {
 	    return maybeNumber;
 	}
