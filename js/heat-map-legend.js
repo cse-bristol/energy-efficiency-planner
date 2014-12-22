@@ -54,6 +54,6 @@ module.exports = function(getZoom, errors) {
 	return "n/a";
     };
 
-    f.units = 'kWh/m<sup>2</sup>/year<sup>1</sup>';
+    f.units = 'kWh/m<sup>2</sup>/year';
     return f;
 };
