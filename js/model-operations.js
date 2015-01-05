@@ -70,7 +70,7 @@ module.exports = function(doWriteOp, onStateReplaced, getTileLayers, getLayers, 
 		newBase.onSetOpacity(hookBaseOpacity);
 		
 		writeOp({
-		    p: ["base"],
+		    p: ["tileLayers", "base"],
 		    oi: newBase.name()
 		});
 	    });
