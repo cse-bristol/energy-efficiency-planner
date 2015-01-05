@@ -40,6 +40,7 @@ var d3 = require("d3"),
     ),    
     state = require("./state.js")(errors, map, toolbar, tableForLayer, update),
     dataTransfer = require("./data-transfer.js")(errors, state.fresh),
+    layerControl = require("./layer-control.js")(body, toolbar, state.getLayers, state.getTileLayers, map.zoomTo),    
     menu = require("multiuser-file-menu")(
 	"maps",
 	dataTransfer.serialize,
@@ -55,11 +56,15 @@ var d3 = require("d3"),
 	dataTransfer.onDeserializeLayer,
 	state.getLayers,
 	state.onSet
-    ),
-    layerControl = require("./layer-control.js")(body, toolbar, state.getLayers, state.getTileLayers, map.zoomTo);
+    );
 
 menu.buildMenu(menuBar, [
-    require("./load-layer-button.js")(fetchLayers.collection, state.getLayers, fetchLayers.load)
+    require("./load-layer-button.js")(
+	fetchLayers.collection,
+	state.getLayers,
+	fetchLayers.load,
+	menu.spec.button
+    )
 ]);
 
 map.onViewReset(paint.redrawAll);
