@@ -5,7 +5,12 @@
 var d3 = require("d3"),
     _ = require("lodash"),
     rounded = require("./helpers.js").rounded,
-    maxZoom = 17;
+    maxZoom = 17,
+    baseUrl = (function() {
+	var a = document.createElement("a");
+	a.href = "/heat-map-cdn/Total Heat Density";
+	return a.href;
+    }());
 
 module.exports = function(getZoom, errors) {
     var legendByZoom = d3.map();
@@ -13,10 +18,10 @@ module.exports = function(getZoom, errors) {
     // loop over the zoom levels
     _.range(1, maxZoom + 1).forEach(function(z) {
 	d3.json(
-	    "http://localhost/heat-map-cdn/Total Heat Density/legend_Z" + z + ".json",
+	    baseUrl + "/legend_Z" + z + ".json",
 	    function(error, data) {
 		if (error) {
-		    errors(error);
+		    errors.warnUser(error);
 		} else {
 		    var legend = d3.map();
 
