@@ -279,7 +279,6 @@ th.reverse:before {
 .colour-picker {
     top: 3em;
     left: calc(100% - 33em);
-    opacity: 0.8;
 }
 
 .leaflet-overlay-pane {
