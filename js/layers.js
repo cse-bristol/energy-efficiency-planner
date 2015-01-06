@@ -19,9 +19,9 @@ module.exports = function(errors) {
 	onCreate = callbacks(),
 	onReorder = callbacks();
 
-    var stripRegex = new RegExp(" ", "g");
+    var stripRegex = new RegExp("[ ()]+", "g");
     var stripSpaces = function(s) {
-	return s.replace(stripRegex, "_");
+	return s.replace(stripRegex, "-");
     };
 
     var incrementName = function(n) {
