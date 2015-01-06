@@ -82,10 +82,6 @@ module.exports = function(isUp, waitForConnection, load, onDeserializeLayer, get
 	 */
 	save: saveLayer,
 
-	collection: collection,
-
-	loading: function() {
-	    return loading;
-	}
+	collection: collection
     };
 };

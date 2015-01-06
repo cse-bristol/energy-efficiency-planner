@@ -83,6 +83,5 @@ require("./model-operations.js")(
     state.getLayers,
     toolbar,
     dataTransfer.serializeShapeLayer,
-    function() {
-	return state.loading() || fetchLayers.loading();
-    });
+    state.loading
+);
