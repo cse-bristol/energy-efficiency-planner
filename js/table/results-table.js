@@ -7,7 +7,9 @@ var d3 = require("d3"),
     helpers = require("../helpers.js"),
     callbacks = helpers.callbackHandler,
     identity = helpers.identity,
-    rounded = helpers.rounded;
+    rounded = function(d, i) {
+	return helpers.rounded(d, 5);
+    };
 
 /*
  Make an info panel for a polygon on the map.
