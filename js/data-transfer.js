@@ -137,6 +137,20 @@ module.exports = function(errors, freshState) {
 		    );
 	    }
 	    
+	},
+
+	serializeViewport = function(viewport) {
+	    return {
+		coordinates: [viewport.lat(), viewport.lng()],
+		zoom: viewport.zoom()
+	    };
+	},
+
+	deserializeViewport = function(viewport, serialized) {
+	    viewport.set(
+		leaflet.latLng(serialized.coordinates),
+		serialized.zoom
+	    );
 	};
 
     return {
@@ -144,13 +158,14 @@ module.exports = function(errors, freshState) {
 	    return {
 		shapeLayers: serializeShapeLayers(state.layers),
 		tileLayers: serializeTileLayers(state.tileLayers),
-		startCoordinates: [state.startCoordinates.lat, state.startCoordinates.lng],
-		startZoom: state.startZoom,
+		viewport: serializeViewport(state.viewport),
 		tools: state.tools
 	    };
 	},
 
 	serializeShapeLayer: serializeShapeLayer,
+
+	serializeViewport: serializeViewport,
 
 	deserialize: function(serialized) {
 	    var state = freshState();
@@ -163,10 +178,8 @@ module.exports = function(errors, freshState) {
 		deserializeShapeLayers(state.layers, serialized.shapeLayers);
 	    }
 
-	    if (serialized.startCoordinates) {
-		state.startCoordinates = leaflet.latLng(
-		    asNum(serialized.startCoordinates[0]),
-		    asNum(serialized.startCoordinates[1]));
+	    if (serialized.viewport) {
+		deserializeViewport(state.viewport, serialized.viewport);
 	    }
 
 	    if (serialized.startZoom) {

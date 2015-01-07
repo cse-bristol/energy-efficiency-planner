@@ -56,6 +56,13 @@ var d3 = require("d3"),
 	dataTransfer.onDeserializeLayer,
 	state.getLayers,
 	state.onSet
+    ),
+    viewportButtons = require("./viewport-buttons.js")(
+	map.setView,
+	map.getCenter,
+	map.getZoom,
+	state.getViewport,
+	menu.spec.button
     );
 
 menu.buildMenu(menuBar, [
@@ -64,7 +71,9 @@ menu.buildMenu(menuBar, [
 	state.getLayers,
 	fetchLayers.load,
 	menu.spec.button
-    )
+    ),
+    viewportButtons.set,
+    viewportButtons.get
 ]);
 
 map.onViewReset(paint.redrawAll);
@@ -81,7 +90,9 @@ require("./model-operations.js")(
     state.onSet,
     state.getTileLayers,
     state.getLayers,
+    state.getViewport,
     toolbar,
     dataTransfer.serializeShapeLayer,
+    dataTransfer.serializeViewport,
     state.loading
 );

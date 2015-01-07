@@ -80,6 +80,8 @@ module.exports = function(container) {
 
 	setView: _.bind(map.setView, map),
 
+	getCenter: _.bind(map.getCenter, map),
+	
 	getZoom: _.bind(map.getZoom, map),
 
 	eachLayer: _.bind(map.eachLayer, map),

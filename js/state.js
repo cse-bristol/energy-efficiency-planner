@@ -5,6 +5,7 @@
 var leaflet = require("leaflet"),
     layersFactory = require("./layers.js"),
     tileLayersFactory = require("./tile-layers.js"),
+    viewportFactory = require("./viewport.js"),
     helpers = require("./helpers.js"),
     callbacks = helpers.callbackHandler;
 
@@ -15,8 +16,7 @@ module.exports = function(errors, map, toolbar, tableForLayer, update) {
     var layers,
 	tileLayers,
 	baseLayer,
-	startCoordinates,
-	startZoom,
+	viewport,
 	onSet = callbacks(),
 	loading = false,
 	
@@ -26,8 +26,8 @@ module.exports = function(errors, map, toolbar, tableForLayer, update) {
 	    return {
 		layers: layersFactory(errors),
 		tileLayers: t,
-		startCoordinates: leaflet.latLng(0, 0),
-		startZoom: 2,
+		viewport: viewportFactory(),
+
 		tools: {
 		    "L": true,
 		    "!": false
@@ -50,8 +50,7 @@ module.exports = function(errors, map, toolbar, tableForLayer, update) {
 	    return {
 		layers: layers,
 		tileLayers: tileLayers,
-		startCoordinates: startCoordinates,
-		startZoom: startZoom,
+		viewport: viewport,
 		tools: toolbar.visibility()
 	    };
 	},
@@ -64,6 +63,9 @@ module.exports = function(errors, map, toolbar, tableForLayer, update) {
 	    return tileLayers;
 	},
 
+	getViewport: function() {
+	    return viewport;
+	},
 
 	set: function(state) {
 	    loading = true;
@@ -120,12 +122,11 @@ module.exports = function(errors, map, toolbar, tableForLayer, update) {
 			}
 		    });
 
-		startCoordinates = state.startCoordinates;
-		startZoom = state.startZoom;
+		viewport = state.viewport;
 		
 		map.setView(
-		    state.startCoordinates,
-		    state.startZoom
+		    viewport.coordinates(),
+		    viewport.zoom()
 		);
 
 		onSet();

@@ -10,7 +10,7 @@ var _ = require("lodash"),
 
  The loading parameter is a function which returns true if we shouldn't write because we are currently reading in.
  */
-module.exports = function(doWriteOp, onStateReplaced, getTileLayers, getLayers, toolbar, serializeShapeLayer, loading) {
+module.exports = function(doWriteOp, onStateReplaced, getTileLayers, getLayers, getViewport, toolbar, serializeShapeLayer, serializeViewport, loading) {
     var writeOp = function(op) {
 	if (!loading()) {
 	    doWriteOp(op);
@@ -120,6 +120,15 @@ module.exports = function(doWriteOp, onStateReplaced, getTileLayers, getLayers, 
 		    oi: serializeShapeLayer(l)
 		});
 	    });
+	},
+
+	hookViewport = function(viewport) {
+	    viewport.onChange(function() {
+		writeOp({
+		    p: ["viewport"],
+		    oi: serializeViewport(viewport)
+		});
+	    });
 	};
 
     toolbar.onVisibilityChanged(function(toolText, visible) {
@@ -132,5 +141,6 @@ module.exports = function(doWriteOp, onStateReplaced, getTileLayers, getLayers, 
     onStateReplaced(function() {
 	hookTileLayers(getTileLayers());
 	hookShapeLayers(getLayers());
+	hookViewport(getViewport());
     });
 };

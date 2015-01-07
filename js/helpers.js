@@ -18,6 +18,11 @@ module.exports = {
 	    throw new Error("Not a number " + n);
 	}
     },
+    isInt: function(n) {
+	var i = parseInt(n);
+	
+	return !isNaN(i) && (parseFloat(n) == i); 
+    },
     rounded: function(maybeNumber, precision) {
 	if (module.exports.isNum(maybeNumber)) {
 	    return (+maybeNumber).toPrecision(precision ? precision : 5);
