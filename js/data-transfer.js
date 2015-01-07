@@ -182,10 +182,6 @@ module.exports = function(errors, freshState) {
 		deserializeViewport(state.viewport, serialized.viewport);
 	    }
 
-	    if (serialized.startZoom) {
-		state.startZoom = asNum(serialized.startZoom);
-	    }
-
 	    if (serialized.tools) {
 		state.tools = serialized.tools;
 	    }
