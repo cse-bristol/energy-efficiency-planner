@@ -6,8 +6,8 @@ var d3 = require("d3"),
     helpers = require("./helpers.js"),
     callbacks = helpers.callbackHandler,
     worksheetFactory = require("./table/worksheet.js")(),
-    resultsTableFactory = require("./table/results-table.js");
-
+    resultsTableFactory = require("./table/results-table.js"),
+    idMaker = require("./id-maker.js");
 
 /*
  A collection of shape (GeoJSON vector) layers which will be drawn as map overlays.
@@ -18,33 +18,6 @@ module.exports = function(errors) {
     var layers = d3.map([]),
 	onCreate = callbacks(),
 	onReorder = callbacks();
-
-    var stripRegex = new RegExp("[ ()]+", "g");
-    var stripSpaces = function(s) {
-	return s.replace(stripRegex, "-");
-    };
-
-    var incrementName = function(n) {
-	var accum = function(n, acc) {
-	    if (n.length === 0) {
-		return acc + "A";
-	    } 
-
-	    var len = n.length;
-	    var head = n.slice(0, len - 1);
-	    var tail = n[len - 1];
-
-	    if (tail === "Z") {
-		return accum(head, "A" + acc);
-	    } else {
-		var codeNow = tail.charCodeAt(0);
-		var replacement = String.fromCharCode(codeNow + 1);
-		return head + replacement + acc;
-	    }
-	};
-
-	return accum(n, "");
-    };
 
     var fixGeometryNames = function(geometry) {
 	var chooseNameProp = function (keys) {
@@ -96,11 +69,11 @@ module.exports = function(errors) {
 	    var ids = d3.set({});
 	    
 	    geometry.forEach(function(shape){
-		var id = stripSpaces(shape.properties[nameProp]);
+		var id = idMaker.fromString(shape.properties[nameProp]);
 
 		while (ids.has(id) || id === "") {
 		    /* Prevent duplicate names. */
-		    id = incrementName(id);
+		    id = idMaker.increment(id);
 		}
 
 		ids.add(id);
@@ -109,10 +82,10 @@ module.exports = function(errors) {
 	    errors.informUser("Using " + nameProp + " as id property.");
 
 	} else {
-	    var id = "A";
+	    var id = "";
 	    geometry.forEach(function(shape){
+		id = idMaker.increment(id);
 		shape.id = id;
-		id = incrementName(id);
 	    });
 	    errors.informUser("No 'id' property found. Inventing names for each shape.");
 	}
@@ -151,7 +124,7 @@ module.exports = function(errors) {
 	    }
 	},
 	create : function(namePreference, geometry, boundingbox) {
-	    var name = stripSpaces(namePreference),
+	    var name = idMaker.fromString(namePreference),
 		onSetOpacity = callbacks(),
 		onSetZIndex = callbacks(),
 		onRemove = callbacks();
