@@ -102,6 +102,7 @@ module.exports = function(
 		    break;
 		case "opacity":
 		    layer.setOpacity(op.oi);
+		    break;
 		case "sort":
 		    deserializeShapeSort(op.oi, layer.worksheet.sortProperty);
 		    break;
