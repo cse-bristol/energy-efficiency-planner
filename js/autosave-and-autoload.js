@@ -18,10 +18,14 @@ module.exports = function(
     var
     reading = false,
     writing = false,
+
+    canWrite = function() {
+	return !(state.loading() || data.reading() || reading);
+    },
     
     autosave = autosaveFactory(
 	function(op) {
-	    if (!(state.loading() || data.reading() || reading)) {
+	    if (canWrite()) {
 		try {
 		    writing = true;
 		    writeOp(op);
@@ -31,6 +35,7 @@ module.exports = function(
 	    }
 	    
 	},
+	canWrite,
 	state.onSet,
 	state.getTileLayers,
 	state.getLayers,

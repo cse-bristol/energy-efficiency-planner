@@ -8,7 +8,7 @@ var _ = require("lodash"),
 /*
  Sends changes we make to the map back to the server automatically.
  */
-module.exports = function(writeOp, onStateReplaced, getTileLayers, getLayers, getViewport, toolbar, serializeShapeLayer, serializeViewport) {
+module.exports = function(writeOp, canWrite, onStateReplaced, getTileLayers, getLayers, getViewport, toolbar, serializeShapeLayer, serializeViewport) {
     /*
      A convenience device to help set up lots of hooks on an object hierarchy.
 
@@ -32,7 +32,15 @@ module.exports = function(writeOp, onStateReplaced, getTileLayers, getLayers, ge
 	    };
 
 	if (delay) {
-	    f = _.debounce(f, userDelay);
+	    var f_actual = _.debounce(f, userDelay);
+	    /*
+	     We need to do execute canWrite before we debounce, otherwise we can get into an infinite read -> write -> read with 2 or more clients.
+	     */
+	    f = function() {
+		if (canWrite()) {
+		    f_actual.apply(this, arguments);
+		}
+	    };
 	}
 	
 	f.p = function(extraP) {
@@ -48,6 +56,10 @@ module.exports = function(writeOp, onStateReplaced, getTileLayers, getLayers, ge
 	};
 
 	f.delay = function() {
+	    if (delay) {
+		throw new Error("Have already applied a delay to this hook.");
+	    }
+	    
 	    return hook(path, getter, true);
 	};
 
