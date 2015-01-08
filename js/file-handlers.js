@@ -83,7 +83,12 @@ var singleTable = function(extension, mime, parser){
     });
 };
 
-module.exports = function(errors, geometries, getLayers, refresh) {
+module.exports = function(errors, geometries, getLayers, saveLayerGeometry, refresh) {
+    var createLayer = function(name, geometry, bbox) {
+	var layer = getLayers().create(name, geometry, bbox);
+	saveLayerGeometry(layer);
+    };
+    
     return [
 	singleTable("tsv", "test/tab-separated-values", d3.tsv.parse),
 	singleTable("csv", "text/csv", d3.csv.parse),
@@ -91,7 +96,7 @@ module.exports = function(errors, geometries, getLayers, refresh) {
 	    var data = JSON.parse(text);
 	    var shapes = geometries.manyFromTopoJSON(filename, data);
 	    shapes.entries().forEach(function(e){
-		getLayers().create(e.key, e.value);
+		createLayer(e.key, e.value);
 	    });
 	    refresh();
 	}),
@@ -126,7 +131,7 @@ module.exports = function(errors, geometries, getLayers, refresh) {
 			}
 			
 			var name = withoutExtension(shp.name);
-			var l = getLayers().create(name, geojson.features, geojson.bbox);
+			createLayer(name, geojson.features, geojson.bbox);
 			refresh();
 		    }
 		);

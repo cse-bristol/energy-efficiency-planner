@@ -82,6 +82,7 @@ var handlers = require("./file-handlers.js")(
     errors, 
     geometries, 
     state.getLayers,
+    fetchLayers.save,
     update
 );
 require("./file-drop.js")(d3.select("body"), errors, handlers);

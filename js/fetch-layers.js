@@ -8,28 +8,16 @@ var d3 = require("d3"),
 /*
  If we add a layer to a map, it will get saved in a collection (overwriting any existing layer of the same name).
  */
-module.exports = function(isUp, waitForConnection, load, onDeserializeLayer, getLayers, onStateChanged) {
-    /*
-     The loading flag prevents us from trying to save layers we've just loaded.
-     */
-    var loading = false;
-    
-    var loadLayer = function(layers, layerName, callback) {
-	if (isUp) {
+module.exports = function(isUp, waitForConnection, load, onDeserializeLayer, getLayers) {
+    var loadLayer = function(layerName, callback) {
+	if (isUp()) {
 	    load(
 		collection,
 		layerName,
-		function(loaded) {
+		function(loaded) { 
 		    var snapshot = loaded.getSnapshot();
 		    if (snapshot) {
-			loading = true;
-			try {
-			    var layer = layers.create(layerName, snapshot.geometry, snapshot.boundingbox);
-			    callback(layer);			    
-			} finally {
-			    loading = false;
-			}
-			
+			callback(snapshot.geometry, snapshot.boundingbox);
 		    } else {
 			throw new Error("Attempted to load Layer which does not exist " + layerName);
 		    }
@@ -61,14 +49,6 @@ module.exports = function(isUp, waitForConnection, load, onDeserializeLayer, get
     
     onDeserializeLayer(loadLayer);
 
-    onStateChanged(function() {
-	getLayers().onCreate(function(layer) {
-	    if (!loading) {
-		saveLayer(layer);
-	    }
-	});
-    });
-    
     return {
 	/*
 	 Retrieves a layer from the server by name and adds it to a layers collection.

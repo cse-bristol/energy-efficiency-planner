@@ -21,7 +21,7 @@ module.exports = function(
     
     autosave = autosaveFactory(
 	function(op) {
-	    if (!(state.loading() || reading)) {
+	    if (!(state.loading() || data.reading() || reading)) {
 		try {
 		    writing = true;
 		    writeOp(op);

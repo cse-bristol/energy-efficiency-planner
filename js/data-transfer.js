@@ -12,22 +12,23 @@ var _ = require("lodash"),
  Converts between the state of the world (as defined in state.js) and data transfer objects which can be turned into JSON and sent out across the wire.
  */
 module.exports = function(errors, freshState) {
-    var onDeserializeLayer = callbacks();
+    var reading = false,
+	onDeserializeLayer = callbacks(),
 
-    var serializeResultsTable = function(table) {
-	var result = {
-	    visible: table.visible()
-	};
+	serializeResultsTable = function(table) {
+	    var result = {
+		visible: table.visible()
+	    };
 
-	if (table.manuallySized()) {
-	    result.size = table.size();
-	}
-	if (table.manuallyPositioned()) {
-	    result.position = table.position();
-	}
+	    if (table.manuallySized()) {
+		result.size = table.size();
+	    }
+	    if (table.manuallyPositioned()) {
+		result.position = table.position();
+	    }
 
-	return result;
-    },
+	    return result;
+	},
 
 	serializeShapeLayer = function(layer) {
 	    var table = layer.resultsTable.dialogue();
@@ -76,26 +77,34 @@ module.exports = function(errors, freshState) {
 	    /*
 	     Schedule the layer's geometry to be loaded from the database. When it is, fill in the created layer.
 	     */
-	    onDeserializeLayer(layers, layerName, function(layer) {
-		layer.setOpacity(layerData.opacity);
-		layer.setZIndex(layerData.z);
-		layer.worksheet.baseColour(layerData.colour);
+	    onDeserializeLayer(layerName, function(geometry, bbox) {
+		try {
+		    reading = true;
+		    
+		    var layer = layers.create(layerName, geometry, bbox);
+		    
+		    layer.setOpacity(layerData.opacity);
+		    layer.setZIndex(layerData.z);
+		    layer.worksheet.baseColour(layerData.colour);
 
-		var first = true;
-		deserializeShapeSort(layerData.sort, layer.worksheet.sortProperty);
-		
-		var table = layer.resultsTable.dialogue();
-		if (layerData.table.visible) {
-		    table.show();
-		} else {
-		    table.hide();
-		}
-		
-		if (layerData.table.size !== undefined) {
-		    table.size(layerData.table.size);
-		}
-		if (layerData.table.position !== undefined) {
-		    table.position(layerData.table.position);
+		    var first = true;
+		    deserializeShapeSort(layerData.sort, layer.worksheet.sortProperty);
+
+		    var table = layer.resultsTable.dialogue();
+		    if (layerData.table.visible) {
+			table.show();
+		    } else {
+			table.hide();
+		    }
+		    
+		    if (layerData.table.size !== undefined) {
+			table.size(layerData.table.size);
+		    }
+		    if (layerData.table.position !== undefined) {
+			table.position(layerData.table.position);
+		    }
+		} finally {
+		    reading = false;
 		}
 	    });
 	},
@@ -168,6 +177,10 @@ module.exports = function(errors, freshState) {
 	};
 
     return {
+	reading: function() {
+	    return reading;
+	},
+	
 	serialize: function(state) {
 	    return {
 		shapeLayers: serializeShapeLayers(state.layers),

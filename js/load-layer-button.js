@@ -10,9 +10,10 @@ module.exports = function(collection, getLayers, load, makeButton) {
 	"Layers",
 	function(name) {
 	    load(
-		getLayers(),
 		name,
-		noop
+		function(geometry, bbox) {
+		    getLayers().create(name, geometry, bbox);
+		}
 	    );
 	},
 	{
