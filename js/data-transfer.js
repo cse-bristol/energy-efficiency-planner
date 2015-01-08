@@ -51,45 +51,59 @@ module.exports = function(errors, freshState) {
 	    return result;
 	},
 
+	deserializeShapeSort = function(serialized, setSortProperty) {
+	    _.zip(serialized.properties, serialized.reverse)
+		.forEach(function(sort, i) {
+
+		    setSortProperty(
+			sort[0],
+			/*
+			 The first property in the list replaces any existing sort.
+			 */
+			i !== 0
+		    );
+		    
+		    /*
+		     In order to reverse the sort order, sort again by the same property.
+		     */
+		    if (sort[1]) {
+			setSortProperty(sort[1], true);
+		    }
+		});
+	},
+
+	deserializeShapeLayer = function(layers, layerName, layerData) {
+	    /*
+	     Schedule the layer's geometry to be loaded from the database. When it is, fill in the created layer.
+	     */
+	    onDeserializeLayer(layers, layerName, function(layer) {
+		layer.setOpacity(layerData.opacity);
+		layer.setZIndex(layerData.z);
+		layer.worksheet.baseColour(layerData.colour);
+
+		var first = true;
+		deserializeShapeSort(layerData.sort, layer.worksheet.sortProperty);
+		
+		var table = layer.resultsTable.dialogue();
+		if (layerData.table.visible) {
+		    table.show();
+		} else {
+		    table.hide();
+		}
+		
+		if (layerData.table.size !== undefined) {
+		    table.size(layerData.table.size);
+		}
+		if (layerData.table.position !== undefined) {
+		    table.position(layerData.table.position);
+		}
+	    });
+	},
+
 	deserializeShapeLayers = function(layers, serializedLayers) {
 	    Object.keys(serializedLayers).forEach(function(layerName) {
 		var layerData = serializedLayers[layerName];
-
-		/*
-		 Schedule the layer's geometry to be loaded from the database. When it is, fill in the created layer.
-		 */
-		onDeserializeLayer(layers, layerName, function(layer) {
-		    layer.setOpacity(layerData.opacity);
-		    layer.setZIndex(layerData.z);
-		    layer.worksheet.baseColour(layerData.colour);
-
-		    var first = true;
-		    _.zip(layerData.sort.properties, layerData.sort.reverse)
-			.forEach(function(sort) {
-			    layer.worksheet.sortProperty(sort[0], true);
-
-			    /*
-			     In order to reverse the sort order, sort again by the same property.
-			     */
-			    if (sort[1]) {
-				layer.worksheet.sortProperty(sort[1], true);
-			    }
-			});
-		    
-		    var table = layer.resultsTable.dialogue();
-		    if (layerData.table.visible) {
-			table.show();
-		    } else {
-			table.hide();
-		    }
-		    
-		    if (layerData.table.size !== undefined) {
-			table.size(layerData.table.size);
-		    }
-		    if (layerData.table.position !== undefined) {
-			table.position(layerData.table.position);
-		    }
-		});
+		deserializeShapeLayer(layers, layerName, layerData);
 	    });
 	},
 
@@ -163,8 +177,11 @@ module.exports = function(errors, freshState) {
 	    };
 	},
 
+	deserializeShapeSort: deserializeShapeSort,
+	deserializeShapeLayer: deserializeShapeLayer,
 	serializeShapeLayer: serializeShapeLayer,
 
+	deserializeViewport: deserializeViewport,
 	serializeViewport: serializeViewport,
 
 	deserialize: function(serialized) {

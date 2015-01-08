@@ -81,18 +81,14 @@ map.onViewReset(paint.redrawAll);
 var handlers = require("./file-handlers.js")(
     errors, 
     geometries, 
-    state.getLayers, 
+    state.getLayers,
     update
 );
 require("./file-drop.js")(d3.select("body"), errors, handlers);
-require("./model-operations.js")(
+require("./autosave-and-autoload.js")(
     menu.store.writeOp,
-    state.onSet,
-    state.getTileLayers,
-    state.getLayers,
-    state.getViewport,
-    toolbar,
-    dataTransfer.serializeShapeLayer,
-    dataTransfer.serializeViewport,
-    state.loading
+    menu.store.onOp,
+    state,
+    dataTransfer,
+    toolbar
 );
