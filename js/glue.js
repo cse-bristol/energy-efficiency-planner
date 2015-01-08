@@ -21,6 +21,7 @@ var d3 = require("d3"),
     
     toolbar = require("./toolbar.js")(body),
     errors = require("./errors.js")(body, toolbar),
+    progress = require("./progress.js")(body),
     loader = require("./loader.js"),
     geometries = require("./geometries.js"),
     map = require("./map.js")(body),
@@ -55,7 +56,7 @@ var d3 = require("d3"),
 	menu.backend.load,
 	dataTransfer.onDeserializeLayer,
 	state.getLayers,
-	state.onSet
+	progress
     ),
     viewportButtons = require("./viewport-buttons.js")(
 	map.setView,
