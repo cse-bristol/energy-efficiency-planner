@@ -70,7 +70,7 @@ module.exports = function(writeOp, onStateReplaced, getTileLayers, getLayers, ge
 
 	tileLayers.overlays.forEach(function(name, layer) {
 	    layer.onSetOpacity(
-		hook(["tileLayers", "overlays", name, "opacity"]));
+		hook(["tileLayers", "overlays", name, "opacity"]).delay());
 	});
     },
 
