@@ -288,3 +288,26 @@ th.reverse:before {
 .leaflet-zoom-hide {
     pointer-events: all;
 }
+
+#import-dialogue {
+    background-color: white;
+    top: 3em;
+    left: 3em;
+}
+
+.file-import {
+    padding-bottom: 0.5em;
+    margin: 0.5em;
+}
+
+.file-import fieldset select {
+    margin-right: 0.5em;
+}
+
+.cancel-file-import {
+    float:left;
+}
+
+.confirm-file-import {
+    float: right;
+}

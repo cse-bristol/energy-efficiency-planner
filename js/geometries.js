@@ -97,16 +97,14 @@ module.exports = {
     fromGeoJSON : function(data) {
 	return data.features;
     },
-    fromShapefile : function(shapeData, dbfData, prj) {
+    fromShapefile : function(shapeData, dbfData) {
 	var s = shapefile(shapeData);
 	var d = dbf(dbfData);
 	s.addDBFDataToGeoJSON(d);
 
-	if (prj) {
-	    transform(prj, s.geojson);
-	}
-
 	return s.geojson;
-    }
+    },
+
+    projectLayer: transform
 };
 

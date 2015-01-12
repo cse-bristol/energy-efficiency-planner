@@ -76,29 +76,35 @@ var singleText = function(extension, mime, onFileLoad) {
     return h;
 };
 
-var singleTable = function(extension, mime, parser){
-    return singleText(extension, mime, function(filename, text){
-	var data = parser(text);
-	sources.fromTable(withoutExtension(filename), data, filename);
-    });
-};
-
-module.exports = function(errors, geometries, getLayers, saveLayerGeometry, refresh) {
-    var createLayer = function(name, geometry, bbox) {
-	var layer = getLayers().create(name, geometry, bbox);
-	saveLayerGeometry(layer);
+module.exports = function(errors, importDialogue) {
+    var singleTable = function(extension, mime, parser){
+	return singleText(extension, mime, function(filename, text) {
+	    try {
+		var data = parser(text);
+		importDialogue.csv(
+		    withoutExtension(filename),
+		    data
+		);
+	    } catch (e) {
+		errors.warnUser(e);
+	    }
+	});
     };
     
     return [
 	singleTable("tsv", "test/tab-separated-values", d3.tsv.parse),
 	singleTable("csv", "text/csv", d3.csv.parse),
 	singleText("json", "application/json", function(filename, text){
-	    var data = JSON.parse(text);
-	    var shapes = geometries.manyFromTopoJSON(filename, data);
-	    shapes.entries().forEach(function(e){
-		createLayer(e.key, e.value);
-	    });
-	    refresh();
+	    try {
+		var data = JSON.parse(text);
+		
+		importDialogue.topojson(
+		    withoutExtension(filename),
+		    data
+		);
+	    } catch (e) {
+		errors.warnUser(e);
+	    }
 	}),
 	function shapefile() {
 	    var makeBatch = function(shp, dbf, prj) {
@@ -112,27 +118,19 @@ module.exports = function(errors, geometries, getLayers, saveLayerGeometry, refr
 		
 		return batch(
 		    files,
-		    function(files){
-			var geojson;
-			
-			if (prj) {
-
-			    geojson = geometries.fromShapefile(
+		    function(files) {
+			try {
+			    
+			    importDialogue.shapefile(
+				withoutExtension(shp.name),
 				files.get(shp.name),
 				files.get(dbf.name),
-				files.get(prj.name));
-			    
-			} else {
-			    errors.informUser("Imported a .shp file without a .prj file. Assuming it uses the WGS84 coordinate system.");
-			    
-			    geojson = geometries.fromShapefile(
-				files.get(shp.name),
-				files.get(dbf.name));
+				prj ? files.get(prj.name) : null
+			    );
+
+			} catch (e) {
+			    errors.warnUser(e);
 			}
-			
-			var name = withoutExtension(shp.name);
-			createLayer(name, geojson.features, geojson.bbox);
-			refresh();
 		    }
 		);
 	    };

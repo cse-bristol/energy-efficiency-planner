@@ -23,7 +23,6 @@ var d3 = require("d3"),
     errors = require("./errors.js")(body, toolbar),
     progress = require("./progress.js")(body),
     loader = require("./loader.js"),
-    geometries = require("./geometries.js"),
     map = require("./map.js")(body),
     paint = require("./paint.js")(
 	map.overlay,
@@ -79,14 +78,18 @@ menu.buildMenu(menuBar, [
 
 map.onViewReset(paint.redrawAll);
 
-var handlers = require("./file-handlers.js")(
-    errors, 
-    geometries, 
+var fileImportDialogue = require("./files/import-dialogue.js")(
+    toolbar,
+    body,
     state.getLayers,
     fetchLayers.save,
     update
-);
-require("./file-drop.js")(d3.select("body"), errors, handlers);
+),
+    handlers = require("./files/file-handlers.js")(
+	errors, 
+	fileImportDialogue
+    );
+require("./files/file-drop.js")(d3.select("body"), errors, handlers);
 require("./autosave-and-autoload.js")(
     menu.store.writeOp,
     menu.store.onOp,
