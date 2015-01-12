@@ -20,7 +20,7 @@ module.exports = function() {
 	onChange: onChange.add,
 
 	set: function(c, z) {
-	    if (!c instanceof leaflet.LatLng) {
+	    if (!c instanceof leaflet.latLng) {
 		throw new Error("Coordinates should be a Leaflet LatLng object, was: " + c + " of type: " + Object.prototype.toString.call(c));
 	    }
 	    
