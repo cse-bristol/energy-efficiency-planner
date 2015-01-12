@@ -3,6 +3,8 @@
 /*global module, require*/
 
 var d3 = require("d3"),
+    helpers = require("../helpers.js"),
+    noDrag = helpers.noDrag,
     geometries = require("../geometries.js"),
     asLayerName = require("../id-maker.js").fromString;
 
@@ -30,7 +32,8 @@ module.exports = function(container, layerNames, makeExtraContent, onSubmit) {
 	    .classed("imported-layer-name", true)
 	    .on("input", function(d, i) {
 		this.value = asLayerName(this.value);
-	    });
+	    })
+	    .call(noDrag);
 
     makeExtraContent(content);
 
@@ -42,7 +45,8 @@ module.exports = function(container, layerNames, makeExtraContent, onSubmit) {
 
 	coordinateSystem = coordinateSystemFieldset.append("textarea")
 	    .classed("coordinate-system", true)
-    	    .attr("placeholder", "assumes Web Mercator if left blank"),
+    	    .attr("placeholder", "assumes Web Mercator if left blank")
+	    .call(noDrag),
 
 	buttonFieldset = content.append("fieldset")
 	    .classed("button-fieldset", true),
