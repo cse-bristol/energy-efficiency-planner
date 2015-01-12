@@ -17,7 +17,7 @@ var a = 'a'.charCodeAt(0),
     /*
      Greedily natch as many hyphens as we can in a row.
      */
-    collapseHyphens = new RegExp("-+");
+    collapseHyphens = new RegExp("-+", "g");
 
 /*
  Make valid HTML ids from arbitrary strings.
@@ -94,6 +94,6 @@ module.exports =  {
 	    i++;
 	}
 
-	return result.join("").replace(collapseHyphens, "g");
+	return result.join("").replace(collapseHyphens, "-");
     }
 };
