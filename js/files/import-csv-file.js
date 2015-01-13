@@ -118,7 +118,6 @@ module.exports = function(container, fileName, data, createLayer) {
 		    right,
 		    
 		    geometry = data.map(function(row) {
-			// TODO remove latColumnVal and lngColumnVal from row before adding it in
 			var lng = asNum(row[lngColumnVal]),
 			    lat = asNum(row[latColumnVal]);
 
