@@ -38,6 +38,11 @@ var transform = function(from, o) {
     };
     
     var obj = function(o) {
+	if (o.forEach) {
+	    o.forEach(function(x) {
+		obj(x);
+	    });
+	}
 	if (o.bbox) {
 	    bbox(o.bbox);
 	}
