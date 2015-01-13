@@ -4,9 +4,11 @@
 
 var _ = require("lodash"),
     d3 = require("d3"),
+    leaflet = require("leaflet"),
     helpers = require("../helpers.js"),
     noDrag = helpers.noDrag,
     isNum = helpers.isNum,
+    asNum = helpers.asNum,
     makeForm = require("./import-file.js");
 
 /*
@@ -50,8 +52,8 @@ module.exports = function(container, fileName, data, createLayer) {
 	    .attr("value", function(d, i) {
 		return d;
 	    })
-	    .attr("enabled", function(d, i) {
-		return d === startColumn;
+	    .attr("selected", function(d, i) {
+		return d === startColumn ? true : null;
 	    })
 	    .text(function(d, i) {
 		return d;
@@ -109,30 +111,54 @@ module.exports = function(container, fileName, data, createLayer) {
 		latColumnVal = latColumn.node().options[
 		    latColumn.node().selectedIndex
 		].value;
-		
-		var geometry = {
-		    type: "GeometryCollection",
-		    geometries: data.map(function(row) {
-			// TODO remove latColumnVal and lngColumnVal from row before adding it in
 
+		var top,
+		    left,
+		    bottom,
+		    right,
+		    
+		    geometry = data.map(function(row) {
+			// TODO remove latColumnVal and lngColumnVal from row before adding it in
+			var lng = asNum(row[lngColumnVal]),
+			    lat = asNum(row[latColumnVal]);
+
+			if (!bottom || lat < bottom) {
+			    bottom = lat;
+			}
+			if (!top || lat > top) {
+			    top = lat;
+			}
+			if (!left || lng < left) {
+			    left = lng;
+			}
+			if (!right || lng > right) {
+			    right = lng;
+			}
+			
 			return {
-			    type: "Point",
-			    coordinates: [
-				row[lngColumnVal],
-				row[latColumnVal]
-			    ],
+			    type: "Feature",
+			    geometry: {
+				type: "Point",
+				coordinates: [
+				    lng,
+				    lat
+				]
+			    },
+			    bbox: [lng, lat, lng, lat],
 			    properties: row
 			};
-		    })
-		};
+		    }),
+		    bbox = [
+			left, bottom, right, top
+		    ];
+		
 		form.projectLayer(geometry);
+		form.projectLayer(bbox);
 		
 		createLayer(
 		    layerNames[0],
-		    geometry
+		    geometry,
+		    bbox
 		);
 	    });
 };
-
-
-
