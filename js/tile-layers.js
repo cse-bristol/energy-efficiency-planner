@@ -117,9 +117,10 @@ module.exports = function(getZoom, errors) {
 			var rect = this.getBoundingClientRect(),
 			    x = d3.event.offsetX ? d3.event.offsetX : d3.event.clientX - rect.left,
 			    y = d3.event.offsetY ? d3.event.offsetY : d3.event.clientY - rect.top,
-			    colourData = cache.getImageData(x, y, 1, 1).data;
+			    colourData = cache.getImageData(x, y, 1, 1).data,
+			    transparent = colourData[3] === 0;
 
-			colourChanged(d3.rgb(colourData[0], colourData[1], colourData[2]));
+			colourChanged(d3.rgb(colourData[0], colourData[1], colourData[2]), transparent);
 		    });
 	    });
 	}

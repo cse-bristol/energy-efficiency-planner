@@ -193,15 +193,22 @@ module.exports = function(container, toolbar, getLayers, getTileLayers, zoomTo) 
 		var status = d3.select(this),
 		    layer = getTileLayers().overlays.get(d);
 		
-		layer.colourChanged(function(colour) {
-		    status.style("background-color", colour);
-		    if (layer.legend) {
-			status.style("color", reverseColour(colour));
-			status.text(layer.legend(colour));
-			if (layer.legend.units) {
-			    status.append("span")
-				.classed("legend-units", true)
-				.html(layer.legend.units);
+		layer.colourChanged(function(colour, transparent) {
+		    if (transparent) {
+			status.style("background-color", null);
+			status.text(null);
+			
+		    } else {
+			status.style("background-color", colour);
+			
+			if (layer.legend) {
+			    status.style("color", reverseColour(colour));
+			    status.text(layer.legend(colour));
+			    if (layer.legend.units) {
+				status.append("span")
+				    .classed("legend-units", true)
+				    .html(layer.legend.units);
+			    }
 			}
 		    }
 		});
