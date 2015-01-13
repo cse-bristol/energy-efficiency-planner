@@ -14,7 +14,7 @@ module.exports = function(container, fileName, shapeFileData, dbfFileData, prjFi
 	},
 	function(layerNames) {
 	    var geometry = geometries.fromShapefile(shapeFileData, dbfFileData);
-	    form.projectLayer(geometry.features);
+	    form.projectLayer(geometry);
 
 	    createLayer(
 		layerNames[0],
