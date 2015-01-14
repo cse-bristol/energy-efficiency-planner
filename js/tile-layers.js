@@ -78,7 +78,11 @@ module.exports = function(getZoom, errors) {
 	nationalHeatMap = leaflet.tileLayer('/heat-map-cdn/Total%20Heat%20Density/Z{z}/{y}/{x}.png', {
 	    attribution: '<a href="http://tools.decc.gov.uk/nationalheatmap/">English National Heat Map</a>,',
 	    minZoom: 2,
-	    maxZoom: 17
+	    maxZoom: 17,
+	    bounds: leaflet.latLngBounds(
+		leaflet.latLng(50, -7),
+		leaflet.latLng(56, 2)
+	    )
 	}),
 
 	overlays = d3.map({
