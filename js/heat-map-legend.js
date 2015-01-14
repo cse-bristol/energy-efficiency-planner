@@ -4,7 +4,10 @@
 
 var d3 = require("d3"),
     _ = require("lodash"),
-    rounded = require("./helpers.js").rounded,
+    helpers = require("./helpers.js"),
+    rounded = helpers.rounded,
+    callbacks = helpers.callbackHandler,
+    legendFactory = require("./tile-legend.js"),
     maxZoom = 17,
     baseUrl = (function() {
 	var a = document.createElement("a");
@@ -13,7 +16,8 @@ var d3 = require("d3"),
     }());
 
 module.exports = function(getZoom, errors) {
-    var legendByZoom = d3.map();
+    var legendByZoom = d3.map(),
+	onLoad = callbacks();
 
     // loop over the zoom levels
     _.range(1, maxZoom + 1).forEach(function(z) {
@@ -23,42 +27,46 @@ module.exports = function(getZoom, errors) {
 		if (error) {
 		    errors.warnUser(error);
 		} else {
-		    var legend = d3.map();
+		    var numbers = [],
+			colours = [];
 
-		    data.legend.forEach(function(range) {
-			var min = rounded(range.min, 2),
-			    max = rounded(range.max, 2);
+		    data.legend.forEach(function(range, i) {
+			if (i === 0) {
+			    numbers.push(
+				rounded(range.min, 2));
+			}
 
-			legend.set(
-			    // Must be American spelling here
-			    range.color, 
-			    min + " to " + max
-			);
+			// Must be American spelling here
+			colours.push(range.color);
+
+			if (rounded(range.min, 2) !== numbers[i]) {
+			    throw new Error("Legend was not continuous.");
+			}
+
+			numbers.push(rounded(range.max, 2));
 		    });
 
-		    legendByZoom.set(z, legend);
+		    legendByZoom.set(z, legendFactory(numbers, colours));
+
+		    onLoad();
 		}
 	    });
     });
 
-    var f = function(colour) {
+    var f = function() {
 	var z = getZoom();
 
 	if (z > maxZoom) {
 	    z = maxZoom;
 	}
 
-	if (legendByZoom.has(z)) {
-	    var legend = legendByZoom.get(z);
-
-	    if (legend.has(colour)) {
-		return legend.get(colour);
-	    }
-	}
-
-	return "n/a";
+	return legendByZoom.has(z) ?
+	    legendByZoom.get(z) :
+	    legendFactory([0], []);
     };
 
     f.units = 'kWh/m<sup>2</sup>/year';
+    f.onLoad = onLoad.add;
+    
     return f;
 };

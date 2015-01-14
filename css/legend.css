@@ -1,0 +1,29 @@
+#legend {
+    left: 0.6em;
+    top: calc(100% - 10em);
+    background-color: white;
+    z-index: 10;
+    width: 35em;
+}
+
+.tile-legend {
+    padding: 0.5em;
+}
+
+.legend-label {
+    padding: 0.5em;
+    font-size: small;
+    font-weight: bold;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    
+}
+
+.legend-chart {
+    padding-left: 0.4em;
+}
+
+.legend-chart text {
+    font-size: xx-small;
+}

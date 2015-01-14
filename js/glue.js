@@ -16,6 +16,7 @@ var d3 = require("d3"),
     menuBar = body.append("div").classed("file-menu", true),
     update = function() {
 	layerControl.update();
+	legend.update();
 	paint.redrawAll();
     },
     
@@ -40,6 +41,7 @@ var d3 = require("d3"),
     ),    
     state = require("./state.js")(errors, map, toolbar, tableForLayer, update),
     dataTransfer = require("./data-transfer.js")(errors, state.fresh),
+    legend = require("./legend.js")(body, toolbar, state.getLayers, state.getTileLayers),
     layerControl = require("./layer-control.js")(body, toolbar, state.getLayers, state.getTileLayers, map.zoomTo),    
     menu = require("multiuser-file-menu")(
 	"maps",

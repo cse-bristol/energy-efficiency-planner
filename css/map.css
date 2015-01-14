@@ -258,20 +258,6 @@ th.reverse:before {
     font-size: large;
 }
 
-.tile-overlay-status {
-    display: inline-block;
-    width: 7.6em;
-    margin: 0.2em;
-    padding: 0.1em;
-    vertical-align: top;
-    font-size: small;
-}
-
-.legend-units {
-    font-size: x-small;
-    display: block;
-}
-
 .choose-colour.element-visible {
     outline: thin solid black;
 }
