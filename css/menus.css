@@ -1,0 +1,22 @@
+.file-menu {
+    position: absolute;
+    top: 0.6em;
+    left: 3em;
+    z-index: 1;
+}
+
+#toolbar {
+    opacity: 0.6;
+    position: absolute;
+    top: 5em;
+    left: 0.6em;
+    z-index: 1;
+}
+
+#toolbar .open-button {
+    display: block;
+}
+
+#toolbar:hover {
+    opacity: 1.0;
+}

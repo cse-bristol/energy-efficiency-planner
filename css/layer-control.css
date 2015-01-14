@@ -1,0 +1,65 @@
+#layer-control {
+    left: calc(100% - 18em);
+    width: 15em;
+    top: 3em;
+    background: white;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    padding-left: 0.5em;
+    z-index: 1;    
+}
+
+#layer-control label {
+    display: block;
+    cursor: pointer;
+}
+
+#layer-control form {
+    border-bottom: thin dotted grey;
+}
+
+#layer-control form:last-child {
+    border-bottom: none;
+}
+
+.shape-layer-delete {
+    float: right;
+    cursor: pointer;
+    font-family: monospace;
+}
+
+.shape-layer-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+    width: calc(100% - 1em);
+    float: left;
+}
+
+.shape-layer-name:hover {
+    text-decoration: underline;
+}
+
+.shape-layer-name.disabled {
+    text-decoration: none;
+    color: grey;
+    pointer-events: none;
+}
+
+.shape-overlay-control .open-button {
+    margin-left: 0.3em;
+    width: 1em;
+    vertical-align: top;
+    display: inline-block;
+    font-size: large;
+}
+
+.choose-colour.element-visible {
+    outline: thin solid black;
+}
+
+.colour-picker {
+    top: 3em;
+    left: calc(100% - 33em);
+}

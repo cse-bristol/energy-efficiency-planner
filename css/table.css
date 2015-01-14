@@ -1,0 +1,91 @@
+.results {
+    text-align: right;
+    left: 5em;
+    top: 12em;
+    max-width: 70vw;
+    max-height: 70vh;
+    font-size: x-small;
+    background-color: #F0F0F0;
+    z-index: 1;    
+}
+
+.results .resize-dialogue {
+    background-color: #F0F0F0;
+}
+
+.results .close-button {
+    background-color: #F0F0F0;
+}
+
+.results .content {
+    height: 100%;
+    padding: 0.5em 0.5em 0 0.5em;
+}
+
+.results-table {
+    display:block;
+    height: 100%;
+    overflow: hidden;
+}
+
+.results-table thead {
+    display: block;
+    border-bottom: 1px solid gray;
+    margin-bottom: 0.1em;
+}
+
+.results-table tbody {
+    display: block;
+    overflow: auto;
+    height: calc(100% - 4em);
+}
+
+.extra-row {
+    background-color: lightblue;
+}
+
+.results-table thead tr th {
+    padding: 0.1em 0.4em 0.1em 0.4em;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.results-table tbody tr td {
+    cursor: pointer;
+    padding: 0.1em 0.4em 0.1em 0.4em;
+}
+
+th.sorted:before {
+    content: "↑";
+    font-family: monospace;
+}
+
+th.reverse:before {
+    content: "↓";
+    font-family: monospace;
+}
+
+.results thead tr th:hover {
+    background-color: LightSlateGray;
+}
+
+.results tbody tr:hover {
+    background-color: LightSteelBlue;
+}
+
+.results tbody tr td:hover {
+    background-color: LightSlateGray;
+}
+
+.selected {
+    outline: 1px solid red;
+}
+
+.reset-results {
+    position: absolute;
+    bottom: 0.5em;
+    left: 0.5em;
+    font-family: monospace;
+    font-weight: bold;
+    cursor: pointer;
+}
