@@ -3,6 +3,7 @@
 /*global module, require*/
 
 var float = require("floating-dialogue"),
+    asId = require("./id-maker.js").fromString,
     colourBarWidth = 40,
     colourBarHeight = 5;
 
@@ -15,16 +16,15 @@ var float = require("floating-dialogue"),
  */
 module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
 
-    var content = container.append("div")
-	    .attr("id", "legend"),
-
-	dialogue = float(content)
+    var dialogue = float(
+	container.append("div")
+	    .attr("id", "legend"))
 	    .close()
 	    .drag()
 	    .resize(),    
 	
 	redraw = function() {
-	    var tileDivs = content.selectAll("div.tile-legend")
+	    var tileDivs = dialogue.content().selectAll("div.tile-legend")
 		    .data(
 			getTileLayers().overlays
 			    .values()
@@ -39,13 +39,37 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
 		    );
 
 	    tileDivs.exit().remove();
-	   var newTileDivs =  tileDivs.enter().append("div")
-		   .classed("tile-legend", true)
-		   .each(function(tileLayer, i) {
-		       if (tileLayer.legend && tileLayer.legend.onLoad) {
-			   tileLayer.legend.onLoad(redraw);
-		       }
-		   });
+	    
+	    var newTileDivs =  tileDivs.enter().append("div")
+		    .classed("tile-legend", true)
+		    .attr("id", function(tileLayer, i) {
+			return "tile-legend-" +
+			    asId(
+				tileLayer.name());
+		    })
+		    .each(function(tileLayer, i) {
+			if (tileLayer.legend && tileLayer.legend.onLoad) {
+			    tileLayer.legend.onLoad(redraw);
+			    var name = asId(tileLayer.name());
+
+			    tileLayer.colourChanged(function(colour) {
+				var colourIndex = tileLayer.legend().colourIndex(colour),
+				    tileDiv = dialogue.content().selectAll("#tile-legend-" + name);
+
+				if (!tileDiv.empty()) {
+
+				    tileDiv
+					.select("svg.legend-chart")
+					.selectAll("rect")
+					.attr("stroke", function(colour, i) {
+					    return i === colourIndex ?
+						"black" :
+						"none";
+					});
+				}
+			    });
+			}
+		    });
 
 	    newTileDivs
 		.append("div")
@@ -89,14 +113,14 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
 
 	    tileLegendColours.exit().remove();
 	    tileLegendColours.enter().append("rect")
-	    	    .attr("x", function(d, i) {
-			return i * (colourBarWidth + 1);
-		    })
-	    	    .attr("width", colourBarWidth)
-		    .attr("height", colourBarHeight)
-		    .attr("fill", function(colour, i) {
-			return colour;
-		    });
+	    	.attr("x", function(d, i) {
+		    return i * (colourBarWidth + 1);
+		})
+	    	.attr("width", colourBarWidth)
+		.attr("height", colourBarHeight)
+		.attr("fill", function(colour, i) {
+		    return colour;
+		});
 
 	    var tileLegendText = tileSVG
 		    .selectAll("text")
@@ -116,17 +140,15 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
 		.attr("width", colourBarWidth)
 		.attr("height", colourBarHeight)
 		.attr("text-anchor", "middle")
-		.attr("x", function(text, i) {
-		    return i * (colourBarWidth + 1);
-		})
 		.attr("y", colourBarHeight + 10)
 		.text(function(text, i) {
 		    return text;
 		});
 
-	    // when we hover over a pixel, highlight the correct bit of the legend: tileDivs.enter().each()? Need a way to unhook this afterwards?
-	    
-	    // for shapes, we have a range, which we will turn into a map via the magic of binning.
+	    tileLegendText
+	    	.attr("x", function(text, i) {
+		    return i * (colourBarWidth + 1);
+		});
 	};
 
     toolbar.add("l", dialogue);

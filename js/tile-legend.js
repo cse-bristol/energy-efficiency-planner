@@ -20,7 +20,7 @@ module.exports = function(numbers, colours) {
 	},
 	
 	colourIndex: function(colour) {
-	    return colours.indexOf(colour);
+	    return colours.indexOf(colour.toString());
 	},
 
 	numbers: function() {
