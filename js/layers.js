@@ -127,7 +127,8 @@ module.exports = function(errors) {
 	    var name = idMaker.fromString(namePreference),
 		onSetOpacity = callbacks(),
 		onSetZIndex = callbacks(),
-		onRemove = callbacks();
+		onRemove = callbacks(),
+		anyPoints;
 
 	    fixGeometryNames(geometry);
 
@@ -142,6 +143,48 @@ module.exports = function(errors) {
 
 		geometry : function() {
 		    return geometry;
+		},
+		
+		/*
+		 Does this layer container any Points. This is useful, because it means we can know whether we should present the user with the option to scale these based on data.
+		 */
+		anyPoints: function() {
+		    if (anyPoints === undefined) {
+			var checkGeom = function(o) {
+			    if (o.type) {
+				switch(o.type) {
+				case "Point":
+				case "MultiPoint":
+				    anyPoints = true;
+				    break;
+				default:
+				    // noop
+				}
+			    }
+
+			    if (o.length) {
+				o.forEach(function(x) {
+				    checkGeom(x);
+				});
+			    }
+
+			    if (o.features) {
+				checkGeom(o.features);
+			    }
+
+			    if (o.geometries) {
+				checkGeom(o.geometries);
+			    }
+
+			    if (o.geometry) {
+				checkGeom(o.geometry);
+			    }
+			};
+
+			checkGeom(geometry);
+		    }
+
+		    return anyPoints;
 		},
 
 		enabled : true,
