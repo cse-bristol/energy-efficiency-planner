@@ -25,7 +25,12 @@ module.exports = {
     },
     rounded: function(maybeNumber, precision) {
 	if (module.exports.isNum(maybeNumber)) {
-	    return (+maybeNumber).toPrecision(precision ? precision : 5);
+	    // parseFloat eliminates scientific e notation.
+	    return parseFloat(
+		// the leading + coerces numbers from strings
+		(+maybeNumber)
+		    .toPrecision(precision ? precision : 5)
+	    );
 	} else {
 	    return maybeNumber;
 	}
