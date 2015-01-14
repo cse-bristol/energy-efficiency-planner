@@ -8,7 +8,7 @@
 	"d3": "3.4.13"
 	,"topojson": "1.6.18"
 	,"leaflet": "0.7.3"
-	,"leaflet-control-geocoder": "0.2.1"
+	,"leaflet-control-geocoder": "1.0.0"
 	,"proj4": "2.2.2"
 	,"lodash": "2.4.1"
 	,"slippy-colors": "0.0.1"
