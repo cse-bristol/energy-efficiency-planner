@@ -7,7 +7,8 @@ var d3 = require("d3"),
     callbacks = helpers.callbackHandler,
     worksheetFactory = require("./table/worksheet.js")(),
     resultsTableFactory = require("./table/results-table.js"),
-    idMaker = require("./id-maker.js");
+    idMaker = require("./id-maker.js"),
+    legendFactory = require("./legend-data.js");
 
 /*
  A collection of shape (GeoJSON vector) layers which will be drawn as map overlays.
@@ -217,13 +218,22 @@ module.exports = function(errors) {
 		    }
 		},
 
+		legend: function() {
+		    var labels = l.worksheet.sortPropertyBins(10);
+		    
+		    return legendFactory(
+			labels,
+			labels.map(l.worksheet.colourFun())
+		    );		    
+		},
+
 		worksheet: worksheetFactory(geometry),
 		resultsTable: resultsTableFactory(),
 
 		onSetOpacity: onSetOpacity.add,
 		onSetZIndex: onSetZIndex.add,
 		onRemove: onRemove.add
-	    };	    
+	    };
 
 	    geometry.forEach(function(g){
 		g.layer = l;

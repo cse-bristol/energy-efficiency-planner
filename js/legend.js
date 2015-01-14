@@ -2,7 +2,9 @@
 
 /*global module, require*/
 
-var float = require("floating-dialogue"),
+var d3 = require("d3"),
+    float = require("floating-dialogue"),
+    helpers = require("./helpers.js"),
     asId = require("./id-maker.js").fromString,
     colourBarWidth = 40,
     colourBarHeight = 5;
@@ -21,89 +23,33 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
 	    .attr("id", "legend"))
 	    .close()
 	    .drag()
-	    .resize(),    
-	
-	redraw = function() {
-	    var tileDivs = dialogue.content().selectAll("div.tile-legend")
-		    .data(
-			getTileLayers().overlays
-			    .values()
-			    .filter(
-				function(tileLayer) {
-				    return tileLayer.options.opacity > 0;
-				}
-			    ),
-			function(tileLayer) {
-			    return tileLayer.name();
-			}
-		    );
+	    .resize()
+	    .hide()
+	    .bringToFront(),
 
-	    tileDivs.exit().remove();
-	    
-	    var newTileDivs =  tileDivs.enter().append("div")
-		    .classed("tile-legend", true)
-		    .attr("id", function(tileLayer, i) {
-			return "tile-legend-" +
-			    asId(
-				tileLayer.name());
-		    })
-		    .each(function(tileLayer, i) {
-			if (tileLayer.legend && tileLayer.legend.onLoad) {
-			    tileLayer.legend.onLoad(redraw);
-			    var name = asId(tileLayer.name());
-
-			    tileLayer.colourChanged(function(colour) {
-				var colourIndex = tileLayer.legend().colourIndex(colour),
-				    tileDiv = dialogue.content().selectAll("#tile-legend-" + name);
-
-				if (!tileDiv.empty()) {
-
-				    tileDiv
-					.select("svg.legend-chart")
-					.selectAll("rect")
-					.attr("stroke", function(colour, i) {
-					    return i === colourIndex ?
-						"black" :
-						"none";
-					});
-				}
-			    });
-			}
-		    });
-
-	    newTileDivs
-		.append("div")
-		.classed("legend-label", true)
-		.html(function(tileLayer, i) {
-		    return tileLayer.name() + (
-			tileLayer.legend ?
-			    " (" + tileLayer.legend.units + ")" :
-			    ""
-		    );
-		});
-	    
-	    newTileDivs
+	makeLegends = function(selection, newSelection) {
+	    newSelection
 		.append("svg")
 		.classed("legend-chart", true)
 		.attr("height", colourBarHeight + 13);
 
 
-	    var tileSVG = tileDivs.selectAll("svg.legend-chart")
-		    .attr("width", function(tileLayer) {
-			if (tileLayer.legend) {
-			    return colourBarWidth * tileLayer.legend().colours().length;
+	    var svg = selection.selectAll("svg.legend-chart")
+		    .attr("width", function(layer, i) {
+			if (layer.legend) {
+			    return colourBarWidth * layer.legend().colours().length;
 			}
 			
 			return null;
 		    });
 
 
-	    var tileLegendColours = tileSVG
+	    var legendColours = svg
 		    .selectAll("rect")
 		    .data(
-			function(tileLayer, i) {
-			    return tileLayer.legend ?
-				tileLayer.legend().colours() :
+			function(layer, i) {
+			    return layer.legend ?
+				layer.legend().colours() :
 				[];
 			},
 			function(colour) {
@@ -111,8 +57,8 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
 			}
 		    );
 
-	    tileLegendColours.exit().remove();
-	    tileLegendColours.enter().append("rect")
+	    legendColours.exit().remove();
+	    legendColours.enter().append("rect")
 	    	.attr("x", function(d, i) {
 		    return i * (colourBarWidth + 1);
 		})
@@ -122,12 +68,12 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
 		    return colour;
 		});
 
-	    var tileLegendText = tileSVG
+	    var legendText = svg
 		    .selectAll("text")
 		    .data(
-			function(tileLayer, i) {
-			    return tileLayer.legend ?
-				tileLayer.legend().numbers() :
+			function(layer, i) {
+			    return layer.legend ?
+				layer.legend().labels() :
 				[];
 			},
 			function(number) {
@@ -135,8 +81,8 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
 			}
 		    );
 
-	    tileLegendText.exit().remove();
-	    tileLegendText.enter().append("text")
+	    legendText.exit().remove();
+	    legendText.enter().append("text")
 		.attr("width", colourBarWidth)
 		.attr("height", colourBarHeight)
 		.attr("text-anchor", "middle")
@@ -145,10 +91,86 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
 		    return text;
 		});
 
-	    tileLegendText
+	    legendText
 	    	.attr("x", function(text, i) {
-		    return i * (colourBarWidth + 1);
+		    var layer = d3.select(this.parentNode).datum(),
+			offset = layer.legend().isBoundary() ? 0 : 0.5;
+		    
+		    return (i + offset) * (colourBarWidth + 1);
 		});
+	},
+
+	makeLegendsForLayers = function(className, layers, hookNewDivs) {
+	    var divs = dialogue.content().selectAll("div." + className)
+		    .data(
+			layers.filter(
+			    function(layer) {
+				return layer.options.opacity > 0;
+			    }
+			),
+			function(layer) {
+			    return layer.name();
+			}
+		    );
+
+	    divs.exit().remove();
+
+	    var newDivs = divs.enter().append("div")
+		    .classed(className, true)
+		    .attr("id", function(layer, i) {
+			return className + "-" + asId(layer.name());
+		    })
+		    .each(hookNewDivs);
+
+	    newDivs.append("div")
+		.classed("legend-label", true)
+		.html(function(layer, i) {
+		    return layer.name() + (
+			layer.legend && layer.legend.units ?
+			    " (" + layer.legend.units + ")" :
+			    ""
+		    );
+		});
+
+	    makeLegends(divs, newDivs);	    
+	},
+	
+	redraw = function() {
+	    makeLegendsForLayers(
+		"tile-legend",
+		getTileLayers().overlays.values(),
+		function(tileLayer, i) {
+		    if (tileLayer.legend && tileLayer.legend.onLoad) {
+			tileLayer.legend.onLoad(redraw);
+			var name = asId(tileLayer.name());
+
+			tileLayer.colourChanged(function(colour) {
+			    var colourIndex = tileLayer.legend().colourIndex(colour),
+				tileDiv = dialogue.content().selectAll("#tile-legend-" + name);
+
+			    if (!tileDiv.empty()) {
+
+				tileDiv
+				    .select("svg.legend-chart")
+				    .selectAll("rect")
+				    .attr("stroke", function(colour, i) {
+					return i === colourIndex ?
+					    "black" :
+					    "none";
+				    });
+			    }
+			});
+		    }		    
+		}
+	    );
+	    
+	    makeLegendsForLayers(
+	    	"shape-legend",
+	    	getShapeLayers().sortedByZ(),
+	    	function(shapeLayer, i) {
+	    	    // TODO set up all my hover and click behaviours
+	    	}
+	    );
 	};
 
     toolbar.add("l", dialogue);

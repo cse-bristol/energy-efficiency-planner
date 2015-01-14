@@ -5,7 +5,10 @@
 var d3 = require("d3"),
     _ = require("lodash"),
     colour = require("../colour.js"),
-    callbacks = require("../helpers.js").callbackHandler;
+    helpers = require("../helpers.js"),
+    callbacks = helpers.callbackHandler,
+    isNum = helpers.isNum,
+    bin = helpers.bin;
 
 var shapeHeaders = function(shapeData) {
     var headers = ["id"];
@@ -37,6 +40,7 @@ module.exports = function() {
 	    sortPropertyChanged = callbacks(),
 	    baseColourChanged = callbacks(),
 	    baseColour = nextColour(),
+	    propertyIsNum = d3.map(),
 	    sortColour = "black",
 	    /* Cache the colour funciton for this layer. Expires when the sort property changes. */
 	    colourFun;
@@ -68,6 +72,18 @@ module.exports = function() {
 		}
 
 		return colourFun;
+	    },
+
+	    colourFun: function() {
+		var f = m.colour();
+
+		if (typeof(f) === "string") {
+		    return function(data) {
+			return f;
+		    };
+		} else {
+		    return f;
+		};
 	    },
 
 	    shapeColour: function() {
@@ -156,6 +172,48 @@ module.exports = function() {
 
 	    headers: function() {
 		return headers;
+	    },
+
+	    /*
+	     Looks at the first sort property.
+
+	     If it's categorical, returns all the unique data for it.
+
+	     If it's numerical, returns bins for a histogram.
+	     */
+	    sortPropertyBins: function(bins) {
+		if (!bins) {
+		    throw new Error("bins parameter must be specified");
+		}
+		
+		if (sortProperties.length === 0) {
+		    return [""];
+		} else {
+		    var p = sortProperties[0],
+			columnData = _.flatten(
+			    m.data([p])
+			);
+		    
+		    if (!propertyIsNum.has(p)) {
+			propertyIsNum.set(
+			    p,
+			    _.all(columnData, isNum)
+			);
+		    }
+
+		    if (propertyIsNum.get(p)) {
+			
+			
+			return bin(
+			    _.min(columnData),
+			    _.max(columnData),
+			    bins
+			);
+			
+		    } else {
+			return _.uniq(columnData);
+		    }
+		}
 	    },
 
 	    sortPropertyChanged: sortPropertyChanged.add,

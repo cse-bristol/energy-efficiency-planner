@@ -5,9 +5,8 @@
 var d3 = require("d3"),
     _ = require("lodash"),
     helpers = require("./helpers.js"),
-    rounded = helpers.rounded,
     callbacks = helpers.callbackHandler,
-    legendFactory = require("./tile-legend.js"),
+    legendFactory = require("./legend-data.js"),
     maxZoom = 17,
     baseUrl = (function() {
 	var a = document.createElement("a");
@@ -32,18 +31,13 @@ module.exports = function(getZoom, errors) {
 
 		    data.legend.forEach(function(range, i) {
 			if (i === 0) {
-			    numbers.push(
-				rounded(range.min, 2));
+			    numbers.push(range.min);
 			}
 
 			// Must be American spelling here
 			colours.push(range.color);
 
-			if (rounded(range.min, 2) !== numbers[i]) {
-			    throw new Error("Legend was not continuous.");
-			}
-
-			numbers.push(rounded(range.max, 2));
+			numbers.push(range.max);
 		    });
 
 		    legendByZoom.set(z, legendFactory(numbers, colours));

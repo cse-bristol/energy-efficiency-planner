@@ -2,7 +2,8 @@
 
 /*global require, module*/
 
-var d3 = require("d3");
+var d3 = require("d3"),
+    _ = require("lodash");
 
 module.exports = {
     toArray: function(pseudoArray) {
@@ -81,5 +82,15 @@ module.exports = {
 	.on("dragend", function(d, i) {
 	    d3.event.sourceEvent.stopPropagation();
 	}),
-    noop: function() {}
+    noop: function() {},
+    bin: function(min, max, bins) {
+	min = module.exports.asNum(min);
+	max = module.exports.asNum(max);
+	
+	return _.range(
+	    min,
+	    max,
+	    (min + max) / bins
+	);
+    }
 };
