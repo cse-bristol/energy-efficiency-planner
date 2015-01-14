@@ -79,6 +79,7 @@ menu.buildMenu(menuBar, [
 ]);
 
 map.onViewReset(paint.redrawAll);
+map.onViewReset(legend.update);
 
 var fileImportDialogue = require("./files/import-dialogue.js")(
     toolbar,
