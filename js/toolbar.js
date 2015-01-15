@@ -13,8 +13,7 @@ var d3 = require("d3"),
  */
 module.exports = function(container) {
     var el = container.append("div").attr("id", "toolbar"),
-	tools = d3.map(),
-	onVisibilityChanged = callbacks();
+	tools = d3.map();
 
     return {
 	add: function(toolText, dialogue) {
@@ -22,38 +21,70 @@ module.exports = function(container) {
 
 	    dialogue.open(icon);
 	    tools.set(toolText, dialogue);
+	},
 
-	    dialogue.onVisibilityChanged(function(visibility) {
-		onVisibilityChanged(toolText, visibility);
+	get: function(toolText) {
+	    return tools.get(toolText);
+	},
+
+	forEach: function(action) {
+	    tools.forEach(action);
+	},
+
+	has: function(toolText) {
+	    return tools.has(toolText);
+	},
+
+	/*
+	 getState and setState convert to and from a snapshot of the tools' current positions, sizes and visibilities.
+
+	 Normally we wouldn't have state and presentation mixed up in one class, but in this case it's helpful as it allows us to persist the position of the tools between clicks of the 'new' button.
+	 */
+	getState: function() {
+	    var s = {};
+
+	    tools.forEach(function(toolText, dialogue) {
+		var toolState = {
+		    visible: dialogue.visible()
+		};
+
+		if (dialogue.manuallySized) {
+		    toolState.size = dialogue.size();
+		}
+
+		if (dialogue.manuallyPositioned) {
+		    toolState.position = dialogue.position();
+		}
+		
+		s[toolText] = toolState;
 	    });
+
+	    return s;
 	},
 
-	visibility: function() {
-	    var r = {};
+	setState: function(state) {
+	    Object.keys(state).forEach(function(toolText) {
+		if (tools.has(toolText)) {
+		    var toolState = state[toolText],
+			dialogue = tools.get(toolText);
 
-	    tools.forEach(function(key, value) {
-		r[key] = value.visible();
+		    if (toolState.visible!== undefined) {
+			if (toolState.visible) {
+			    dialogue.show();
+			} else {
+			    dialogue.hide();
+			}
+		    }
+
+		    if (toolState.size !== undefined) {
+			dialogue.size(toolState.size);
+		    }
+
+		    if (toolState.position !== undefined) {
+			dialogue.position(toolState.position);
+		    }
+		}
 	    });
-
-	    return r;
-	},
-
-	onVisibilityChanged: onVisibilityChanged.add,
-
-	show: function(toolText) {
-	    if (tools.has(toolText)) {
-		tools.get(toolText).show();
-	    } else {
-		throw new Error("Unknown tool " + toolText);
-	    }
-	},
-
-	hide: function(toolText) {
-	    if (tools.has(toolText)) {
-		tools.get(toolText).hide();
-	    } else {
-		throw new Error("Unknown tool " + toolText);
-	    }
 	}
     };
 };

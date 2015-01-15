@@ -49,7 +49,7 @@ module.exports = function(
 	state.getLayers, data.deserializeShapeSort, data.deserializeShapeLayer,
 	state.getTileLayers,
 	state.getViewport, data.deserializeViewport,
-	toolbar.show, toolbar.hide
+	toolbar
     );
     
     onReadOp(function(op) {

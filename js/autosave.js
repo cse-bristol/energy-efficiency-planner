@@ -134,15 +134,25 @@ module.exports = function(writeOp, canWrite, onStateReplaced, getTileLayers, get
 		oi: serializeViewport(viewport)
 	    });
 	});
-    };
+    },
 
-    toolbar.onVisibilityChanged(function(toolText, visible) {
-	writeOp({
-	    p: ["tools", toolText],
-	    oi: visible
-	});
+    hookToolbar = hook(
+	["tools"]
+    );
+    
+    toolbar.forEach(function(toolText, dialogue) {
+	var toolHook = hookToolbar.p(toolText);
+
+	dialogue.onVisibilityChanged(
+	    toolHook.p("visible"));
+	
+	dialogue.onSizeChanged(
+	    toolHook.p("size").delay());
+	
+	dialogue.onPositionChanged(
+	    toolHook.p("position").delay());
     });
-
+   
     onStateReplaced(function() {
 	hookTileLayers(getTileLayers());
 	hookShapeLayers(getLayers());

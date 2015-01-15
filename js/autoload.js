@@ -16,7 +16,9 @@ module.exports = function(
     getShapeLayers, deserializeShapeSort, deserializeShapeLayer,
     getTileLayers,
     getViewport, deserializeViewport,
-    showTool, hideTool) {
+    toolbar
+)
+{
     
     var readOp = function(op) {
 	switch(op.p[0]) {
@@ -33,7 +35,7 @@ module.exports = function(
 	    break;
 
 	case "tools":
-	    readToolVisibility(op.p[1], op.oi);
+	    readTools(op);
 	    break;
 	    
 	default:
@@ -138,13 +140,37 @@ module.exports = function(
 		throw new Error("Unknown shape table property " + prop);
 	    }
 	},
+
+	readTools = function(op) {
+	    var toolText = op.p[1];
+
+	    if (toolbar.has(toolText)) {
+		var tool = toolbar.get(toolText);
+		
+		switch(op.p[2]) {
+		case "visible":
+		    readToolVisibility(tool, op.oi);
+		    break;
+		case "size":
+		    tool.size(op.oi);
+		    break;
+		case "position":
+		    tool.position(op.oi);
+		    break;
+		default:
+		    throw new Error("Unknown tool property " + op.p[2]);
+		}
+	    } else {
+		// No-op, this tool no longer exists in the code.
+	    }
+	},
 	
 	readToolVisibility = function(tool, visible) {
 	    if (visible === true) {
-		showTool(tool);
+		tool.show();
 		
 	    } else if (visible === false) {
-		hideTool(tool);
+		tool.hide();
 		
 	    } else {
 		throw new Error("Unknown tool operation " + visible);

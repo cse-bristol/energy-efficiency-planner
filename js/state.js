@@ -29,10 +29,10 @@ module.exports = function(errors, map, toolbar, tableForLayer, update) {
 		viewport: viewportFactory(),
 
 		tools: {
-		    "L": true,
-		    "!": false,
-		    "I": false,
-		    "l": false
+		    "L": {visibility: true},
+		    "!": {visibility: false},
+		    "I": {visibility: false},
+		    "l": {visibility: false}
 		}
 	    };
 	},
@@ -53,7 +53,7 @@ module.exports = function(errors, map, toolbar, tableForLayer, update) {
 		layers: layers,
 		tileLayers: tileLayers,
 		viewport: viewport,
-		tools: toolbar.visibility()
+		tools: toolbar.getState()
 	    };
 	},
 
@@ -111,18 +111,9 @@ module.exports = function(errors, map, toolbar, tableForLayer, update) {
 
 		layers.onReorder(update);
 
-		Object.keys(state.tools)
-		    .forEach(function(tool) {
-			var vis = state.tools[tool];
-
-			if (vis !== undefined) {
-			    if (vis) {
-				toolbar.show(tool);
-			    } else {
-				toolbar.hide(tool);
-			    }
-			}
-		    });
+		if (state.tools) {
+		    toolbar.setState(state.tools);
+		}
 
 		viewport = state.viewport;
 		

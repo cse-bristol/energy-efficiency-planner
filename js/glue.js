@@ -67,6 +67,15 @@ var d3 = require("d3"),
 	menu.spec.button
     );
 
+require("./files/import.js")(
+    toolbar,
+    body,
+    state,
+    fetchLayers.save,
+    update,
+    errors
+);
+
 menu.buildMenu(menuBar, [
     require("./load-layer-button.js")(
 	fetchLayers.collection,
@@ -87,13 +96,4 @@ require("./autosave-and-autoload.js")(
     state,
     dataTransfer,
     toolbar
-);
-
-require("./files/import.js")(
-    toolbar,
-    body,
-    state,
-    fetchLayers.save,
-    update,
-    errors
 );
