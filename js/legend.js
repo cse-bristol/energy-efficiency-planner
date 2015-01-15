@@ -100,8 +100,8 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
 		});
 	},
 
-	makeLegendsForLayers = function(className, layers, hookNewDivs) {
-	    var divs = dialogue.content().selectAll("div." + className)
+	makeLegendsForLayers = function(container, className, layers, hookNewDivs) {
+	    var divs = container.selectAll("div." + className)
 		    .data(
 			layers.filter(
 			    function(layer) {
@@ -132,11 +132,20 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
 		    );
 		});
 
-	    makeLegends(divs, newDivs);	    
+	    divs.sort();
+
+	    makeLegends(divs, newDivs);
 	},
+
+	tileLegends = dialogue.content().append("div")
+	    .attr("id", "tile-legends"),
+
+	shapeLegends = dialogue.content().append("div")
+	    .attr("id", "shape-legends"),
 	
 	redraw = function() {
 	    makeLegendsForLayers(
+		tileLegends,
 		"tile-legend",
 		getTileLayers().overlays.values(),
 		function(tileLayer, i) {
@@ -165,8 +174,9 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
 	    );
 	    
 	    makeLegendsForLayers(
+		shapeLegends,
 	    	"shape-legend",
-	    	getShapeLayers().sortedByZ(),
+	    	getShapeLayers().sortedByZ().reverse(),
 	    	function(shapeLayer, i) {
 	    	    // TODO set up all my hover and click behaviours
 	    	}
