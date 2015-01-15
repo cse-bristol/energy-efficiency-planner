@@ -100,6 +100,17 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
 		});
 	},
 
+	getColouringPropertyText = function(layer) {
+	    if (layer.worksheet) {
+		var props = layer.worksheet.getSortProperties().properties;
+		if (props[0]) {
+		    return " (" + props[0] + ")";
+		}
+	    }
+
+	    return "";
+	},
+
 	makeLegendsForLayers = function(container, className, layers, hookNewDivs) {
 	    var divs = container.selectAll("div." + className)
 		    .data(
@@ -123,16 +134,21 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
 		    .each(hookNewDivs);
 
 	    newDivs.append("div")
-		.classed("legend-label", true)
+	    	.classed("legend-label", true);
+
+	    divs.selectAll("div.legend-label")
 		.html(function(layer, i) {
-		    return layer.name() + (
-			layer.legend && layer.legend.units ?
-			    " (" + layer.legend.units + ")" :
-			    ""
-		    );
+		    return layer.name() +
+			(
+			    layer.legend && layer.legend.units ?
+				" (" + layer.legend.units + ")" :
+				""
+			) +
+			getColouringPropertyText(layer);
 		});
 
-	    divs.sort();
+	    divs
+		.sort();
 
 	    makeLegends(divs, newDivs);
 	},
