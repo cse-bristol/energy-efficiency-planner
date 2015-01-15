@@ -2,47 +2,38 @@
 
 /*global module, require*/
 
-var floatDialogue = require("floating-dialogue"),
-    importCSV = require("./import-csv-file.js"),
-    importShapefile = require("./import-shapefile.js"),
-    importTopoJSON = require("./import-topojson.js");
+var floatDialogue = require("floating-dialogue");
 
 /*
  Lets us import shape layers from a variety of file formats.
  */
-module.exports = function(toolbar, container, getLayers, saveLayerGeometry, refresh) {
-    var content = container.append("div")
-    	    .attr("id", "import-dialogue"),
-
-	dialogue = floatDialogue(content)
+module.exports = function(toolbar, container, handlers) {
+    var dialogue = floatDialogue(
+	container.append("div")
+    	    .attr("id", "import-dialogue")
+    )
 	    .drag(),
 
-	go = function() {
-	    dialogue.show();
-	    refresh();
-	},
-
-	addLayer = function(name, geometry, bbox) {
-	    var layer = getLayers().create(name, geometry, bbox);
-	    saveLayerGeometry(layer);
-	};
+	filePicker = dialogue.content().append("input")
+	    .attr("type", "file")
+	    .attr("multiple", true)
+	    .attr("accept", ".csv,.tsv,.json,.shp,.dbf,.prj")
+	    .attr("id", "import-file-picker")
+	    .on("change", function(d, i) {
+		handlers(
+		    Array.prototype.slice.call(this.files)
+		);
+	    });
 
     toolbar.add("I", dialogue);
     
     return {
-	csv: function(name, csvFileData) {
-	    importCSV(content, name, csvFileData, addLayer);
-	    go();
+	content: function() {
+	    return dialogue.content();
 	},
 
-	shapefile: function(name, shapeFileData, dbfFileData, prjFileData) {
-	    importShapefile(content, name, shapeFileData, dbfFileData, prjFileData, addLayer);
-	    go();
-	},
-
-	topojson: function(name, topojsonData) {
-	    importTopoJSON(content, name, topojsonData, addLayer);
-	    go();
+	show: function() {
+	    return dialogue.show();
 	}
     };
 };

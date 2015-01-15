@@ -81,22 +81,19 @@ menu.buildMenu(menuBar, [
 map.onViewReset(paint.redrawAll);
 map.onViewReset(legend.update);
 
-var fileImportDialogue = require("./files/import-dialogue.js")(
-    toolbar,
-    body,
-    state.getLayers,
-    fetchLayers.save,
-    update
-),
-    handlers = require("./files/file-handlers.js")(
-	errors, 
-	fileImportDialogue
-    );
-require("./files/file-drop.js")(d3.select("body"), errors, handlers);
 require("./autosave-and-autoload.js")(
     menu.store.writeOp,
     menu.store.onOp,
     state,
     dataTransfer,
     toolbar
+);
+
+require("./files/import.js")(
+    toolbar,
+    body,
+    state,
+    fetchLayers.save,
+    update,
+    errors
 );

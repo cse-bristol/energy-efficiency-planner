@@ -1,11 +1,11 @@
 "use strict";
 
-/*global FileReader, require, module*/
+/*global require, module*/
 
 var d3 = require("d3"), 
     toArray = require("../helpers.js").toArray;
 
-module.exports = function(container, errors, handlers) {
+module.exports = function(container, errors, handle) {
     container.on("dragover", function(d, i){
 	d3.event.preventDefault();
 	d3.event.stopPropagation();
@@ -24,30 +24,6 @@ module.exports = function(container, errors, handlers) {
 	    errors.warnUser("Failed to find any files to load. If you are dropping files, the drop may be blocked by security settings on the files or in your browser.");
 	}
 
-	handlers.forEach(function(h){
-	    var batches = h.tryHandle(files);
-	    batches.forEach(function(b){
-		
-		b.files.forEach(function(f) {
-		    var file = f.file;
-		    files.splice(files.indexOf(file), 1);
-		    
-		    var reader = new FileReader();
-		    reader.onload = function(){
-			b.trigger(file.name, reader.result);
-		    };
-		    
-		    reader.onerror = function(error){
-			errors.warnUser("Failed to load file " + file.name + " " + error);
-		    };
-		    
-		    if (f.binary) {
-			reader.readAsArrayBuffer(file);
-		    } else {
-			reader.readAsText(file);
-		    }
-		});
-	    });
-	});
+	handle(files);
     });
 };

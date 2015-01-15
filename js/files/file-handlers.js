@@ -76,12 +76,12 @@ var singleText = function(extension, mime, onFileLoad) {
     return h;
 };
 
-module.exports = function(errors, importDialogue) {
+module.exports = function(errors, csvDialogue, shapefileDialogue, topojsonDialogue) {
     var singleTable = function(extension, mime, parser){
 	return singleText(extension, mime, function(filename, text) {
 	    try {
 		var data = parser(text);
-		importDialogue.csv(
+		csvDialogue(
 		    withoutExtension(filename),
 		    data
 		);
@@ -98,7 +98,7 @@ module.exports = function(errors, importDialogue) {
 	    try {
 		var data = JSON.parse(text);
 		
-		importDialogue.topojson(
+		topojsonDialogue(
 		    withoutExtension(filename),
 		    data
 		);
@@ -121,7 +121,7 @@ module.exports = function(errors, importDialogue) {
 		    function(files) {
 			try {
 			    
-			    importDialogue.shapefile(
+			    shapefileDialogue(
 				withoutExtension(shp.name),
 				files.get(shp.name),
 				files.get(dbf.name),
