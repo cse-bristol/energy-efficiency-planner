@@ -41,10 +41,10 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
 			}
 			
 			return null;
-		    });
+		    }),
 
 
-	    var legendColours = svg
+		legendColours = svg
 		    .selectAll("rect")
 		    .data(
 			function(layer, i) {
@@ -84,10 +84,13 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
 	    legendText.exit().remove();
 	    legendText.enter().append("text")
 		.attr("width", colourBarWidth)
-		.attr("height", colourBarHeight)
 		.attr("text-anchor", "middle")
 		.attr("y", colourBarHeight + 10)
 		.text(function(text, i) {
+		    if (typeof("text") === "string" && text.length > 10) {
+			return text.slice(0, 8) + "..";
+		    }
+
 		    return text;
 		});
 
