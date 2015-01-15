@@ -87,8 +87,8 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
 		.attr("text-anchor", "middle")
 		.attr("y", colourBarHeight + 10)
 		.text(function(text, i) {
-		    if (typeof("text") === "string" && text.length > 10) {
-			return text.slice(0, 8) + "..";
+		    if (typeof("text") === "string" && text.length > 9) {
+			return text.slice(0, 7) + "..";
 		    }
 
 		    return text;
