@@ -30,7 +30,9 @@ module.exports = function(errors, map, toolbar, tableForLayer, update) {
 
 		tools: {
 		    "L": true,
-		    "!": false
+		    "!": false,
+		    "I": false,
+		    "l": false
 		}
 	    };
 	},
