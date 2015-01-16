@@ -23,7 +23,6 @@ var d3 = require("d3"),
     toolbar = require("./toolbar.js")(body),
     errors = require("./errors.js")(body, toolbar),
     progress = require("./progress.js")(body),
-    loader = require("./loader.js"),
     map = require("./map.js")(body),
     paint = require("./paint.js")(
 	map.overlay,
