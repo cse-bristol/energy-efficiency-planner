@@ -28,20 +28,47 @@ var d3 = require("d3"),
 	map.overlay,
 	map.projectTile,
 	function() {
-	    return state.getLayers().sortedByZ();
+	    return state.getShapeLayers().ordered().reverse();
 	}
     ),
-    tableForLayer = require("./table/table-for-layer.js")(
+    shapeLayerFactory = require("./shape-layers/shape-layer.js")(errors),
+    
+    tableForLayer = require("./shape-layers/table-for-layer.js")(
 	body,
 	map.zoomTo,
 	paint.onClick,
 	paint.onHover,
 	update
-    ),    
-    state = require("./state.js")(errors, map, toolbar, tableForLayer, update),
-    dataTransfer = require("./data-transfer.js")(errors, state.fresh),
-    legend = require("./legend.js")(body, toolbar, state.getLayers, state.getTileLayers),
-    layerControl = require("./layer-control.js")(body, toolbar, state.getLayers, state.getTileLayers, map.zoomTo),    
+    ),
+    
+    state = require("./state.js")(
+	errors,
+	map,
+	toolbar,
+	tableForLayer,
+	update
+    ),
+    
+    dataTransfer = require("./data-transfer.js")(
+	shapeLayerFactory,
+	errors,
+	state.fresh
+    ),
+    
+    legend = require("./legend.js")(
+	body,
+	toolbar,
+	state.getShapeLayers,
+	state.getTileLayers
+    ),
+    
+    layerControl = require("./layer-control.js")(
+	body,
+	toolbar,
+	state.getShapeLayers,
+	state.getTileLayers,
+	map.zoomTo),
+    
     menu = require("multiuser-file-menu")(
 	"maps",
 	dataTransfer.serialize,
@@ -50,14 +77,15 @@ var d3 = require("d3"),
 	state.set,
 	state.fresh
     ),
-    fetchLayers = require("./fetch-layers.js")(
+    
+    fetchLayers = require("./shape-layers/fetch-layers.js")(
 	menu.backend.isUp,
 	menu.backend.waitForConnect,
 	menu.backend.load,
 	dataTransfer.onDeserializeLayer,
-	state.getLayers,
 	progress
     ),
+    
     viewportButtons = require("./viewport-buttons.js")(
 	map.setView,
 	map.getCenter,
@@ -70,24 +98,23 @@ require("./files/import.js")(
     toolbar,
     body,
     state,
+    shapeLayerFactory,
     fetchLayers.save,
     update,
     errors
 );
 
 menu.buildMenu(menuBar, [
-    require("./load-layer-button.js")(
+    require("./shape-layers/load-layer-button.js")(
 	fetchLayers.collection,
-	state.getLayers,
+	shapeLayerFactory,
+	state.getShapeLayers,
 	fetchLayers.load,
 	menu.spec.button
     ),
     viewportButtons.set,
     viewportButtons.get
 ]);
-
-map.onViewReset(paint.redrawAll);
-map.onViewReset(legend.update);
 
 require("./autosave-and-autoload.js")(
     menu.store.writeOp,
@@ -96,3 +123,5 @@ require("./autosave-and-autoload.js")(
     dataTransfer,
     toolbar
 );
+
+map.onViewReset(update);

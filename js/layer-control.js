@@ -36,13 +36,13 @@ var opacitySlider = function(selection, getLayer) {
 	.call(noDrag);
 };
 
-var baseColourPicker = function(shapes, newShapes, picker, getLayers) {
+var baseColourPicker = function(shapes, newShapes, picker, getShapeLayers) {
     newShapes.append("span")
 	.classed("choose-colour", true)
 	.html("&nbsp;", true)
 	.each(function(d, i) {
 	    var el = d3.select(this),
-		layer = getLayers().get(d);
+		layer = getShapeLayers().get(d);
 
 	    if (layer) {
 		layer.worksheet.baseColourChanged(
@@ -56,14 +56,14 @@ var baseColourPicker = function(shapes, newShapes, picker, getLayers) {
 
     var colourButtons = shapes.selectAll(".choose-colour")
 	    .style("background-color", function(d, i) {
-		return getLayers().get(d)
+		return getShapeLayers().get(d)
 		    .worksheet.baseColour();
 	    });
 
     picker.open(colourButtons);
 };
 
-var tables = function(shapes, newShapes, getLayers) {
+var tables = function(shapes, newShapes, getShapeLayers) {
     newShapes.each(function(d, i) {
 	var el = d3.select(this),
 	    button = el.append("span")
@@ -72,13 +72,13 @@ var tables = function(shapes, newShapes, getLayers) {
 		.call(noDrag);
 
 	button.each(function(d, i) {
-	    getLayers().get(d)
+	    getShapeLayers().get(d)
 		.resultsTable.dialogue().open(d3.select(this));
 	});
     });
 };
 
-module.exports = function(container, toolbar, getLayers, getTileLayers, zoomTo) {
+module.exports = function(container, toolbar, getShapeLayers, getTileLayers, zoomTo) {
     var dialogue = floatingDialogue(
 	container.append("div")
 	    .attr("id", "layer-control"))
@@ -113,7 +113,7 @@ module.exports = function(container, toolbar, getLayers, getTileLayers, zoomTo) 
 		  var button = picker.currentOpenButton()
 			  .style("background-color", colour);
 
-		  getLayers().get(button.datum())
+		  getShapeLayers().get(button.datum())
 		      .worksheet
 		      .baseColour(colour);
 	      }));
@@ -159,7 +159,7 @@ module.exports = function(container, toolbar, getLayers, getTileLayers, zoomTo) 
 
 	baseOpacitySlider.datum(getTileLayers().getBaseLayer().name());
 	
-	baseOpacitySlider.node().value = getTileLayers().getBaseLayer().options.opacity;
+	baseOpacitySlider.node().value = getTileLayers().getBaseLayer().getOpacity();
     };
 
     var updateTiles = function() {
@@ -190,16 +190,15 @@ module.exports = function(container, toolbar, getLayers, getTileLayers, zoomTo) 
 	tileDivs.selectAll("." + opacityClass)
 	    .each(function(d, i) {
 		this.value = getTileLayers().overlays.get(d)
-		    .options.opacity;
+		    .getOpacity();
 	    });
     };
 
     var updateShapes = function() {
 	var shapes = shapesForm.selectAll("div")
 		.data(
-		    getLayers()
-			.sortedByZ()
-			.reverse()
+		    getShapeLayers()
+			.ordered()
 			.map(function(layer) {
 			    return layer.name();
 			}),
@@ -218,7 +217,7 @@ module.exports = function(container, toolbar, getLayers, getTileLayers, zoomTo) 
 		return d;
 	    })
 	    .on("click", function(d, i) {
-		var layer = getLayers().get(d);
+		var layer = getShapeLayers().get(d);
 		if (layer.boundingbox) {
 		    zoomTo(layer.boundingbox());
 		}
@@ -229,40 +228,37 @@ module.exports = function(container, toolbar, getLayers, getTileLayers, zoomTo) 
 	    .classed("shape-layer-delete", true)
 	    .text("X")
 	    .on("click", function(d, i) {
-		var layer = getLayers().get(d);
-		layer.remove();
+		var layer = getShapeLayers().get(d);
+		getShapeLayers().remove(layer);
 	    })
 	    .call(noDrag);
 
 	opacitySlider(newShapes, function(name) {
-	    return getLayers().get(name);
+	    return getShapeLayers().get(name);
 	});
 
 	sort(
 	    newShapes,
-	    function(moved, movedDown, displaced) {
-		var direction = movedDown ? -1 : 1;
-
-		getLayers().reorder(
-		    [[d3.select(moved).datum(), direction * displaced.size()]]
-			.concat(displaced.data().map(function(name) {
-			    return [name, -direction];
-			}))
+	    function(moved, from, to) {
+		getShapeLayers().moveLayer(
+		    d3.select(moved).datum(),
+		    from,
+		    to
 		);
 	    }
 	);
 
 	shapes.selectAll("." + opacityClass)
 	    .each(function(d, i) {
-		var layer = getLayers().get(d);
-		this.value = layer.options.opacity;
+		var layer = getShapeLayers().get(d);
+		this.value = layer.getOpacity();
 	    });
 
 	shapes.order();
 
-	baseColourPicker(shapes, newShapes, picker, getLayers);
+	baseColourPicker(shapes, newShapes, picker, getShapeLayers);
 
-	tables(shapes, newShapes, getLayers);
+	tables(shapes, newShapes, getShapeLayers);
     };
 
     return {

@@ -12,7 +12,7 @@ var d3 = require("d3"),
 /*
  A dialogue which displays useful information about enabled layers:
  + The name of the layer.
- + A legend for the layer if it has colouring enabled.
+ + A legend for the layer.
 
  This is the read-only counterpart to layer-control.js.
  */
@@ -119,7 +119,7 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
 		    .data(
 			layers.filter(
 			    function(layer) {
-				return layer.options.opacity > 0;
+				return layer.getOpacity() > 0;
 			    }
 			),
 			function(layer) {
@@ -195,7 +195,7 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
 	    makeLegendsForLayers(
 		shapeLegends,
 	    	"shape-legend",
-	    	getShapeLayers().sortedByZ().reverse(),
+	    	getShapeLayers().ordered(),
 	    	function(shapeLayer, i) {
 	    	    // TODO set up all my hover and click behaviours
 	    	}

@@ -12,14 +12,15 @@ var dialogueFactory = require("./import-dialogue.js"),
 /*
  Hooks up the various file import parts to each other.
  */
-module.exports = function(toolbar, container, state, saveLayerGeometry, refresh, errors) {
+module.exports = function(toolbar, container, state, shapeLayerFactory, saveLayerGeometry, refresh, errors) {
     var
     go = function() {
 	dialogue.show();
 	refresh();
     },
     addLayer = function(name, geometry, bbox) {
-	var layer = state.getLayers().create(name, geometry, bbox);
+	var layer = shapeLayerFactory(name, geometry, bbox);
+	state.getShapeLayers().add(layer);
 	saveLayerGeometry(layer);
     },
 

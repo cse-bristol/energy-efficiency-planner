@@ -8,7 +8,7 @@ var _ = require("lodash"),
 /*
  Sends changes we make to the map back to the server automatically.
  */
-module.exports = function(writeOp, canWrite, onStateReplaced, getTileLayers, getLayers, getViewport, toolbar, serializeShapeLayer, serializeViewport) {
+module.exports = function(writeOp, canWrite, onStateReplaced, getTileLayers, getShapeLayers, getViewport, toolbar, serializeShapeLayer, serializeViewport) {
     /*
      A convenience device to help set up lots of hooks on an object hierarchy.
 
@@ -92,7 +92,6 @@ module.exports = function(writeOp, canWrite, onStateReplaced, getTileLayers, get
 	    table = shapeLayer.resultsTable.dialogue();
 	
 	shapeLayer.onSetOpacity(layerHook.p("opacity").delay());
-	shapeLayer.onSetZIndex(layerHook.p("z"));
 
 	shapeLayer.worksheet.sortPropertyChanged(
 	    layerHook
@@ -104,13 +103,6 @@ module.exports = function(writeOp, canWrite, onStateReplaced, getTileLayers, get
 	table.onVisibilityChanged(tableHook.p("visible"));
 	table.onSizeChanged(tableHook.p("size").delay());
 	table.onPositionChanged(tableHook.p("position").delay());
-
-	shapeLayer.onRemove(function() {
-	    writeOp({
-		p: ["shapeLayers", shapeLayer.name()],
-		od: serializeShapeLayer(shapeLayer)
-	    });
-	});
     },
 
     hookShapeLayers = function(shapeLayers) {
@@ -118,11 +110,25 @@ module.exports = function(writeOp, canWrite, onStateReplaced, getTileLayers, get
 	    hookShapeLayer(l);
 	});
 	
-	shapeLayers.onCreate(function(l) {
+	shapeLayers.onAdd(function(l) {
 	    hookShapeLayer(l);
 	    writeOp({
 		p: ["shapeLayers", l.name()],
 		oi: serializeShapeLayer(l)
+	    });
+	});
+
+	shapeLayers.onRemove(function(shapeLayer) {
+	    writeOp({
+		p: ["shapeLayers", shapeLayer.name()],
+		od: serializeShapeLayer(shapeLayer)
+	    });
+	});
+
+	shapeLayers.onReorder(function() {
+	    writeOp({
+		p: ["shapeLayerOrder"],
+		oi: shapeLayers.getOrder()
 	    });
 	});
     },
@@ -155,7 +161,7 @@ module.exports = function(writeOp, canWrite, onStateReplaced, getTileLayers, get
    
     onStateReplaced(function() {
 	hookTileLayers(getTileLayers());
-	hookShapeLayers(getLayers());
+	hookShapeLayers(getShapeLayers());
 	hookViewport(getViewport());
     });
 };

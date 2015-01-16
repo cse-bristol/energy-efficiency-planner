@@ -30,6 +30,10 @@ module.exports = function(
 	    readShapeLayers(op);
 	    break;
 
+	case "shapeLayerOrder":
+	    getShapeLayers().setOrder(op.oi);
+	    break;
+
 	case "viewport":
 	    deserializeViewport(getViewport(), op.oi);
 	    break;
@@ -89,7 +93,10 @@ module.exports = function(
 		    deserializeShapeLayer(getShapeLayers(), layerName, op.oi);
 		    
 		} else if (op.od !== undefined) {
-		    getShapeLayers().get(layerName).remove();
+		    var shapeLayers = getShapeLayers();
+		    shapeLayers.remove(
+			shapeLayers.get(layerName)
+		    );
 		}
 		
 	    } else {
@@ -98,9 +105,6 @@ module.exports = function(
 		switch(op.p[2]) {
 		case "table":
 		    readShapeTable(op.p[3], op.oi, layer);
-		    break;
-		case "z":
-		    layer.setZIndex(op.oi);
 		    break;
 		case "opacity":
 		    layer.setOpacity(op.oi);

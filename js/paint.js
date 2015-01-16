@@ -36,7 +36,7 @@ module.exports = function(container, projection, dataSource) {
 
 	    l
 		.style("opacity", function(l){
-		    return l.options.opacity;
+		    return l.getOpacity();
 		})
 		.style("fill", function(d, i) {
 		    return colours(i);

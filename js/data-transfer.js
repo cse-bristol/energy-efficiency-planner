@@ -11,7 +11,7 @@ var _ = require("lodash"),
 /*
  Converts between the state of the world (as defined in state.js) and data transfer objects which can be turned into JSON and sent out across the wire.
  */
-module.exports = function(errors, freshState) {
+module.exports = function(shapeLayerFactory, errors, freshState) {
     var reading = false,
 	onDeserializeLayer = callbacks(),
 
@@ -34,8 +34,7 @@ module.exports = function(errors, freshState) {
 	    var table = layer.resultsTable.dialogue();
 
 	    return {
-		opacity: layer.options.opacity,
-		z: layer.options.zIndex,
+		opacity: layer.getOpacity(),
 		colour: layer.worksheet.baseColour(),
 		sort: layer.worksheet.getSortProperties(),
 		table: serializeResultsTable(layer.resultsTable.dialogue())
@@ -73,7 +72,7 @@ module.exports = function(errors, freshState) {
 		});
 	},
 
-	deserializeShapeLayer = function(layers, layerName, layerData) {
+	deserializeShapeLayer = function(shapeLayers, layerName, layerData) {
 	    /*
 	     Schedule the layer's geometry to be loaded from the database. When it is, fill in the created layer.
 	     */
@@ -81,13 +80,12 @@ module.exports = function(errors, freshState) {
 		try {
 		    reading = true;
 		    
-		    var layer = layers.create(layerName, geometry, bbox);
+		    var layer = shapeLayerFactory(layerName, geometry, bbox);
+		    shapeLayers.add(layer);
 		    
 		    layer.setOpacity(layerData.opacity);
-		    layer.setZIndex(layerData.z);
 		    layer.worksheet.baseColour(layerData.colour);
 
-		    var first = true;
 		    deserializeShapeSort(layerData.sort, layer.worksheet.sortProperty);
 
 		    var table = layer.resultsTable.dialogue();
@@ -109,10 +107,10 @@ module.exports = function(errors, freshState) {
 	    });
 	},
 
-	deserializeShapeLayers = function(layers, serializedLayers) {
+	deserializeShapeLayers = function(shapeLayers, serializedLayers) {
 	    Object.keys(serializedLayers).forEach(function(layerName) {
 		var layerData = serializedLayers[layerName];
-		deserializeShapeLayer(layers, layerName, layerData);
+		deserializeShapeLayer(shapeLayers, layerName, layerData);
 	    });
 	},
 
@@ -121,13 +119,13 @@ module.exports = function(errors, freshState) {
 
 	    tileLayers.overlays.forEach(function(name, overlay) {
 		overlays[name] = {
-		    opacity: overlay.options.opacity
+		    opacity: overlay.getOpacity()
 		};
 	    });
 	    
 	    return {
 		base: tileLayers.getBaseLayer().name(),
-		baseOpacity: tileLayers.getBaseLayer().options.opacity,
+		baseOpacity: tileLayers.getBaseLayer().getOpacity(),
 		overlays: overlays
 	    };
 	},
@@ -183,7 +181,8 @@ module.exports = function(errors, freshState) {
 	
 	serialize: function(state) {
 	    return {
-		shapeLayers: serializeShapeLayers(state.layers),
+		shapeLayers: serializeShapeLayers(state.shapeLayers),
+		shapeLayerOrder: state.shapeLayers.getOrder(),
 		tileLayers: serializeTileLayers(state.tileLayers),
 		viewport: serializeViewport(state.viewport),
 		tools: state.tools
@@ -205,7 +204,11 @@ module.exports = function(errors, freshState) {
 	    }
 
 	    if (serialized.shapeLayers) {
-		deserializeShapeLayers(state.layers, serialized.shapeLayers);
+		deserializeShapeLayers(state.shapeLayers, serialized.shapeLayers);
+	    }
+
+	    if (serialized.shapeLayerOrder) {
+		state.shapeLayers.setOrder(serialized.shapeLayerOrder);
 	    }
 
 	    if (serialized.viewport) {

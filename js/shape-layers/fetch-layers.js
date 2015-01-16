@@ -8,7 +8,7 @@ var d3 = require("d3"),
 /*
  If we add a layer to a map, it will get saved in a collection (overwriting any existing layer of the same name).
  */
-module.exports = function(isUp, waitForConnection, load, onDeserializeLayer, getLayers, progress) {
+module.exports = function(isUp, waitForConnection, load, onDeserializeLayer, progress) {
     var loadLayer = function(layerName, callback) {
 	if (isUp()) {
 	    progress.waiting();

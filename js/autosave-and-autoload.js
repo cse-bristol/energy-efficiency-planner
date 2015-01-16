@@ -38,7 +38,7 @@ module.exports = function(
 	canWrite,
 	state.onSet,
 	state.getTileLayers,
-	state.getLayers,
+	state.getShapeLayers,
 	state.getViewport,
 	toolbar,
 	data.serializeShapeLayer,
@@ -46,7 +46,7 @@ module.exports = function(
     ),
     
     autoload = autoloadFactory(
-	state.getLayers, data.deserializeShapeSort, data.deserializeShapeLayer,
+	state.getShapeLayers, data.deserializeShapeSort, data.deserializeShapeLayer,
 	state.getTileLayers,
 	state.getViewport, data.deserializeViewport,
 	toolbar

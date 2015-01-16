@@ -3,7 +3,7 @@
 /*global module, require*/
 
 var leaflet = require("leaflet"),
-    layersFactory = require("./layers.js"),
+    layersFactory = require("./shape-layers/shape-layers-collection.js"),
     tileLayersFactory = require("./tile-layers.js"),
     viewportFactory = require("./viewport.js"),
     helpers = require("./helpers.js"),
@@ -13,7 +13,7 @@ var leaflet = require("leaflet"),
  Bundles together all aspect of the state of the map into a Javascript object.
  */
 module.exports = function(errors, map, toolbar, tableForLayer, update) {
-    var layers,
+    var shapeLayers,
 	tileLayers,
 	baseLayer,
 	viewport,
@@ -24,7 +24,7 @@ module.exports = function(errors, map, toolbar, tableForLayer, update) {
 	    var t = tileLayersFactory(map.getZoom, errors);
 	    
 	    return {
-		layers: layersFactory(errors),
+		shapeLayers: layersFactory(errors),
 		tileLayers: t,
 		viewport: viewportFactory(),
 
@@ -37,11 +37,11 @@ module.exports = function(errors, map, toolbar, tableForLayer, update) {
 	    };
 	},
 	cleanUp = function() {
-	    if (layers) {
+	    if (shapeLayers) {
 		/*
 		 Clean out these now unhelpful elements.
 		 */
-		layers.all().forEach(function(l) {
+		shapeLayers.all().forEach(function(l) {
 		    l.resultsTable.el().remove();
 		});
 	    }
@@ -50,15 +50,15 @@ module.exports = function(errors, map, toolbar, tableForLayer, update) {
     return {
 	get: function() {
 	    return {
-		layers: layers,
+		shapeLayers: shapeLayers,
 		tileLayers: tileLayers,
 		viewport: viewport,
 		tools: toolbar.getState()
 	    };
 	},
 
-	getLayers: function() {
-	    return layers;
+	getShapeLayers: function() {
+	    return shapeLayers;
 	},
 
 	getTileLayers: function() {
@@ -75,7 +75,7 @@ module.exports = function(errors, map, toolbar, tableForLayer, update) {
 	    try {
 		cleanUp();
 		
-		layers = state.layers;
+		shapeLayers = state.shapeLayers;
 		tileLayers = state.tileLayers;
 
 		map.eachLayer(function(layer) {
@@ -99,17 +99,14 @@ module.exports = function(errors, map, toolbar, tableForLayer, update) {
 		    layer.onSetOpacity(update);
 		});
 
-		var setupLayer = function(layer) {
-		    tableForLayer(layer);
-		    layer.onRemove(update);
-		};
-		
-		layers.all().forEach(setupLayer);
-
-		layers.onCreate(setupLayer);
-		layers.onCreate(update);
-
-		layers.onReorder(update);
+		shapeLayers.all().forEach(tableForLayer);
+		shapeLayers.onAdd(tableForLayer);
+		shapeLayers.onAdd(update);
+		shapeLayers.onRemove(function(layer) {
+		    layer.resultsTable.el().remove();
+		    update();
+		});
+		shapeLayers.onReorder(update);
 
 		if (state.tools) {
 		    toolbar.setState(state.tools);

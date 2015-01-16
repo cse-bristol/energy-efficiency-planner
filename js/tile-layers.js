@@ -25,6 +25,9 @@ var decorateTileLayers = function(tileLayers, opacity) {
 	    onSetOpacity(opacity);
 	    return result;
 	};
+	layer.getOpacity = function() {
+	    return layer.options.opacity;
+	};
 	layer.onSetOpacity = onSetOpacity.add;
 	layer.clearOnSetOpacity = onSetOpacity.clear;
 
@@ -142,7 +145,7 @@ module.exports = function(getZoom, errors) {
 	},
 	setBaseLayer: function(value) {
 	    var old = baseLayer;
-	    value.setOpacity(baseLayer.options.opacity);
+	    value.setOpacity(baseLayer.getOpacity());
 	    baseLayer = value;
 	    onSetBaseLayer(old, baseLayer);
 	},
