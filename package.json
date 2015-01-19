@@ -5,7 +5,7 @@
     "keywords": ["map", "d3", "leaflet", "energy planning"],
     
     "dependencies": {
-	"d3": "3.4.13"
+	"d3": "3.5.3"
 	,"topojson": "1.6.18"
 	,"leaflet": "0.7.3"
 	,"leaflet-control-geocoder": "1.0.0"
