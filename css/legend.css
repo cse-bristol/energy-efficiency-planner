@@ -18,11 +18,14 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    
 }
 
 .legend-chart {
     padding-left: 0.4em;
+}
+
+.legend-chart rect.highlight {
+    stroke: black;
 }
 
 .legend-chart text {

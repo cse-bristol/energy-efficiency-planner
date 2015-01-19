@@ -181,10 +181,8 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
 				tileDiv
 				    .select("svg.legend-chart")
 				    .selectAll("rect")
-				    .attr("stroke", function(colour, i) {
-					return i === colourIndex ?
-					    "black" :
-					    "none";
+				    .classed("highlight", function(colour, i) {
+					return i === colourIndex;
 				    });
 			    }
 			});
