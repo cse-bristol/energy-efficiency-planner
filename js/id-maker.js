@@ -33,7 +33,7 @@ module.exports =  {
     increment: function(n) {
 	var accum = function(n, acc) {
 	    if (n.length === 0) {
-		return acc + "A";
+		return acc + a;
 	    } 
 
 	    var len = n.length,
