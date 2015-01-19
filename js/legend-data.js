@@ -33,10 +33,6 @@ module.exports = function(labels, colours) {
 	    return colours;
 	},
 	
-	colourIndex: function(colour) {
-	    return colours.indexOf(colour.toString());
-	},
-
 	labels: function() {
 	    return labels;
 	}

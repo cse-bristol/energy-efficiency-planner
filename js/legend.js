@@ -172,17 +172,17 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
 			tileLayer.legend.onLoad(redraw);
 			var name = asId(tileLayer.name());
 
-			tileLayer.colourChanged(function(colour) {
-			    var colourIndex = tileLayer.legend().colourIndex(colour),
-				tileDiv = dialogue.content().selectAll("#tile-legend-" + name);
+			tileLayer.colourChanged(function(pixelColour) {
+			    var tileDiv = dialogue.content().selectAll("#tile-legend-" + name);
+			    pixelColour = pixelColour.toString();
 
 			    if (!tileDiv.empty()) {
 
 				tileDiv
 				    .select("svg.legend-chart")
 				    .selectAll("rect")
-				    .classed("highlight", function(colour, i) {
-					return i === colourIndex;
+				    .classed("highlight", function(rectColour, i) {
+					return rectColour === pixelColour;
 				    });
 			    }
 			});
@@ -195,7 +195,7 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
 	    	"shape-legend",
 	    	getShapeLayers().ordered(),
 	    	function(shapeLayer, i) {
-	    	    // TODO set up all my hover and click behaviours
+	    	    // Noop - shape layer legends currently have no interactions.
 	    	}
 	    );
 	};
