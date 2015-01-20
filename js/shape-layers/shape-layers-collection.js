@@ -17,7 +17,16 @@ module.exports = function(errors) {
 	order = [],
 	onAdd = callbacks(),
 	onRemove = callbacks(),
-	onReorder = callbacks();
+	onReorder = callbacks(),
+	verifyOrderChange = function() {
+	    // Make sure this doesn't get out of sync.
+	    order = _.uniq(
+		_.compact(
+		    order
+		)
+	    );
+	    onReorder();
+	};
 
 
     return {
@@ -48,6 +57,7 @@ module.exports = function(errors) {
 		errors.informUser("Layer with name " + layer.name() + " already exists, and will be replaced.");
 	    } else {
 		order.push(layer.name());
+		verifyOrderChange();
 	    }
 	    
 	    layers.set(layer.name(), layer);
@@ -66,13 +76,13 @@ module.exports = function(errors) {
 		);
 		
 		onRemove(layer);
-		onReorder();
+		verifyOrderChange();
 	    }
 	},
 
 	setOrder: function(newOrder) {
 	    order = newOrder;
-	    onReorder();
+	    verifyOrderChange();
 	},
 
 	getOrder: function() {
@@ -85,10 +95,9 @@ module.exports = function(errors) {
 		return;
 		
 	    } else {
-		
 		order.splice(fromIndex, 1);
 		order.splice(toIndex, 0, layerName);
-		onReorder();
+		verifyOrderChange();
 	    }
 	},
 
