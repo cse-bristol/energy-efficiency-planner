@@ -21,6 +21,7 @@ var d3 = require("d3"),
     reverseColour = require("./colour.js").reverse,
     noDrag = require("./helpers.js").noDrag,
     sort = require("sort-children"),
+    clickExpand = require("./click-to-expand.js"),
     opacityClass = "opacity-slider";
 
 var opacitySlider = function(selection, getLayer) {
@@ -30,6 +31,9 @@ var opacitySlider = function(selection, getLayer) {
 	.attr("min", 0)
 	.attr("max", 1)
 	.attr("step", 0.05)
+	.on("click", function(d, i) {
+	    d3.event.stopPropagation();
+	})
 	.on("input", function(d, i) {
 	    getLayer(d).setOpacity(this.value);
 	})
@@ -51,8 +55,7 @@ var baseColourPicker = function(shapes, newShapes, picker, getShapeLayers) {
 		    }
 		);
 	    }
-	})
-	.call(noDrag);
+	});
 
     var colourButtons = shapes.selectAll(".choose-colour")
 	    .style("background-color", function(d, i) {
@@ -68,8 +71,7 @@ var tables = function(shapes, newShapes, getShapeLayers) {
 	var el = d3.select(this),
 	    button = el.append("span")
 		.classed("open-table", true)
-		.text("⊞")
-		.call(noDrag);
+		.text("⊞");
 
 	button.each(function(d, i) {
 	    getShapeLayers().get(d)
@@ -217,25 +219,15 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers, zoo
 		return d;
 	    })
 	    .on("click", function(d, i) {
-		var layer = getShapeLayers().get(d);
-		if (layer.boundingbox) {
-		    zoomTo(layer.boundingbox());
-		}
-	    })
-	    .call(noDrag);
+		d3.event.stopPropagation();
+	    	var layer = getShapeLayers().get(d);
+	    	if (layer.boundingbox) {
+	    	    zoomTo(layer.boundingbox());
+	    	}
+	    });
 
-	newShapes.append("span")
-	    .classed("shape-layer-delete", true)
-	    .text("X")
-	    .on("click", function(d, i) {
-		var layer = getShapeLayers().get(d);
-		getShapeLayers().remove(layer);
-	    })
-	    .call(noDrag);
-
-	opacitySlider(newShapes, function(name) {
-	    return getShapeLayers().get(name);
-	});
+	newShapes
+	    .call(clickExpand);	
 
 	sort(
 	    newShapes,
@@ -259,6 +251,18 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers, zoo
 	baseColourPicker(shapes, newShapes, picker, getShapeLayers);
 
 	tables(shapes, newShapes, getShapeLayers);
+
+	newShapes.append("span")
+	    .classed("shape-layer-delete", true)
+	    .text("X")
+	    .on("click", function(d, i) {
+		var layer = getShapeLayers().get(d);
+		getShapeLayers().remove(layer);
+	    });
+	
+	opacitySlider(newShapes, function(name) {
+	    return getShapeLayers().get(name);
+	});
     };
 
     return {

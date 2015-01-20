@@ -22,29 +22,45 @@
     border-bottom: none;
 }
 
-.shape-layer-delete {
-    float: right;
-    cursor: pointer;
-    font-family: monospace;
+input.opacity-slider {
+    width: 97%;
+}
+
+.shape-overlay-control {
+    padding: 0.3em;
+}
+
+.shape-overlay-control:hover {
+    color: black;
+    /* Colour chosen to leave the opacity slider visible/usable. */
+    background-color: #E0F0FF;
 }
 
 .shape-layer-name {
     overflow: hidden;
     text-overflow: ellipsis;
+    display: inline-block;
     white-space: nowrap;
+    /* Leave some space for the expander. */
+    width: calc(100% - 0.7em);
     cursor: pointer;
-    width: calc(100% - 1em);
-    float: left;
 }
 
 .shape-layer-name:hover {
-    text-decoration: underline;
+    font-weight: bold;
 }
 
-.shape-layer-name.disabled {
-    text-decoration: none;
-    color: grey;
-    pointer-events: none;
+.expander {
+    display: inline-block;
+    cursor: pointer;
+    vertical-align: top;
+}
+
+.shape-layer-delete {
+    float: right;
+    width: 0.9em;
+    cursor: pointer;
+    font-family: monospace;
 }
 
 .shape-overlay-control .open-button {
