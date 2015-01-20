@@ -48,11 +48,11 @@ module.exports = function(container) {
 		    visible: dialogue.visible()
 		};
 
-		if (dialogue.manuallySized) {
+		if (dialogue.manuallySized()) {
 		    toolState.size = dialogue.size();
 		}
 
-		if (dialogue.manuallyPositioned) {
+		if (dialogue.manuallyPositioned()) {
 		    toolState.position = dialogue.position();
 		}
 		
