@@ -13,16 +13,16 @@ var batch = function(files, onBatchLoad) {
     var filenames = files.map(function(f){
 	return f.file.name;
     });
-    
+
     return {
 	files : files,
 	trigger : function(file, result) {
 	    if (filenames.indexOf(file) < 0) {
-		throw "File " + file + " does was not part of this batch.";
+		throw new Error("File " + file + " was not part of this batch.");
 	    }
 
 	    if (results.has(file)) {
-		throw "File " + file + " was loaded twice";
+		throw new Error("File " + file + " was loaded twice");
 	    }
 
 	    results.set(file, result);
@@ -90,14 +90,14 @@ module.exports = function(errors, csvDialogue, shapefileDialogue, topojsonDialog
 	    }
 	});
     };
-    
+
     return [
 	singleTable("tsv", "test/tab-separated-values", d3.tsv.parse),
 	singleTable("csv", "text/csv", d3.csv.parse),
 	singleText("json", "application/json", function(filename, text){
 	    try {
 		var data = JSON.parse(text);
-		
+
 		topojsonDialogue(
 		    withoutExtension(filename),
 		    data
@@ -111,16 +111,16 @@ module.exports = function(errors, csvDialogue, shapefileDialogue, topojsonDialog
 		var files = [
 		    {file: shp, binary: true},
 		    {file: dbf, binary: true}];
-		
+
 		if (prj) {
 		    files.push({file: prj, binary: false});
 		}
-		
+
 		return batch(
 		    files,
 		    function(files) {
 			try {
-			    
+
 			    shapefileDialogue(
 				withoutExtension(shp.name),
 				files.get(shp.name),
@@ -134,7 +134,7 @@ module.exports = function(errors, csvDialogue, shapefileDialogue, topojsonDialog
 		    }
 		);
 	    };
-	    
+
 	    var h = {
 		tryHandle : function(files) {
 		    var shp = d3.map({});
@@ -201,12 +201,37 @@ module.exports = function(errors, csvDialogue, shapefileDialogue, topojsonDialog
 	}),
 	singleText("prj", null, function(filename, text){
 	    errors.warnUser("Cannot load a prj file by itself. Please import .prj, .dbf and .shp files together: " + filename);
-	}),	
-	
+	}),
+
+	{
+	    tryHandle: function(files) {
+		var handled = files.filter(makeFileFilter([], ["shx", "sbn", "sbx"]));
+
+		if (handled.length > 0) {
+		    return [
+			batch(
+			    handled.map(function(f) {
+				return {
+				    file: f,
+				    binary: false
+				};
+			    }),
+			    function(results) {
+				errors.informUser("We don't currently make use of the following parts of the shapefile: " + results.keys().join(", ") + ".");
+			    }
+			)
+		    ];
+		} else {
+		    return [];
+		}
+	    }
+	},
+
+
 	function fallback() {
 	    var h = {
 		tryHandle : function(files) {
-		    files.forEach(function(f){
+		    files.forEach(function(f) {
 			errors.warnUser("Can't load file " + f.name + " with " + (f.type ? f.type : "unknown") + " type.");
 		    });
 		    return [];
