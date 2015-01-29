@@ -14,7 +14,8 @@ module.exports = function(toolbar, container, handlers) {
     )
 	    .drag(),
 
-	filePicker = dialogue.content().append("input")
+	filePicker = dialogue.content().append("form")
+	    .append("input")
 	    .attr("type", "file")
 	    .attr("multiple", true)
 	    .attr("accept", ".csv,.tsv,.json,.shp,.dbf,.prj")
@@ -23,6 +24,10 @@ module.exports = function(toolbar, container, handlers) {
 		handlers(
 		    Array.prototype.slice.call(this.files)
 		);
+		/*
+		 Clear the files so that this will work if the user selects the same files twice in a row.
+		 */
+		this.parentElement.reset();
 	    });
 
     toolbar.add("I", dialogue);
