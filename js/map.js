@@ -6,6 +6,7 @@ var d3 = require("d3"),
     _ = require("lodash"),
     leaflet = require("leaflet"),
     geocoder = require("leaflet-control-geocoder"),
+    zoombox = require("../node_modules/Leaflet.ZoomBox/L.Control.ZoomBox.min.js"),
     
     log2 = function(n) {
 	return Math.log(n) / Math.LN2;
@@ -51,9 +52,15 @@ module.exports = function(container) {
 
     map.setView(leaflet.latLng(0, 0), 2);
     
-    map.addControl(new geocoder({
-	email: "research@cse.org.uk"
-    }));
+    map.addControl(
+	new geocoder({
+	    email: "research@cse.org.uk"
+	})
+    ).addControl(
+	leaflet.control.zoomBox()
+    );
+
+    
     
     return {
 	zoomTo: function(bbox) {
