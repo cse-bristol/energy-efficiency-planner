@@ -8,9 +8,9 @@ var d3 = require("d3"),
 /*
  If we add a layer to a map, it will get saved in a collection (overwriting any existing layer of the same name).
  */
-module.exports = function(isUp, waitForConnection, load, onDeserializeLayer, progress) {
+module.exports = function(waitForConnection, load, onDeserializeLayer, progress) {
     var loadLayer = function(layerName, callback) {
-	if (isUp()) {
+	waitForConnection(function() {
 	    progress.waiting();
 	    load(
 		collection,
@@ -25,9 +25,7 @@ module.exports = function(isUp, waitForConnection, load, onDeserializeLayer, pro
 		    }
 		}
 	    );
-	} else {
-	    throw new Error("Cannot load layer " + layerName + ": the server is down.");
-	}
+	});
     };
 
     var saveLayer = function(layer) {
