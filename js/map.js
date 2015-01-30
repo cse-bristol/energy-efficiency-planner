@@ -60,29 +60,14 @@ module.exports = function(container) {
 	leaflet.control.zoomBox()
     );
 
-    
-    
     return {
 	zoomTo: function(bbox) {
-	    var x1 = bbox[0],
-		y1 = bbox[1],
-		x2 = bbox[2],
-		y2 = bbox[3];
-
-	    var boxSize = Math.max(
-		Math.abs(x1 - x2),
-		Math.abs(y1 - y2));
-
-	    var newZoom = Math.round(
-		log2(360 / boxSize) + 1.5);
-	    console.log("new zoom " + newZoom);
-	    console.log("new bounds " + [(y1 + y2) / 2, (x1 + x2) / 2]);
-	    
-	    map.setView(
-		leaflet.latLng(
-		    (y1 + y2) / 2,
-		    (x1 + x2) / 2),
-		newZoom);
+	    map.fitBounds([
+		// South-West
+		[bbox[1], bbox[0]],
+		// North-East
+		[bbox[3], bbox[2]]
+	    ]);
 	},
 
 	setView: _.bind(map.setView, map),
