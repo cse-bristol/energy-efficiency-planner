@@ -12,8 +12,8 @@
 	,"Leaflet.ZoomBox": "git://github.com/consbio/Leaflet.ZoomBox.git"
 	,"proj4": "2.2.2"
 	,"lodash": "2.4.1"
-	,"slippy-colors": "0.0.1"
 	
+	,"slippy-colors": "git://github.com/cse-bristol/slippy-colors.git#mouse-position"
 	,"js-shapefile-to-geojson--": "git://github.com/GlennS/js-shapefile-to-geojson.git"
 	,"floating-dialogue": "git://github.com/cse-bristol/floating-dialogue.git"
 	,"multiuser-file-menu": "git://github.com/cse-bristol/multiuser-file-menu"
