@@ -90,7 +90,8 @@ var d3 = require("d3"),
 	map.getCenter,
 	map.getZoom,
 	state.getViewport,
-	menu.spec.button
+	menu.spec.button,
+	update
     );
 
 require("./files/import.js")(

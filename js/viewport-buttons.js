@@ -2,7 +2,7 @@
 
 /*global module, require*/
 
-module.exports = function(setView, getCenter, getZoom, getViewport, makeButton) {
+module.exports = function(setView, getCenter, getZoom, getViewport, makeButton, update) {
     return {
 	set: makeButton(
 	    "Set Home",
@@ -24,6 +24,8 @@ module.exports = function(setView, getCenter, getZoom, getViewport, makeButton) 
 		    viewport.coordinates(),
 		    viewport.zoom()
 		);
+
+		update();
 	    },
 	    {}
 	)
