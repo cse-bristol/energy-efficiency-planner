@@ -125,3 +125,5 @@ require("./autosave-and-autoload.js")(
 );
 
 map.onViewReset(update);
+
+menu.queryString.fromURL();
