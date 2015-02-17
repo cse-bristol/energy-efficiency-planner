@@ -54,7 +54,8 @@ module.exports = function(container) {
     
     map.addControl(
 	new geocoder({
-	    email: "research@cse.org.uk"
+	    email: "research@cse.org.uk",
+	    collapsed: false
 	})
     ).addControl(
 	leaflet.control.zoomBox()

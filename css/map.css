@@ -34,3 +34,7 @@ path.LineString {
 .leaflet-zoom-hide {
     pointer-events: all;
 }
+
+.leaflet-control-geocoder {
+    width: 23em;
+}
