@@ -12,7 +12,7 @@ var dialogueFactory = require("./import-dialogue.js"),
 /*
  Hooks up the various file import parts to each other.
  */
-module.exports = function(toolbar, container, state, shapeLayerFactory, saveLayerGeometry, refresh, errors) {
+module.exports = function(toolbar, container, state, shapeLayerFactory, saveLayerGeometry, refresh, errors, progress) {
     var
     go = function() {
 	dialogue.show();
@@ -25,17 +25,17 @@ module.exports = function(toolbar, container, state, shapeLayerFactory, saveLaye
     },
 
     csv = function(name, csvFileData) {
-	importCSV(dialogue.content(), name, csvFileData, addLayer);
+	importCSV(dialogue.content(), progress, errors, name, csvFileData, addLayer);
 	go();
     },
 
     shapefile = function(name, shapeFileData, dbfFileData, prjFileData) {
-	importShapefile(dialogue.content(), name, shapeFileData, dbfFileData, prjFileData, addLayer);
+	importShapefile(dialogue.content(), progress, errors, name, shapeFileData, dbfFileData, prjFileData, addLayer);
 	go();
     },
 
     topojson = function(name, topojsonData) {
-	importTopoJSON(dialogue.content(), name, topojsonData, addLayer);
+	importTopoJSON(dialogue.content(), progress, errors, name, topojsonData, addLayer);
 	go();
     },	
 
@@ -57,12 +57,15 @@ module.exports = function(toolbar, container, state, shapeLayerFactory, saveLaye
 		    var reader = new FileReader();
 		    reader.onload = function(){
 			b.trigger(file.name, reader.result);
+			progress.ready();
 		    };
 		    
 		    reader.onerror = function(error){
 			errors.warnUser("Failed to load file " + file.name + " " + error);
+			progress.ready();
 		    };
-		    
+
+		    progress.waiting();
 		    if (f.binary) {
 			reader.readAsArrayBuffer(file);
 		    } else {

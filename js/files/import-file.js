@@ -11,7 +11,7 @@ var d3 = require("d3"),
 /*
  Provides a file import form with cancel and import buttons, and a section for choosing a coordinate system.
  */
-module.exports = function(container, layerNames, makeExtraContent, onSubmit) {
+module.exports = function(container, progress, errors, layerNames, makeExtraContent, onSubmit) {
     var content = container.append("form")
 	    .classed("file-import", true),
 
@@ -66,14 +66,27 @@ module.exports = function(container, layerNames, makeExtraContent, onSubmit) {
 	    .on("click", function(d, i) {
 		d3.event.preventDefault();
 		d3.event.stopPropagation();
-		onSubmit(
-		    names[0].map(
-			function(name) {
-			    return name.value;
-			}
-		    )
-		);
-		content.remove();
+		/*
+		 This doesn't appear to work - I think the button press is overriding it and the browser is doing too much to be able to redraw.
+
+		 Consider rewriting using web workers?
+		 */
+		progress.waiting();
+
+		try {
+		    onSubmit(
+			names[0].map(
+			    function(name) {
+				return name.value;
+			    }
+			)
+		    );
+		    content.remove();
+		} catch (e) {
+		    errors.warnUser(e);
+		} finally {
+		    progress.ready();
+		}
 	    });
 
     return {

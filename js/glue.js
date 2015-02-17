@@ -100,7 +100,8 @@ require("./files/import.js")(
     shapeLayerFactory,
     fetchLayers.save,
     update,
-    errors
+    errors,
+    progress
 );
 
 menu.buildMenu(menuBar, [

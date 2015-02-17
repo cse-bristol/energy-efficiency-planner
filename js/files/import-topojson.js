@@ -6,11 +6,13 @@ var _ = require("lodash"),
     makeForm = require("./import-file.js"),
     geometries = require("../geometries.js");
 
-module.exports = function(container, name, topojsonData, addLayer) {
+module.exports = function(container, progress, errors, name, topojsonData, addLayer) {
     var layers = geometries.manyFromTopoJSON(topojsonData);
     
     var form = makeForm(
 	container,
+	progress,
+	errors,
 	/*
 	 Using entries here even though keys would be more natural, but we want it to come out in the same order as in the submit function below.
 	 */

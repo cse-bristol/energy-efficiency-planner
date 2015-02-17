@@ -27,6 +27,7 @@ module.exports = function(load, onDeserializeLayer, progress) {
     };
 
     var saveLayer = function(layer) {
+	progress.waiting();
 	load(
 	    collection,
 	    layer.name(),
@@ -40,6 +41,7 @@ module.exports = function(load, onDeserializeLayer, progress) {
 		    geometry: layer.geometry(),
 		    boundingbox: layer.boundingbox()
 		});
+		progress.ready();
 	    });
     };
     
