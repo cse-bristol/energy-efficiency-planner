@@ -79,7 +79,6 @@ var d3 = require("d3"),
     ),
     
     fetchLayers = require("./shape-layers/fetch-layers.js")(
-	menu.backend.waitForConnect,
 	menu.backend.load,
 	dataTransfer.onDeserializeLayer,
 	progress

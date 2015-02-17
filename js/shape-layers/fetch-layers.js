@@ -8,43 +8,39 @@ var d3 = require("d3"),
 /*
  If we add a layer to a map, it will get saved in a collection (overwriting any existing layer of the same name).
  */
-module.exports = function(waitForConnection, load, onDeserializeLayer, progress) {
+module.exports = function(load, onDeserializeLayer, progress) {
     var loadLayer = function(layerName, callback) {
-	waitForConnection(function() {
-	    progress.waiting();
-	    load(
-		collection,
-		layerName,
-		function(loaded) { 
-		    var snapshot = loaded.getSnapshot();
-		    if (snapshot) {
-			callback(snapshot.geometry, snapshot.boundingbox);
-			progress.ready();
-		    } else {
-			throw new Error("Attempted to load Layer which does not exist " + layerName);
-		    }
+	progress.waiting();
+	load(
+	    collection,
+	    layerName,
+	    function(loaded) {
+		var snapshot = loaded.getSnapshot();
+		if (snapshot) {
+		    callback(snapshot.geometry, snapshot.boundingbox);
+		    progress.ready();
+		} else {
+		    throw new Error("Attempted to load Layer which does not exist " + layerName);
 		}
-	    );
-	});
+	    }
+	);
     };
 
     var saveLayer = function(layer) {
-	waitForConnection(function() {
-	    load(
-		collection,
-		layer.name(),
-		function(loaded) {
-		    var snapshot = loaded.getSnapshot();
-		    if (snapshot) {
-			loaded.del();
-		    }
+	load(
+	    collection,
+	    layer.name(),
+	    function(loaded) {
+		var snapshot = loaded.getSnapshot();
+		if (snapshot) {
+		    loaded.del();
+		}
 
-		    loaded.create("json0", {
-			geometry: layer.geometry(),
-			boundingbox: layer.boundingbox()
-		    });
+		loaded.create("json0", {
+		    geometry: layer.geometry(),
+		    boundingbox: layer.boundingbox()
 		});
-	});
+	    });
     };
     
     onDeserializeLayer(loadLayer);
