@@ -9,12 +9,24 @@ var scale = function(data, colour) {
     var numeric = [];
     var len = data.length;
     for (var i = 0; i < len; i++) {
-	var r = parseFloat(data[i]);
-	if (data[i] && isNaN(r)) {
-	    return d3.scale.category20();
+	var d = data[i][0];
+
+	if (!d) {
+	    // Ignore this data point.
 	} else {
-	    numeric.push(r);
+	    var r = parseFloat(d);
+
+	    if (isNaN(r)) {
+		return d3.scale.category20();
+	    } else {
+		numeric.push(r);
+	    }
 	}
+    }
+
+    if (!numeric.length) {
+	// Can't take min or max of an empty list.
+	return d3.scale.category20();
     }
     
     return d3.scale.linear()
