@@ -3,6 +3,11 @@
     "version": "0.5.0",
     "description": "",
     "keywords": ["map", "d3", "leaflet", "energy planning"],
+
+    "repository": {
+	"type": "git",
+	"url": "git://github.com/cse-bristol/energy-efficiency-planner.git"
+    },
     
     "dependencies": {
 	"d3": "3.5.3"
