@@ -16,7 +16,8 @@ var d3 = require("d3"),
 
 module.exports = function(getZoom, errors) {
     var legendByZoom = d3.map(),
-	onLoad = callbacks();
+	onLoad = callbacks(),
+	broken = false;
 
     // loop over the zoom levels
     _.range(1, maxZoom + 1).forEach(function(z) {
@@ -24,7 +25,10 @@ module.exports = function(getZoom, errors) {
 	    baseUrl + "/legend_Z" + z + ".json",
 	    function(error, data) {
 		if (error) {
-		    errors.warnUser("Failed to load heat map legend: " + error.response);
+		    if (!broken) {
+			errors.warnUser("Failed to load heat map legend: " + error.response);
+			broken = true;
+		    }
 		} else {
 		    var numbers = [],
 			colours = [];
