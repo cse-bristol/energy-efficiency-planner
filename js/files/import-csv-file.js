@@ -154,7 +154,7 @@ module.exports = function(container, progress, errors, fileName, data, createLay
 		    ];
 		
 		form.projectLayer(geometry);
-		form.projectLayer(bbox);
+		form.projectLayer({bbox: bbox});
 		
 		createLayer(
 		    layerNames[0],
