@@ -24,7 +24,7 @@ module.exports = function(getZoom, errors) {
 	    baseUrl + "/legend_Z" + z + ".json",
 	    function(error, data) {
 		if (error) {
-		    errors.warnUser(error);
+		    errors.warnUser("Failed to load heat map legend: " + error.response);
 		} else {
 		    var numbers = [],
 			colours = [];
