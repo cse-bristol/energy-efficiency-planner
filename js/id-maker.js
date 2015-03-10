@@ -24,16 +24,14 @@ var a = 'a'.charCodeAt(0),
  */
 module.exports =  {
     /*
-     Add a letter to a string if it is empty of ends with 'Z'.
+     Add a letter to a string if it is empty or ends with 'Z'.
 
      Otherwise, increment the letter at the end of the string.
-
-     This is obviously not a good wait to do it.
      */
     increment: function(n) {
 	var accum = function(n, acc) {
 	    if (n.length === 0) {
-		return acc + a;
+		return acc + "a";
 	    } 
 
 	    var len = n.length,
@@ -72,14 +70,14 @@ module.exports =  {
 	    i = 1;
 	}
 
-
 	/*
 	 There are different restrictions on the first character (which possibly follows the optional hyphen).
 	 */
+
 	result.push(
 	    nmstart.test(s[i]) ?
 		s[i]
-		: "-"
+		: "_"
 	);
 	
 	i++;
