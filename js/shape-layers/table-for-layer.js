@@ -149,5 +149,6 @@ module.exports = function(container, zoomTo, onClickShape, onHoverShape, redraw)
 	l.onSetOpacity(redraw);
 
 	updateResultsTable();
+	recolour();
     };
 };
