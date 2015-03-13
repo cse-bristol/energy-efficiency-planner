@@ -46,6 +46,7 @@ module.exports = function(
     ),
     
     autoload = autoloadFactory(
+	state.set, data.deserialize,
 	state.getShapeLayers, data.deserializeShapeSort, data.deserializeShapeLayer,
 	state.getTileLayers,
 	state.getViewport, data.deserializeViewport,

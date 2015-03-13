@@ -13,6 +13,7 @@
 
  */
 module.exports = function(
+    setState, deserialize,
     getShapeLayers, deserializeShapeSort, deserializeShapeLayer,
     getTileLayers,
     getViewport, deserializeViewport,
@@ -21,30 +22,42 @@ module.exports = function(
 {
     
     var readOp = function(op) {
-	switch(op.p[0]) {
-	case "tileLayers":
-	    readTileLayers(op);
-	    break;
+	if (op.p.length === 0) {
+	    if (op.oi) {
+		setState(
+		    deserialize(op.oi)
+		);
+		
+	    } else {
+		// We have no representation for a deleted model, so we'll ignore this and the user can overwrite the delete if they want.
+	    }
 
-	case "shapeLayers":
-	    readShapeLayers(op);
-	    break;
+	} else {
+	    switch(op.p[0]) {
+	    case "tileLayers":
+		readTileLayers(op);
+		break;
 
-	case "shapeLayerOrder":
-	    getShapeLayers().setOrder(op.oi);
-	    break;
+	    case "shapeLayers":
+		readShapeLayers(op);
+		break;
 
-	case "viewport":
-	    deserializeViewport(getViewport(), op.oi);
-	    break;
+	    case "shapeLayerOrder":
+		getShapeLayers().setOrder(op.oi);
+		break;
 
-	case "tools":
-	    readTools(op);
-	    break;
-	    
-	default:
-	    // We don't know how to read this event.
-	    break;
+	    case "viewport":
+		deserializeViewport(getViewport(), op.oi);
+		break;
+
+	    case "tools":
+		readTools(op);
+		break;
+		
+	    default:
+		// We don't know how to read this event.
+		break;
+	    }
 	}
     },
 
