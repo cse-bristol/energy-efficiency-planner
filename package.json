@@ -21,7 +21,7 @@
 	,"slippy-colors": "git://github.com/mapbox/slippy-colors.git"
 	,"js-shapefile-to-geojson--": "git://github.com/GlennS/js-shapefile-to-geojson.git#v1.0.0"
 	,"floating-dialogue": "git://github.com/cse-bristol/floating-dialogue.git#v1.0.0"
-	,"multiuser-file-menu": "git://github.com/cse-bristol/multiuser-file-menu#v0.5.0"
+	,"multiuser-file-menu": "git://github.com/cse-bristol/multiuser-file-menu"
 	,"sort-children": "git://github.com/cse-bristol/sort-children.git#v1.0.0"
     }
 }
