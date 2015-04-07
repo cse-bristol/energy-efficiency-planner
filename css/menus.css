@@ -20,3 +20,9 @@
 #toolbar:hover {
     opacity: 1.0;
 }
+
+@media print {
+    #toolbar {
+    	display: none !important;
+    }
+}
