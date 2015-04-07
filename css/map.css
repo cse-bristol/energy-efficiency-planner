@@ -38,3 +38,15 @@ path.LineString {
 .leaflet-control-geocoder {
     width: 23em;
 }
+
+@media print {
+    /* Work around viewport units being 0 while printing: https://code.google.com/p/chromium/issues/detail?id=382313 */
+    .leaflet-container {
+	overflow: visible !important;
+    }
+
+    /* Hide leaflet tools. */
+    .leaflet-control {
+	display: none;
+    }
+}

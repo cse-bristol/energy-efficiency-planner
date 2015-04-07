@@ -20,3 +20,9 @@
 .confirm-file-import {
     float: right;
 }
+
+@media print {
+    #import-dialogue {
+	display: none;
+    }
+}
