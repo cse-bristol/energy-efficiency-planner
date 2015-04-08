@@ -42,7 +42,7 @@ module.exports = function(errors, map, toolbar, tableForLayer, update) {
 		 Clean out these now unhelpful elements.
 		 */
 		shapeLayers.all().forEach(function(l) {
-		    l.resultsTable.el().remove();
+		    l.resultsTable.remove();
 		});
 	    }
 	};
@@ -103,7 +103,7 @@ module.exports = function(errors, map, toolbar, tableForLayer, update) {
 		shapeLayers.onAdd(tableForLayer);
 		shapeLayers.onAdd(update);
 		shapeLayers.onRemove(function(layer) {
-		    layer.resultsTable.el().remove();
+		    layer.resultsTable.remove();
 		    update();
 		});
 		shapeLayers.onReorder(update);

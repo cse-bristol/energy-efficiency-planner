@@ -24,6 +24,7 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
 	    .close()
 	    .drag()
 	    .resize()
+	    .sticky()
 	    .hide()
 	    .bringToFront(),
 
