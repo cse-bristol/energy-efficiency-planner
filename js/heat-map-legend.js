@@ -12,12 +12,12 @@ var d3 = require("d3"),
 	var a = document.createElement("a");
 	a.href = "/heat-map-cdn/Total Heat Density";
 	return a.href;
-    }());
+    }()),
+    broken = false;
 
 module.exports = function(getZoom, errors) {
     var legendByZoom = d3.map(),
-	onLoad = callbacks(),
-	broken = false;
+	onLoad = callbacks();
 
     // loop over the zoom levels
     _.range(1, maxZoom + 1).forEach(function(z) {
