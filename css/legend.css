@@ -1,9 +1,7 @@
-#legend {
-    left: 0.6em;
+.legend {
     top: calc(100% - 10em);
     background-color: white;
     z-index: 10;
-    width: 35em;
     background-color: #F0F0F0;
 }
 

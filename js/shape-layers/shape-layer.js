@@ -94,10 +94,10 @@ module.exports = function(errors) {
 	    
 	    legend: function() {
 		var labels = l.worksheet.sortPropertyBins(10);
-		
+
 		return legendFactory(
 		    labels,
-		    labels.map(l.worksheet.colourFun())
+		    labels.map(l.worksheet.getColourFunction())
 		);		    
 	    },
 

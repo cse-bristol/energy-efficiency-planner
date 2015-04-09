@@ -46,7 +46,13 @@ var reverse = function(colour) {
     return d3.lab((lab.l + 50) % 100, -lab.a, -lab.b);
 };
 
+var cyclingColours = d3.scale.category10(),
+    colourI = 10;
+
 module.exports = {
     scale: scale,
-    reverse: reverse
+    reverse: reverse,
+    next: function() {
+	return cyclingColours((colourI++ % 10));
+    }
 };

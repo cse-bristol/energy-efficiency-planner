@@ -13,10 +13,10 @@ var leaflet = require("leaflet"),
  Bundles together all aspect of the state of the map into a Javascript object.
  */
 module.exports = function(errors, map, toolbar, tableForLayer, update) {
-    var shapeLayers,
-	tileLayers,
+    var shapeLayers = layersFactory(errors),
+	tileLayers = tileLayersFactory(map.getZoom, errors),
 	baseLayer,
-	viewport,
+	viewport = viewportFactory(),
 	onSet = callbacks(),
 	loading = false,
 	

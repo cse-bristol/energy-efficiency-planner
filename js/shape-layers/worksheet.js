@@ -5,6 +5,7 @@
 var d3 = require("d3"),
     _ = require("lodash"),
     colour = require("../colour.js"),
+    nextColour = colour.next,
     helpers = require("../helpers.js"),
     callbacks = helpers.callbackHandler,
     isNum = helpers.isNum,
@@ -23,45 +24,59 @@ var shapeHeaders = function(shapeData) {
 };
 
 /*
- Data about a single shape layer's table and colouring.
+ Provides access to our data as a table structure.
+
+ Describes how we want our data to be displayed:
+ * Sort
+ * Colour
+ * Size (for points)
  */
 module.exports = function() {
-    var colours = d3.scale.category10(),
-	colourI = 0;
-    
-    var nextColour = function() {
-	return colours((colourI++ % 10));
-    };
-
     return function(shapeData) {
 	var headers = shapeHeaders(shapeData),
 	    sortProperties = [],
 	    reverseSort = [],
+	    
 	    sortPropertyChanged = callbacks(),
 	    baseColourChanged = callbacks(),
+
+	    colourFun,
+ 
 	    baseColour = nextColour(),
-	    propertyIsNum = d3.map(),
-	    sortColour = "black",
-	    /* Cache the colour funciton for this layer. Expires when the sort property changes. */
-	    colourFun;
+	    propertyIsNum = d3.map();
 
+	sortPropertyChanged.add(function() {
+	    colourFun = null;
+	});
+	
+	baseColourChanged.add(function() {
+	    colourFun = null;
+	});	    	
+	    
 	var m = {
-	    baseColour: function(val) {
-		colourFun = undefined;
-
-		if (val === undefined) {
-		    return baseColour;
-		} else {
-		    baseColour = val;
-		    baseColourChanged(val);
-		    return m;
-		}
+	    setBaseColour: function(newColour) {
+		baseColour = newColour;
+		baseColourChanged(newColour);
+		return m;		
 	    },
 
-	    colour: function() {
+	    /*
+	     The colour from which the scale will be derived.
+	     */
+	    baseColour: function() {
+		return baseColour;
+	    },
+
+	    /*
+	     Returns a function which will take a piece of data and give back a colour.
+	     */
+	    getColourFunction: function() {
 		if (!colourFun) {
 		    if (sortProperties.length === 0) {
-			colourFun = baseColour;
+			colourFun = function(data) {
+			    return baseColour;
+			};
+			
 		    } else {
 			var column = sortProperties[0],
 			    data = m.data([column]),
@@ -74,40 +89,25 @@ module.exports = function() {
 		return colourFun;
 	    },
 
-	    colourFun: function() {
-		var f = m.colour();
-
-		if (typeof(f) === "string") {
-		    return function(data) {
-			return f;
-		    };
+	    /*
+	     Given a shape and a named column, get the data from it.
+	     */
+	    getShapeData: function(d, column) {
+		if (column === "id") {
+		    return d.id;
 		} else {
-		    return f;
-		};
-	    },
-
-	    shapeColour: function() {
-		var colour = m.colour();
-		
-		if (sortProperties.length === 0) {
-		    return colour;
-		} else {
-		    var col = sortProperties[0];
-		    if (col === "id") {
-			return function(d, i) {
-			    return colour(d.id);
-			};
-		    }
-
-		    return function(d, i) {
-			return colour(d.properties[col]);
-		    };
+		    return d.properties[column];
 		}
 	    },
 
-	    sortProperty : function(property, additional) {
-		colourFun = undefined;
+	    /*
+	     Returns the column which should be used to colour data or shapes.
+	     */
+	    getColourColumn: function() {
+		return sortProperties[0];
+	    },
 
+	    sortProperty : function(property, additional) {
 		if (property) {
 
 		    var i = sortProperties.indexOf(property);
@@ -202,8 +202,6 @@ module.exports = function() {
 		    }
 
 		    if (propertyIsNum.get(p)) {
-			
-			
 			return bin(
 			    _.min(columnData),
 			    _.max(columnData),

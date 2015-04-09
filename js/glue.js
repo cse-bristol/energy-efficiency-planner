@@ -15,8 +15,8 @@ var d3 = require("d3"),
     body = d3.select("body"),
     menuBar = body.append("div").classed("file-menu", true),
     update = function() {
+	drawLegends(body, state.getShapeLayers, state.getTileLayers);
 	layerControl.update();
-	legend.update();
 	paint.redrawAll();
     },
     
@@ -24,6 +24,7 @@ var d3 = require("d3"),
     errors = require("./errors.js")(body, toolbar),
     progress = require("./progress.js")(body),
     map = require("./map.js")(body),
+    drawLegends = require("./legend.js"),
     paint = require("./paint.js")(
 	map.overlay,
 	map.projectTile,
@@ -55,14 +56,7 @@ var d3 = require("d3"),
 	state.fresh
     ),
     
-    legend = require("./legend.js")(
-	body,
-	toolbar,
-	state.getShapeLayers,
-	state.getTileLayers
-    ),
-    
-    layerControl = require("./layer-control.js")(
+    layerControl = require("./layer-control/layer-control.js")(
 	body,
 	toolbar,
 	state.getShapeLayers,

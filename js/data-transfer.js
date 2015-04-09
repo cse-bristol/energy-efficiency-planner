@@ -84,7 +84,7 @@ module.exports = function(shapeLayerFactory, errors, freshState) {
 		    shapeLayers.add(layer);
 		    
 		    layer.setOpacity(layerData.opacity);
-		    layer.worksheet.baseColour(layerData.colour);
+		    layer.worksheet.setBaseColour(layerData.colour);
 
 		    deserializeShapeSort(layerData.sort, layer.worksheet.sortProperty);
 

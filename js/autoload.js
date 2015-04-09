@@ -126,7 +126,7 @@ module.exports = function(
 		    deserializeShapeSort(op.oi, layer.worksheet.sortProperty);
 		    break;
 		case "colour":
-		    layer.worksheet.baseColour(op.oi);
+		    layer.worksheet.setBaseColour(op.oi);
 		    break;
 		default:
 		    throw new Error("Unknown shape layer property " + op.p[2]);

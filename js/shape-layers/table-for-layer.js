@@ -32,16 +32,16 @@ module.exports = function(container, zoomTo, onClickShape, onHoverShape, redraw)
 
 	var recolour = function() {
 	    if (l.worksheet.getSortProperties().properties.length > 0) {
-		var colour = l.worksheet.colour(),
-		    col = l.worksheet.firstSortPropertyI();
+		var column = l.worksheet.firstSortPropertyI(),
+		    colourFun = l.worksheet.getColourFunction();
 
 		l.resultsTable.rows().each(function(d, i) {
 		    d3.select(this)
 			.selectAll("td")
 			.each(function(d, i) {
 			    var el = d3.select(this);
-			    var background = i === col ? colour(d) : null,
-				font = i === col ? colours.reverse(background) : null;
+			    var background = i === column ? colourFun(d) : null,
+				font = i === column ? colours.reverse(background) : null;
 
 			    el
 				.style("background-color", background)

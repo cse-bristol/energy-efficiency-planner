@@ -3,39 +3,30 @@
 /*global module, require*/
 
 var d3 = require("d3"),
-    float = require("floating-dialogue"),
+    dialogue = require("floating-dialogue"),
     helpers = require("./helpers.js"),
     asId = require("./id-maker.js").fromString,
     colourBarWidth = 40,
-    colourBarHeight = 5;
+    colourBarHeight = 5,
+
+    legendClass = "legend",
+    legendLabelClass = "legend-label",
+    chartClass = "legend-chart";
 
 /*
- A dialogue which displays useful information about enabled layers:
+ A dialogue which displays useful information about an enabled layer:
  + The name of the layer.
  + A legend for the layer.
-
- This is the read-only counterpart to layer-control.js.
  */
-module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
-
-    var dialogue = float(
-	container.append("div")
-	    .attr("id", "legend"))
-	    .close()
-	    .drag()
-	    .resize()
-	    .sticky()
-	    .hide()
-	    .bringToFront(),
-
-	makeLegends = function(selection, newSelection) {
+module.exports = function(container, getShapeLayers, getTileLayers) {
+    var makeLegends = function(selection, newSelection) {
 	    newSelection
 		.append("svg")
-		.classed("legend-chart", true)
+		.classed(chartClass, true)
 		.attr("height", colourBarHeight + 13);
 
 
-	    var svg = selection.selectAll("svg.legend-chart")
+	    var svg = selection.selectAll("." + chartClass)
 		    .attr("width", function(layer, i) {
 			if (layer.legend) {
 			    return colourBarWidth * layer.legend().colours().length;
@@ -43,7 +34,6 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
 			
 			return null;
 		    }),
-
 
 		legendColours = svg
 		    .selectAll("rect")
@@ -60,14 +50,16 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
 
 	    legendColours.exit().remove();
 	    legendColours.enter().append("rect")
-	    	.attr("x", function(d, i) {
-		    return i * (colourBarWidth + 1);
-		})
 	    	.attr("width", colourBarWidth)
 		.attr("height", colourBarHeight)
 		.attr("fill", function(colour, i) {
 		    return colour;
 		});
+
+	legendColours
+	    .attr("x", function(d, i) {
+		return i * (colourBarWidth + 1);
+	    });
 
 	    var legendText = svg
 		    .selectAll("text")
@@ -115,14 +107,10 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
 	    return "";
 	},
 
-	makeLegendsForLayers = function(container, className, layers, hookNewDivs) {
+	makeLegendsForLayers = function(className, layers, hookNewDivs) {
 	    var divs = container.selectAll("div." + className)
 		    .data(
-			layers.filter(
-			    function(layer) {
-				return layer.getOpacity() > 0;
-			    }
-			),
+			layers,
 			function(layer) {
 			    return layer.name();
 			}
@@ -131,16 +119,25 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
 	    divs.exit().remove();
 
 	    var newDivs = divs.enter().append("div")
+		    .classed(legendClass, true)
 		    .classed(className, true)
 		    .attr("id", function(layer, i) {
 			return className + "-" + asId(layer.name());
 		    })
-		    .each(hookNewDivs);
+		    .each(hookNewDivs)
+		    .each(function(d, i) {
+			var el = d3.select(this);
+			d.legendDisplay = dialogue(el)
+			    .drag()
+			    .close()
+			    .sticky()
+			    .findSpace();
+		    });
 
 	    newDivs.append("div")
-	    	.classed("legend-label", true);
+	    	.classed(legendLabelClass, true);
 
-	    divs.selectAll("div.legend-label")
+	    divs.select("." + legendLabelClass)
 		.html(function(layer, i) {
 		    return layer.name() +
 			(
@@ -157,15 +154,8 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
 	    makeLegends(divs, newDivs);
 	},
 
-	tileLegends = dialogue.content().append("div")
-	    .attr("id", "tile-legends"),
-
-	shapeLegends = dialogue.content().append("div")
-	    .attr("id", "shape-legends"),
-	
 	redraw = function() {
 	    makeLegendsForLayers(
-		tileLegends,
 		"tile-legend",
 		getTileLayers().overlays.values(),
 		function(tileLayer, i) {
@@ -174,16 +164,16 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
 			var name = asId(tileLayer.name());
 
 			tileLayer.colourChanged(function(pixelColour) {
-			    var tileDiv = dialogue.content().selectAll("#tile-legend-" + name);
-			    pixelColour = pixelColour.toString();
+			    var tileDiv = container.select("#tile-legend-" + name);
+
+			    var colourString = pixelColour.toString();
 
 			    if (!tileDiv.empty()) {
-
 				tileDiv
 				    .select("svg.legend-chart")
 				    .selectAll("rect")
 				    .classed("highlight", function(rectColour, i) {
-					return rectColour === pixelColour;
+					return rectColour === colourString;
 				    });
 			    }
 			});
@@ -192,20 +182,13 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers) {
 	    );
 	    
 	    makeLegendsForLayers(
-		shapeLegends,
 	    	"shape-legend",
-	    	getShapeLayers().ordered(),
+	    	getShapeLayers().all(),
 	    	function(shapeLayer, i) {
 	    	    // Noop - shape layer legends currently have no interactions.
 	    	}
 	    );
 	};
 
-    toolbar.add("l", dialogue);
-    
-    return {
-	update: function() {
-	    redraw();
-	}
-    };
+    redraw();
 };

@@ -8,7 +8,6 @@ var d3 = require("d3"),
 module.exports = function(container, projection, dataSource) {
     var path = d3.geo.path()
 	    .projection(projection),
-	colours = d3.scale.category10(),
     	onClick = handlerFactory(),
 	onHover = handlerFactory();
 
@@ -37,9 +36,6 @@ module.exports = function(container, projection, dataSource) {
 	    l
 		.style("opacity", function(l){
 		    return l.getOpacity();
-		})
-		.style("fill", function(d, i) {
-		    return colours(i);
 		})
 		.attr("id", function(l) {
 		    return l.name();
@@ -73,27 +69,29 @@ module.exports = function(container, projection, dataSource) {
 		    .attr("d", path)
 		    .each(function(d, i) {
 			var el = d3.select(this),
-			    colour = d.layer.worksheet.shapeColour(),
-			    feature = undefined;
+			    colour = d.layer.worksheet.getColourFunction(),
+			    column = d.layer.worksheet.getColourColumn(),
 
-			switch (d.geometry.type) {
-			case "Point":
-			case "MultiPoint":
-			    feature = "fill";
-			    break;
-			case "LineString":
-			case "MultiLineString":
-			    feature = "stroke";
-			    break;
-			case "Polygon":
-			default:
-			    feature = "fill";
-			    break;
-			}
+			    feature = function() {
+				switch (d.geometry.type) {
+				case "Point":
+				case "MultiPoint":
+				    return "fill";
+				case "LineString":
+				case "MultiLineString":
+				    return "stroke";
+				case "Polygon":
+				default:
+				    return "fill";
+				}
+			    }();
 			
 			el
 			    .classed(d.geometry.type, true)
-			    .style(feature, colour);
+			    .style(feature, function(d, i) {
+				return colour(
+				    d.layer.worksheet.getShapeData(d, column));
+			    });
 		    });
 	    });
 
