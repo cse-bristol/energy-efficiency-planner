@@ -18,6 +18,10 @@ module.exports = function(labels, colours) {
     var labelLen = labels.length,
 	colourLen = colours.length;
 
+    if (colourLen === 0) {
+	labels = [];
+    }
+
     labels = labels.map(rounded);
 
     if (!(labelLen === colourLen || labelLen === colourLen + 1)) {
