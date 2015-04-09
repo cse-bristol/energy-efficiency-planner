@@ -10,4 +10,4 @@ lib: ; mkdir -p lib; git submodule init; git submodule update;
 
 clean: ; rm -rf ./bin/*
 
-
+watch: ; mkdir -p bin; watchify -d js/glue.js -o bin/main.js;
