@@ -202,6 +202,8 @@ module.exports = function() {
 		    }
 
 		    if (propertyIsNum.get(p)) {
+			columnData = columnData.map(parseFloat);
+			
 			return bin(
 			    _.min(columnData),
 			    _.max(columnData),
@@ -209,7 +211,7 @@ module.exports = function() {
 			);
 			
 		    } else {
-			return _.uniq(columnData);
+			return columnData;
 		    }
 		}
 	    },

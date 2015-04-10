@@ -90,7 +90,7 @@ module.exports = {
 	return _.range(
 	    min,
 	    max,
-	    (min + max) / bins
+	    (max - min) / bins
 	);
     }
 };
