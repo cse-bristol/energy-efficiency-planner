@@ -6,7 +6,7 @@ var d3 = require("d3"),
     _ = require("lodash"),
     leaflet = require("leaflet"),
     geocoder = require("leaflet-control-geocoder"),
-    zoombox = require("../node_modules/Leaflet.ZoomBox/L.Control.ZoomBox.min.js"),
+    zoombox = require("../node_modules/leaflet-zoombox/L.Control.ZoomBox.min.js"),
     
     log2 = function(n) {
 	return Math.log(n) / Math.LN2;

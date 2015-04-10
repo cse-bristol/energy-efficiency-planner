@@ -14,7 +14,7 @@
 	,"topojson": "1.6.18"
 	,"leaflet": "0.7.3"
 	,"leaflet-control-geocoder": "1.0.0"
-	,"Leaflet.ZoomBox": "git://github.com/consbio/Leaflet.ZoomBox.git"
+	,"leaflet-zoombox": "0.1.0"
 	,"proj4": "2.2.2"
 	,"lodash": "2.4.1"
 	
