@@ -224,6 +224,10 @@ module.exports = function() {
 	addToContainer: function(container) {
 	    container.node().appendChild(
 		dialogue.el().node());
+	},
+
+	remove: function() {
+	    dialogue.remove();
 	}
     };
 
