@@ -26,7 +26,8 @@ module.exports = function() {
 	    .resize()
 	    .drag()
 	    .hide()
-	    .bringToFront(),
+	    .bringToFront()
+	    .sticky(),
 	
 	table = dialogue.content().append("table")
 	    .classed("results-table", true),
