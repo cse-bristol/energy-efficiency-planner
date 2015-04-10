@@ -93,12 +93,23 @@ module.exports = function(errors) {
 	    },
 	    
 	    legend: function() {
-		var labels = l.worksheet.sortPropertyBins(10);
+		var colourFun = l.worksheet.getColourFunction();
 
-		return legendFactory(
-		    labels,
-		    labels.map(l.worksheet.getColourFunction())
-		);		    
+		var labels = l.worksheet.sortPropertyBins(10);
+		
+		if (colourFun.isCategorical) {
+		    return legendFactory.categorical(
+			colourFun.range(),
+			colourFun,
+			labels
+		    );
+		    
+		} else {
+		    return legendFactory.sampled(
+			labels,
+			l.worksheet.getColourFunction()
+		    );		    
+		}
 	    },
 
 	    worksheet: worksheetFactory(geometry),

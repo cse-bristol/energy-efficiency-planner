@@ -5,11 +5,17 @@
 var d3 = require("d3"),
     dialogue = require("floating-dialogue"),
     helpers = require("./helpers.js"),
+    colours = require("./colour.js"),
+    isNum = helpers.isNum,
+    rounded = helpers.rounded,
     asId = require("./id-maker.js").fromString,
-    colourBarWidth = 40,
-    colourBarHeight = 5,
+    
+    groupHeight = 10,
+    textWidth = 80,
+    textPadding = 2,
 
     legendClass = "legend",
+    legendGroupClass = "legend-group",
     legendLabelClass = "legend-label",
     chartClass = "legend-chart";
 
@@ -20,81 +26,105 @@ var d3 = require("d3"),
  */
 module.exports = function(container, getShapeLayers, getTileLayers) {
     var makeLegends = function(selection, newSelection) {
-	    newSelection
-		.append("svg")
-		.classed(chartClass, true)
-		.attr("height", colourBarHeight + 13);
+	newSelection
+	    .append("svg")
+	    .classed(chartClass, true);
 
-
-	    var svg = selection.selectAll("." + chartClass)
-		    .attr("width", function(layer, i) {
-			if (layer.legend) {
-			    return colourBarWidth * layer.legend().colours().length;
-			}
-			
+	var svg = selection.select("." + chartClass)
+		.attr("width", function(layer, i) {
+		    if (layer.legend) {
+			return textPadding + (textWidth * layer.legend().width);
+		    } else {
 			return null;
-		    }),
+		    }
+		})
+		.attr("height", function(layer) {
+		    if (layer.legend) {
+			return layer.legend().labelsByColour.size() * groupHeight;
+		    }
+		    
+		    return null;
+		}),
 
-		legendColours = svg
-		    .selectAll("rect")
-		    .data(
-			function(layer, i) {
-			    return layer.legend ?
-				layer.legend().colours() :
-				[];
-			},
-			function(colour) {
-			    return colour;
+	    legendColours = svg
+		.selectAll("g." + legendGroupClass)
+		.data(
+		    function(layer, i) {
+			if (layer.legend) {
+			    var legend = layer.legend();
+
+			    return legend.labelsByColour.entries()
+				.map(function(e) {
+				    return {
+					colour: e.key,
+					labels: e.value,
+					legend: legend
+				    };
+				});
+			} else {
+			    return [];
 			}
-		    );
+		    },
+		    function(d, i) {
+			return d.colour;
+		    }
+		);
 
-	    legendColours.exit().remove();
-	    legendColours.enter().append("rect")
-	    	.attr("width", colourBarWidth)
-		.attr("height", colourBarHeight)
-		.attr("fill", function(colour, i) {
-		    return colour;
+	legendColours.exit().remove();
+	var newLegendColours = legendColours.enter()
+		.append("g")
+		.classed(legendGroupClass, true)
+		.attr("fill", function(d, i) {
+		    return colours.reverse(d.colour);
 		});
+	
+	legendColours.attr("transform", function(d, i) {
+	    return "translate(0," + (i * groupHeight) + ")";
+	});
 
-	legendColours
-	    .attr("x", function(d, i) {
-		return i * (colourBarWidth + 1);
+	newLegendColours.append("rect")
+	    .attr("width", "100%")
+	    .attr("height", groupHeight)
+	    .attr("fill", function(d, i) {
+		return d.colour;
 	    });
 
-	    var legendText = svg
-		    .selectAll("text")
-		    .data(
-			function(layer, i) {
-			    return layer.legend ?
-				layer.legend().labels() :
-				[];
-			},
-			function(number) {
-			    return number;
-			}
-		    );
-
-	    legendText.exit().remove();
-	    legendText.enter().append("text")
-		.attr("width", colourBarWidth)
-		.attr("text-anchor", "middle")
-		.attr("y", colourBarHeight + 10)
-		.text(function(text, i) {
-		    if (typeof("text") === "string" && text.length > 9) {
-			return text.slice(0, 7) + "..";
+	var legendText = legendColours
+		.selectAll("text")
+		.data(
+		    function(d, i) {
+			return d.labels;
+		    },
+		    function(datum) {
+			return datum;
 		    }
+		);
 
+	legendText.exit().remove();
+
+	legendText.enter().append("text")
+	    .attr("text-anchor", function(text, i) {
+		var legend = d3.select(this.parentNode).datum().legend;
+		
+		return legend.numeric ? "end" : "start"; 
+	    })
+	    .attr("y", 9)
+	    .attr("x", function(d, i) {
+		var legend = d3.select(this.parentNode).datum().legend,
+		    offset = legend.numeric ? 1 : 0;
+		
+		return textPadding + (textWidth * (i + offset));
+	    })
+	    .text(function(text, i) {
+		if (isNum(text)) {
+		    return rounded(text);
+		} else if (text.length > 15) {
+		    return text.slice(0, 13) + "..";
+		} else {
 		    return text;
-		});
-
-	    legendText
-	    	.attr("x", function(text, i) {
-		    var layer = d3.select(this.parentNode).datum(),
-			offset = layer.legend().isBoundary() ? 0 : 0.5;
-		    
-		    return (i + offset) * (colourBarWidth + 1);
-		});
-	},
+		}
+	    });
+    },
 
 	getColouringPropertyText = function(layer) {
 	    if (layer.worksheet) {

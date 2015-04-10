@@ -17,7 +17,9 @@ var scale = function(data, colour) {
 	    var r = parseFloat(d);
 
 	    if (isNaN(r)) {
-		return d3.scale.category20();
+		var scale = d3.scale.category20();
+		scale.isCategorical = true;
+		return scale;
 	    } else {
 		numeric.push(r);
 	    }

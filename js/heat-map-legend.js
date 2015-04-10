@@ -30,21 +30,7 @@ module.exports = function(getZoom, errors) {
 			broken = true;
 		    }
 		} else {
-		    var numbers = [],
-			colours = [];
-
-		    data.legend.forEach(function(range, i) {
-			if (i === 0) {
-			    numbers.push(range.min);
-			}
-
-			// Must be American spelling here
-			colours.push(range.color);
-
-			numbers.push(range.max);
-		    });
-
-		    legendByZoom.set(z, legendFactory(numbers, colours));
+		    legendByZoom.set(z, legendFactory.bins(data.legend));
 
 		    onLoad();
 		}
@@ -60,7 +46,7 @@ module.exports = function(getZoom, errors) {
 
 	return legendByZoom.has(z) ?
 	    legendByZoom.get(z) :
-	    legendFactory([0], []);
+	    legendFactory.bins([]);
     };
 
     f.units = 'kWh/m<sup>2</sup>/year';
