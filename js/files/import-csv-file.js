@@ -16,7 +16,7 @@ var _ = require("lodash"),
 
  Provides a form which lets you select columns to be the latitude and longitude. Creates a point for each data row in the file.
  */
-module.exports = function(container, progress, errors, fileName, data, createLayer) {
+module.exports = function(container, progress, errors, coordinateSearch, fileName, data, createLayer) {
     if (data.length === 0) {
 	throw new Error("Imported csv file had no data.");
     }
@@ -93,6 +93,7 @@ module.exports = function(container, progress, errors, fileName, data, createLay
 	    container,
 	    progress,
 	    errors,
+	    coordinateSearch,
 	    [fileName],
 	    function(formEl) {
 		var csvFields = formEl.append("fieldset")

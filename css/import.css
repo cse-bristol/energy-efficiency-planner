@@ -13,6 +13,37 @@
     margin-right: 0.5em;
 }
 
+.coordinate-system-search {
+    display: block;
+    margin-bottom: 0.1em;
+    width: 99%
+}
+
+.srid-search-results {
+    z-index: 999;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+}
+
+.srid-search-result {
+    display: block;
+    width: 18em;
+    padding: 0.3em;
+    background-color: white;
+}
+
+.srid-search-result:hover {
+    background-color: lightgreen;
+}
+
+.coordinate-system {
+    width: 20em;
+    height: 10em;
+    font-size: small;
+}
+
 .cancel-file-import {
     float:left;
 }

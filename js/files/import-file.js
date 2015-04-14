@@ -11,7 +11,7 @@ var d3 = require("d3"),
 /*
  Provides a file import form with cancel and import buttons, and a section for choosing a coordinate system.
  */
-module.exports = function(container, progress, errors, layerNames, makeExtraContent, onSubmit) {
+module.exports = function(container, progress, errors, coordinateSearch, layerNames, makeExtraContent, onSubmit) {
     var content = container.append("form")
 	    .classed("file-import", true),
 
@@ -42,6 +42,29 @@ module.exports = function(container, progress, errors, layerNames, makeExtraCont
 
 	coordinateSystemLegend = coordinateSystemFieldset.append("legend")
 	    .text("Coordinate System"),
+
+	coordinateSearchBox = coordinateSystemFieldset.append("input")
+	    .classed("coordinate-system-search", true)
+	    .attr("placeholder", "Search for a coordinate system")
+	    .attr("type", "text")
+	    .on("input", function() {
+		var bbox = this.getBoundingClientRect();
+		
+		coordinateSearch.search(
+		    coordinateSearchBox.node().value,
+		    [
+			bbox.right,
+			bbox.top
+		    ],
+		    function(result) {
+			coordinateSearchBox.node().value = result.srid;
+			coordinateSystem.text(result.srtext);
+		    }
+		);
+		
+	    })
+	    .on("blur", coordinateSearch.hide)
+	    .call(noDrag),
 
 	coordinateSystem = coordinateSystemFieldset.append("textarea")
 	    .classed("coordinate-system", true)

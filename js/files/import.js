@@ -7,7 +7,8 @@ var dialogueFactory = require("./import-dialogue.js"),
     handlersFactory = require("./file-handlers.js"),
     importCSV = require("./import-csv-file.js"),
     importShapefile = require("./import-shapefile.js"),
-    importTopoJSON = require("./import-topojson.js");
+    importTopoJSON = require("./import-topojson.js"),
+    coordinateSearchFactory = require("./coordinate-search.js");
 
 /*
  Hooks up the various file import parts to each other.
@@ -24,18 +25,20 @@ module.exports = function(toolbar, container, state, shapeLayerFactory, saveLaye
 	saveLayerGeometry(layer);
     },
 
+    coordinateSearch = coordinateSearchFactory(container, errors),
+
     csv = function(name, csvFileData) {
-	importCSV(dialogue.content(), progress, errors, name, csvFileData, addLayer);
+	importCSV(dialogue.content(), progress, errors, coordinateSearch, name, csvFileData, addLayer);
 	go();
     },
 
     shapefile = function(name, shapeFileData, dbfFileData, prjFileData) {
-	importShapefile(dialogue.content(), progress, errors, name, shapeFileData, dbfFileData, prjFileData, addLayer);
+	importShapefile(dialogue.content(), progress, errors, coordinateSearch, name, shapeFileData, dbfFileData, prjFileData, addLayer);
 	go();
     },
 
     topojson = function(name, topojsonData) {
-	importTopoJSON(dialogue.content(), progress, errors, name, topojsonData, addLayer);
+	importTopoJSON(dialogue.content(), progress, errors, coordinateSearch, name, topojsonData, addLayer);
 	go();
     },	
 
