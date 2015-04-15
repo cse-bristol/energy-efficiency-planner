@@ -78,9 +78,22 @@ module.exports = function(container, getShapeLayers, getTileLayers) {
 		    return colours.reverse(d.colour);
 		});
 	
-	legendColours.attr("transform", function(d, i) {
-	    return "translate(0," + (i * groupHeight) + ")";
-	});
+	legendColours
+	    .sort(function(a, b) {
+		if (a.labels[0] === undefined || b.labels[0] === undefined) {
+		    return a.colour.localeCompare(b.colour);
+		} else {
+		    if (a.legend.numeric) {
+			return a.labels[0] - b.labels[0];
+		    } else {
+			
+			return a.labels[0].localeCompare(b.labels[0]);
+		    }
+		}
+	    })
+	    .attr("transform", function(d, i) {
+		return "translate(0," + (i * groupHeight) + ")";
+	    });
 
 	newLegendColours.append("rect")
 	    .attr("width", "100%")
