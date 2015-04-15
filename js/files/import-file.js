@@ -94,7 +94,7 @@ module.exports = function(container, progress, errors, coordinateSearch, layerNa
 		    ],
 		    function(result) {
 			coordinateSearchBox.node().value = result.srid;
-			coordinateSystem.text(result.srtext);
+			coordinateSystem.node().value = result.srtext;
 		    }
 		);
 		
