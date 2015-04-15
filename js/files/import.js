@@ -25,7 +25,7 @@ module.exports = function(toolbar, container, state, shapeLayerFactory, saveLaye
 	saveLayerGeometry(layer);
     },
 
-    coordinateSearch = coordinateSearchFactory(container, errors),
+    coordinateSearch = coordinateSearchFactory(container, errors.warnUser),
 
     csv = function(name, csvFileData) {
 	importCSV(dialogue.content(), progress, errors, coordinateSearch, name, csvFileData, addLayer);
