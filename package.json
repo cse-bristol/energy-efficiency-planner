@@ -19,7 +19,7 @@
 	,"lodash": "2.4.1"
 	
 	,"slippy-colors": "git://github.com/mapbox/slippy-colors.git"
-	,"js-shapefile-to-geojson--": "git://github.com/GlennS/js-shapefile-to-geojson.git#v1.0.0"
+	,"js-shapefile-to-geojson--": "git://github.com/GlennS/js-shapefile-to-geojson.git"
 	,"floating-dialogue": "git://github.com/cse-bristol/floating-dialogue.git"
 	,"multiuser-file-menu": "git://github.com/cse-bristol/multiuser-file-menu"
 	,"sort-children": "git://github.com/cse-bristol/sort-children.git#v1.0.0"
