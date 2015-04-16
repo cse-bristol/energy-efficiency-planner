@@ -1,5 +1,5 @@
 * Energy Efficiency Planner
-A web-based mapping tool. Use it to plan an energy intervention in an area, then share that plan with local stakeholders. Create alternative versions of plans which have been shared with you.
+A web-based mapping tool. Use it to plan an energy intervention in an area, then share that plan with local stakeholders. Create your own alternative versions of plans which have been shared.
   
 ** Features
  + Import shapes onto a map by dragging and dropping geoJSON, topoJSON or Shapefile, along with data describing attributes of those shapes as tsv.
@@ -10,13 +10,19 @@ A web-based mapping tool. Use it to plan an energy intervention in an area, then
 Get [[https://github.com/cse-bristol/energy-efficiency-planner][the source code]]. 
 
 ** Installation
-To install, clone the repository then serve using any web server, for example using python3 on a Debian system:
-#+BEGIN_SRC sh
-  sudo python3 -m http.server 80 &
+Clone the repository.
+#+BEGIN_SRC 
+git clone git@github.com:cse-bristol/energy-efficiency-planner.git;
 #+END_SRC
 
-*** Building the Code
-If you make changes to the code, you will need to rebuild it. Our Javascript files our arranged as node.js modules, and we use the 'browserify' tool to combine them into a single file.
+Optionally, check out a release. These are implemented as git tags:
+#+BEGIN_SRC sh
+  git fetch -a;
+  git checkout v0.5.0;
+#+END_SRC
+
+*** Build the Code
+Our Javascript files are arranged as node.js modules, and we use the 'browserify' tool to combine them into a single file.
 
 Begin by installing [[http://nodejs.org/][Node JS]]. On a Debian-based system, I'd recommend using this PPA:
 #+BEGIN_SRC sh
@@ -27,11 +33,17 @@ sudo aptitude install -y nodejs
 
 Then run the following:
 #+BEGIN_SRC sh
-  npm -g install browserify # Install Browserify as a command you can run.
-  npm install # Install the various packages we depend on (listed in package.json).
-  browserify glue.js -o bin/main.js # Package all the Javascript code together in a way that we can load into a browser.
+  git submodule update --init; # Acquire external libraries which aren't currently available as npm modules.
+  npm -g install browserify; # Install Browserify as a command you can run.
+  npm install; # Install the various packages we depend on (listed in package.json).
+  browserify glue.js -o bin/main.js; # Package all the Javascript code together in a way that we can load into a browser.
+#+END_SRC
+
+*** Serve as a web site
+Serve using any web server, for example using python3 on a Debian system:
+#+BEGIN_SRC sh
+  sudo python3 -m http.server 80 &
 #+END_SRC
 
 ** TODO Future Plans
 http://tools.smartsteep.eu/wiki/ToDo
-
