@@ -35,7 +35,7 @@ module.exports = function(shapes, newShapes, getShapeLayerById) {
 
 				getShapeLayerById(p.datum())
 				    .worksheet
-				    .baseColour(colour);
+				    .setBaseColour(colour);
 			    }));
 	})
 	.on("click", function(d, i) {
