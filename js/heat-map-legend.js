@@ -8,49 +8,48 @@ var d3 = require("d3"),
     callbacks = helpers.callbackHandler,
     legendFactory = require("./legend-data.js"),
     maxZoom = 17,
-    baseUrl = (function() {
-	var a = document.createElement("a");
-	a.href = "/heat-map-cdn/Total Heat Density";
-	return a.href;
-    }()),
+
     broken = false;
 
 module.exports = function(getZoom, errors) {
-    var legendByZoom = d3.map(),
-	onLoad = callbacks();
+    return function(baseUrl) {
+	var legendByZoom = d3.map(),
+	    onLoad = callbacks();
 
-    // loop over the zoom levels
-    _.range(1, maxZoom + 1).forEach(function(z) {
-	d3.json(
-	    baseUrl + "/legend_Z" + z + ".json",
-	    function(error, data) {
-		if (error) {
-		    if (!broken) {
-			errors.warnUser("Failed to load heat map legend: " + error.response);
-			broken = true;
+	// loop over the zoom levels
+	_.range(1, maxZoom + 1).forEach(function(z) {
+	    d3.json(
+		baseUrl + "/legend_Z" + z + ".json",
+		function(error, data) {
+		    if (error) {
+			if (!broken) {
+			    errors.warnUser("Failed to load heat map legend: " + error.response);
+			    broken = true;
+			}
+		    } else {
+			legendByZoom.set(z, legendFactory.bins(data.legend));
+
+			onLoad();
 		    }
-		} else {
-		    legendByZoom.set(z, legendFactory.bins(data.legend));
+		});
+	});
 
-		    onLoad();
-		}
-	    });
-    });
+	var f = function() {
+	    var z = getZoom();
 
-    var f = function() {
-	var z = getZoom();
+	    if (z > maxZoom) {
+		z = maxZoom;
+	    }
 
-	if (z > maxZoom) {
-	    z = maxZoom;
-	}
+	    return legendByZoom.has(z) ?
+		legendByZoom.get(z) :
+		legendFactory.bins([]);
+	};
 
-	return legendByZoom.has(z) ?
-	    legendByZoom.get(z) :
-	    legendFactory.bins([]);
+	f.units = 'kWh/m<sup>2</sup>/year';
+	f.onLoad = onLoad.add;
+	
+	return f;
     };
-
-    f.units = 'kWh/m<sup>2</sup>/year';
-    f.onLoad = onLoad.add;
-    
-    return f;
 };
+

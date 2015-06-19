@@ -6,7 +6,8 @@ var leaflet = require("leaflet"),
     d3 = require("d3"),
     helpers = require("./helpers.js"),
     callbacks = helpers.callbackHandler,
-    heatMapLegendFactory = require("./heat-map-legend.js");
+
+    heatMapLayerFactory = require("./heat-map-layer.js");
 
 var decorateTileLayers = function(tileLayers, opacity) {
     tileLayers.forEach(function(name, layer) {
@@ -77,23 +78,22 @@ module.exports = function(getZoom, errors) {
 	    "ESRI World Imagery" : Esri_WorldImagery,
 	    "ESRI World Topography": Esri_WorldTopoMap
 	}),
+
+	makeHeatMapLayer = heatMapLayerFactory(getZoom, errors),
+
+	heatMapLayers = [
+	    "Total Heat Density",
+	    "Public Buildings Heat Density",
+	    "Commercial Heat Density",
+	    "Industrial Heat Density",
+	    "Residential Heat Density"
+	],
 	
-	nationalHeatMap = leaflet.tileLayer('/heat-map-cdn/Total%20Heat%20Density/Z{z}/{y}/{x}.png', {
-	    attribution: '<a href="http://tools.decc.gov.uk/nationalheatmap/">English National Heat Map</a>,',
-	    minZoom: 2,
-	    maxZoom: 17,
-	    bounds: leaflet.latLngBounds(
-		leaflet.latLng(50, -7),
-		leaflet.latLng(56, 2)
-	    )
-	}),
+	overlays = d3.map();
 
-	overlays = d3.map({
-	    "English National Heat Map" : nationalHeatMap
-	});
-
-    nationalHeatMap.options.zIndex = 1;
-    nationalHeatMap.legend = heatMapLegendFactory(getZoom, errors);
+    heatMapLayers.forEach(function(heatMapLayer) {
+	overlays.set(heatMapLayer, makeHeatMapLayer(heatMapLayer));
+    });
 
     decorateTileLayers(baseLayers);
     decorateTileLayers(overlays, 0);
