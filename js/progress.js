@@ -10,17 +10,7 @@ var d3 = require("d3");
 module.exports = function(body) {
     var mask = body
 	    .append("div")
-	    .attr("id", "loading-cursor-mask")
-	    .style("display", "none")
-	    .style("opacity", 0)
-	    .style("cursor", "wait")
-	    .style("z-index", 999)
-	    .style("position", "fixed")
-	    .style("top", 0)
-	    .style("bottom", 0)
-	    .style("left", 0)
-	    .style("right", 0)
-	    .style("margin", 0),
+	    .attr("id", "loading-cursor-mask"),
 
 	depth = 0,
 
@@ -30,9 +20,9 @@ module.exports = function(body) {
 	    }
 
 	    if (depth) {
-		mask.style("display", "block");
+		mask.classed("loading", true);
 	    } else {
-		mask.style("display", "none");
+		mask.classed("loading", false);
 	    }
 	};
 
