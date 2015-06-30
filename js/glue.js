@@ -75,8 +75,10 @@ var d3 = require("d3"),
     
     fetchLayers = require("./shape-layers/fetch-layers.js")(
 	menu.backend.load,
+	menu.backend.loadSnapshot,
 	dataTransfer.onDeserializeLayer,
-	progress
+	progress,
+	errors
     ),
     
     viewportButtons = require("./viewport-buttons.js")(

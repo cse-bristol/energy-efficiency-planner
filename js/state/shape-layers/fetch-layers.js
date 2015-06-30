@@ -8,20 +8,18 @@ var d3 = require("d3"),
 /*
  If we add a layer to a map, it will get saved in a collection (overwriting any existing layer of the same name).
  */
-module.exports = function(load, onDeserializeLayer, progress) {
+module.exports = function(load, loadSnapshot, onDeserializeLayer, progress, errors) {
     var loadLayer = function(layerName, callback) {
 	progress.waiting();
-	load(
+	loadSnapshot(
 	    collection,
 	    layerName,
 	    function(loaded) {
-		var snapshot = loaded.getSnapshot();
-		if (snapshot) {
-		    callback(snapshot.geometry, snapshot.boundingbox);
-		    progress.ready();
-		} else {
-		    throw new Error("Attempted to load Layer which does not exist " + layerName);
-		}
+		callback(loaded.geometry, loaded.boundingbox);
+		progress.ready();
+	    },
+	    function(error) {
+		errors.warnUser(error);
 	    }
 	);
     };
