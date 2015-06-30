@@ -22,14 +22,6 @@ var d3 = require("d3"),
  */
 module.exports = function(container, zoomTo, onClickShape, onHoverShape, redraw) {
     return function(l) {
-	var updateResultsTable = function() {
-	    l.resultsTable.info(
-		l.worksheet.headers(),
-		l.worksheet.data(),
-		l.worksheet.getSortProperties()
-	    );
-	};
-
 	var recolour = function() {
 	    if (l.worksheet.getSortProperties().properties.length > 0) {
 		var column = l.worksheet.firstSortPropertyI(),
@@ -57,28 +49,11 @@ module.exports = function(container, zoomTo, onClickShape, onHoverShape, redraw)
 	    redraw();
 	};
 
-	if (!l.worksheet) {
-	    throw new Error("Layer did not have a worksheet " + l.name());
-	}
-
-	if (!l.resultsTable) {
-	    throw new Error("Layer did not have a results table " + l.name());
-	}
-
-	l.resultsTable.addToContainer(container);
-	
-	/*
-	 When we click a header in the table, sort by that column.
-	 */
-	l.resultsTable.headerClicked(function(p) {
-	    l.worksheet.sortProperty(p, d3.event.shiftKey);
-	});
-
 	l.resultsTable.rowClicked(function(d, i) {
 	    /*
 	     When we click on a row in the table, zoom to it on the map.
 
-	     Highlight that row on the table, and hide all the others.
+	     Highlight that row on the table, and clear highlights for the other rows.
 	     */
 	    var id = d[0];
 	    zoomTo(getShapeById(l, id).datum().bbox);
@@ -89,22 +64,6 @@ module.exports = function(container, zoomTo, onClickShape, onHoverShape, redraw)
 		});
 	});
 	
-	l.resultsTable.rowHovered(function(d, i) {
-	    /*
-	     When we hover over a row in the table, highlight the corresponding shape in the map.
-	     */
-	    var id = d[0];
-	
-	    getShapes(l)
-		.classed("highlight", function(d, i) {
-		    return d.id === id;
-		});
-	});
-	
-	l.resultsTable.resetClicked(function() {
-	    l.worksheet.sortProperty();
-	});
-
 	onClickShape(function(id, layer) {
 	    /*
 	     If we click on a shape, focus on it in the table.
@@ -141,14 +100,5 @@ module.exports = function(container, zoomTo, onClickShape, onHoverShape, redraw)
 		})
 	    );
 	});
-
-	l.worksheet.sortPropertyChanged(updateResultsTable);
-	l.worksheet.sortPropertyChanged(recolour);
-	l.worksheet.baseColourChanged(recolour);
-
-	l.onSetOpacity(redraw);
-
-	updateResultsTable();
-	recolour();
     };
 };

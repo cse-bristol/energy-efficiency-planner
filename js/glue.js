@@ -14,25 +14,31 @@ var d3 = require("d3"),
 
     body = d3.select("body"),
     menuBar = body.append("div").classed("file-menu", true),
-    update = function() {
-	drawLegends(body, state.getShapeLayers, state.getTileLayers);
-	layerControl.update();
-	paint.redrawAll();
-    },
-    
-    toolbar = require("./toolbar.js")(body),
-    errors = require("./errors.js")(body, toolbar),
-    progress = require("./progress.js")(body),
-    map = require("./map.js")(body),
-    drawLegends = require("./legend.js"),
-    paint = require("./paint.js")(
-	map.overlay,
-	map.projectTile,
-	function() {
-	    return state.getShapeLayers().ordered().reverse();
+    toolbar = body.append("div").classed("toolbar", true),
+
+    resultsTables = dialogue(
+	"results-table",
+	{
+	    reposition: true,
+	    close: true,
+	    resize: true,
+	    sticky: true,
+	    bringToFront: true,
+	    findSpace: true,
+	    lockToScreen: true
 	}
     ),
-    shapeLayerFactory = require("./shape-layers/shape-layer.js")(errors),
+
+    update = function() {
+	draw.update();
+    },
+    
+    errors = require("./errors.js")(toolbar, body),
+    progress = require("./progress.js")(body),
+
+    shapeLayerFactory = require("./shape-layers/shape-layer.js")(errors, resultsTables),
+
+    map = require("./map.js")(body),
     
     tableForLayer = require("./shape-layers/table-for-layer.js")(
 	body,
@@ -49,19 +55,14 @@ var d3 = require("d3"),
 	tableForLayer,
 	update
     ),
+
+    draw = require("./draw/draw.js")(body, resultsTables, state.getShapeLayers, state.getTileLayers),
     
     dataTransfer = require("./data-transfer.js")(
 	shapeLayerFactory,
 	errors,
 	state.fresh
     ),
-    
-    layerControl = require("./layer-control/layer-control.js")(
-	body,
-	toolbar,
-	state.getShapeLayers,
-	state.getTileLayers,
-	map.zoomTo),
     
     menu = require("multiuser-file-menu")(
 	"maps",
@@ -87,13 +88,12 @@ var d3 = require("d3"),
 	update
     );
 
-require("./files/import.js")(
+require("./serialization/files/import.js")(
     toolbar,
     body,
     state,
     shapeLayerFactory,
     fetchLayers.save,
-    update,
     errors,
     progress
 );
@@ -117,7 +117,5 @@ require("./autosave-and-autoload.js")(
     dataTransfer,
     toolbar
 );
-
-map.onViewReset(update);
 
 menu.queryString.fromURL();

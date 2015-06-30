@@ -8,7 +8,7 @@ var d3 = require("d3"),
     helpers = require("../helpers.js"),
     callbacks = helpers.callbackHandler,
     fixGeometryIdsFactory = require("./fix-geometry-ids.js"),
-    worksheetFactory = require("./worksheet.js")(),
+    worksheetFactory = require("./worksheet/worksheet.js")(),
     resultsTableFactory = require("./results-table.js"),
     legendFactory = require("../legend-data.js");
 
@@ -17,7 +17,7 @@ var d3 = require("d3"),
 
  The geometry of the layer is represented as a deserialized GeoJSON object (see: http://geojson.org/geojson-spec.html).
  */
-module.exports = function(errors) {
+module.exports = function(errors, resultsTables) {
     var fixGeometryIds = fixGeometryIdsFactory(errors);
 
     return function(namePreference, geometry, boundingbox) {
@@ -113,13 +113,12 @@ module.exports = function(errors) {
 	    },
 
 	    worksheet: worksheetFactory(geometry),
-	    resultsTable: resultsTableFactory(),
+	    resultsTable: resultsTables.createData(name),
 
 	    onSetOpacity: onSetOpacity.add
 	};
 
-	geometry.forEach(function(g){
-	    g.layer = l;
+	geometry.forEach(function(g) {
 	    g.key = name + "/" + g.id;
 	});
 

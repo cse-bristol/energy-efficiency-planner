@@ -166,31 +166,19 @@ module.exports = function(
 		
 		switch(op.p[2]) {
 		case "visible":
-		    readToolVisibility(tool, op.oi);
+		    tool.setVisibility(op.oi);
 		    break;
 		case "size":
-		    tool.size(op.oi);
+		    tool.setSize(op.oi);
 		    break;
 		case "position":
-		    tool.position(op.oi);
+		    tool.setPosition(op.oi);
 		    break;
 		default:
 		    throw new Error("Unknown tool property " + op.p[2]);
 		}
 	    } else {
 		// No-op, this tool no longer exists in the code.
-	    }
-	},
-	
-	readToolVisibility = function(tool, visible) {
-	    if (visible === true) {
-		tool.show();
-		
-	    } else if (visible === false) {
-		tool.hide();
-		
-	    } else {
-		throw new Error("Unknown tool operation " + visible);
 	    }
 	};
 

@@ -13,11 +13,12 @@ var dialogueFactory = require("./import-dialogue.js"),
 /*
  Hooks up the various file import parts to each other.
  */
-module.exports = function(toolbar, container, state, shapeLayerFactory, saveLayerGeometry, refresh, errors, progress) {
+module.exports = function(toolbar, container, state, shapeLayerFactory, saveLayerGeometry, errors, progress) {
     var
     go = function() {
-	dialogue.show();
-	refresh();
+	dialogueState.setVisibility(true);
+	drawing.dialogues();
+	drawing.buttons(toolbar);
     },
     addLayer = function(name, geometry, bbox) {
 	var layer = shapeLayerFactory(name, geometry, bbox);
@@ -28,17 +29,17 @@ module.exports = function(toolbar, container, state, shapeLayerFactory, saveLaye
     coordinateSearch = coordinateSearchFactory(container, errors.warnUser),
 
     csv = function(name, csvFileData) {
-	importCSV(dialogue.content(), progress, errors, coordinateSearch, name, csvFileData, addLayer);
+	importCSV(dialogueElement, progress, errors, coordinateSearch, name, csvFileData, addLayer);
 	go();
     },
 
     shapefile = function(name, shapeFileData, dbfFileData, prjFileData) {
-	importShapefile(dialogue.content(), progress, errors, coordinateSearch, name, shapeFileData, dbfFileData, prjFileData, addLayer);
+	importShapefile(dialogueElement, progress, errors, coordinateSearch, name, shapeFileData, dbfFileData, prjFileData, addLayer);
 	go();
     },
 
     topojson = function(name, topojsonData) {
-	importTopoJSON(dialogue.content(), progress, errors, coordinateSearch, name, topojsonData, addLayer);
+	importTopoJSON(dialogueElement, progress, errors, coordinateSearch, name, topojsonData, addLayer);
 	go();
     },	
 
@@ -78,10 +79,33 @@ module.exports = function(toolbar, container, state, shapeLayerFactory, saveLaye
 	    });
 	});   
     },
+    
     dialogue = dialogueFactory(
-	toolbar,
+	"import",
+	{
+	    position: true,
+	    lockToScreen: true
+	}
+    ),
+
+    dialogueElement,
+
+    dialogueState = dialogueState.createData(),
+
+    drawing = dialogue.drawing(
+	function() {
+	    return dialogueState;
+	},
 	container,
-	handle
+	function(dialogues, newDialogues) {
+	    dialogueElement = dialogues;
+	},
+	function(buttons, newButtons) {
+	    newButtons.text("I");
+	},
+	function() {
+	    return dialogueState;
+	}
     );
 
     dropFactory(container, errors, handle);

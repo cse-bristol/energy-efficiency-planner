@@ -25,45 +25,57 @@ var d3 = require("d3"),
     tableButton = require("./table-button.js"),
     empty = d3.select(),
     overlayControlClass = "overlay-control",
-    layerNameClass = "layer-name";
+    layerNameClass = "layer-name",
+    toolText = "L";
 
-module.exports = function(container, toolbar, getShapeLayers, getTileLayers, zoomTo) {
-    var dialogue = floatingDialogue(
-	container.append("div")
-	    .attr("id", "layer-control"))
-	    .close()
-	    .drag()
-	    .show(),
-	
-	control = dialogue
-	    .content(),
+module.exports = function(container, toolbar, getTileLayers, getShapeLayers, zoomTo) {
+    var dialogueFactory = floatingDialogue(
+	container,
+	toolbar.get,
+	toolbar.update,
+	"layer-control",
+	{
+	    reposition: true,
+	    close: true,
+	    lockToScreen: true
+	}
+    ),
 
-	baseForm = control.append("form").datum(getTileLayers().getBaseLayer().name()),
-	baseDiv = baseForm.append("div"),
-	tilesForm = control.append("form"),
-	shapesForm = control.append("form"),
-	
+	control,
+	baseForm,
+	baseDiv,
+	tilesForm,
+	shapesForm,
+
 	getShapeLayerById = function(layerId) {
 	    return getShapeLayers().get(layerId);
 	},
 
 	getTileOverlayById = function(layerId) {
 	    return getTileLayers().overlays.get(layerId);
-	};
+	};	
 
-    opacitySlider(baseForm, baseForm, function(noIdRequiredHere) {
-	return getTileLayers().getBaseLayer();
+    toolbar.add(toolText, dialogueFactory, function(dialogues, newDialogues) {
+	control = newDialogues;
+	baseForm = control.append("form").datum(getTileLayers().getBaseLayer().name());
+	baseDiv = baseForm.append("div");
+	tilesForm = control.append("form");
+	shapesForm = control.append("form");
+
+	opacitySlider(baseForm, baseForm, function(noIdRequiredHere) {
+	    return getTileLayers().getBaseLayer();
+	});	
     });
-
-    toolbar.add("L", dialogue);
-
-    var updateBase = function() {
-	baseForm.datum(getTileLayers().getBaseLayer().name());
+	
+    var updateBase = function(baseLayer, baseLayerNames) {
+	baseForm.datum(
+	    baseLayer.name()
+	);
 	
 	var baseLabels = baseDiv
 		.selectAll("label")
 		.data(
-		    getTileLayers().base.keys(),
+		    baseLayerNames,
 		    function(d, i) {
 			return d;
 		    });
@@ -93,7 +105,7 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers, zoo
 
 	baseLabels.select("input")
 	    .attr("checked", function(d, i) {
-		return d === getTileLayers().getBaseLayer().name() ? "checked" : null;
+		return d === baseLayer.name() ? "checked" : null;
 	    });
 
 	opacitySlider(baseForm, empty, function(noIdRequiredHere) {
@@ -101,11 +113,11 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers, zoo
 	});
     };
 
-    var updateTiles = function() {
+    var updateTiles = function(tileOverlays) {
 	var tileDivs = tilesForm
 		.selectAll("div")
 		.data(
-		    getTileLayers().overlays.keys(),
+		    tileOverlays.keys(),
 		    function(d, i) {
 			return d;
 		    });
@@ -129,14 +141,10 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers, zoo
 	legendButton(tileDivs, newTileDivs, getTileOverlayById);
     };
 
-    var updateShapes = function() {
+    var updateShapes = function(shapeLayerNames) {
 	var shapes = shapesForm.selectAll("div")
 		.data(
-		    getShapeLayers()
-			.ordered()
-			.map(function(layer) {
-			    return layer.name();
-			}),
+		    shapeLayerNames,
 		    function(d, i) {
 			return d;
 		    });
@@ -194,10 +202,14 @@ module.exports = function(container, toolbar, getShapeLayers, getTileLayers, zoo
     };
 
     return {
-	update: function() {
-	    updateBase();
-	    updateTiles();
-	    updateShapes();
+	fromData: function(tileLayers, shapeLayers) {
+	    updateBase(tileLayers.getBaseLayer(), tileLayers.base.keys());
+	    updateTiles(tileLayers.overlays());
+	    updateShapes(
+		shapeLayers.map(function(layer) {
+		    return layer.name();
+		})
+	    );
 	}
     };
 };

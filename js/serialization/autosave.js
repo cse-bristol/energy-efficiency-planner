@@ -146,22 +146,22 @@ module.exports = function(writeOp, canWrite, onStateReplaced, getTileLayers, get
 	["tools"]
     );
     
-    toolbar.forEach(function(toolText, dialogue) {
-	var toolHook = hookToolbar.p(toolText);
-
-	dialogue.onVisibilityChanged(
-	    toolHook.p("visible"));
-	
-	dialogue.onSizeChanged(
-	    toolHook.p("size").delay());
-	
-	dialogue.onPositionChanged(
-	    toolHook.p("position").delay());
-    });
-   
     onStateReplaced(function() {
 	hookTileLayers(getTileLayers());
 	hookShapeLayers(getShapeLayers());
 	hookViewport(getViewport());
+
+	toolbar.eachData(function(toolText, dialogueData) {
+	    var toolHook = hookToolbar.p(toolText);
+
+	    dialogueData.onVisibilityChanged(
+		toolHook.p("visible"));
+	    
+	    dialogueData.onSizeChanged(
+		toolHook.p("size").delay());
+	    
+	    dialogueData.onPositionChanged(
+		toolHook.p("position").delay());
+	});
     });
 };

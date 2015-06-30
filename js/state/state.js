@@ -31,8 +31,7 @@ module.exports = function(errors, map, toolbar, tableForLayer, update) {
 		tools: {
 		    "L": {visibility: true},
 		    "!": {visibility: false},
-		    "I": {visibility: false},
-		    "l": {visibility: false}
+		    "I": {visibility: false}
 		}
 	    };
 	},

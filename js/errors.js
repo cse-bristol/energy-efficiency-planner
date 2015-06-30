@@ -3,49 +3,85 @@
 /*global module, require*/
 
 var float = require("floating-dialogue"),
-    d3 = require("d3");
+    d3 = require("d3"),
+    toolText = "!";
 
-module.exports = function(container, toolbar) {
+module.exports = function(toolbar, body) {
     var dialogue = float(
-	container.append("div")
-	    .attr("id", "messages"))
-	    .drag()
-	    .resize()
-	    .close()
-	    .hide(),
-
-	messages = dialogue
-	    .content(),
-
-	noErrors = messages.append("div")
-	    .classed("info", true)
-	    .text("No errors.");
-
-    toolbar.add("!", dialogue);
-
-    var hideNoErrors = function() {
-	noErrors.style("display", "none");
-    };
-
-    var maybeShowNoErrors = function() {
-	if (messages.node().childNodes.length <= 1) {
-	    noErrors.style("display", "block");
+	"errors",
+	{
+	    position: true,
+	    size: true,
+	    close: true,
+	    visible: false,
+	    lockToScreen: true
 	}
-    };
+    ),
 
-    var fadeOut = function(selection) {
-	selection.transition()
-	    .delay(15000)
-	    .remove()
-	    .each("end", function() {
-		maybeShowNoErrors();
-	    });
-    };
+	dialogueState = dialogue.createData(),
+
+	drawDialogueContent = function(dialogues, newDialogues) {
+	    messages = dialogues;
+	    
+	    noErrors = newDialogues.append("div")
+		.classed("info", true)
+		.text("No errors.");
+	},
+
+	drawButtonContent = function(button, newButton) {
+	    newButton.text("!");
+	},	
+
+	hideNoErrors = function() {
+	    noErrors.style("display", "none");
+	},
+
+	maybeShowNoErrors = function() {
+	    if (messages.node().childNodes.length <= 1) {
+		noErrors.style("display", "block");
+	    }
+	},
+
+	fadeOut = function(selection) {
+	    selection.transition()
+		.delay(15000)
+		.remove()
+		.each("end", function() {
+		    maybeShowNoErrors();
+		});
+	},
+
+	draw = function() {
+	    drawing.dialogues([dialogueState]);
+	    drawing.buttons(toolbar);
+	},
+
+	drawing = dialogue.drawing(
+	    function() {
+		return dialogueState;
+	    },
+	    body,
+	    drawDialogueContent,
+	    drawButtonContent,
+	    function() {
+		return dialogueState;
+	    }
+	),	
+
+	messages,
+	noErrors;
+
+    draw();
     
     return {
+	serialize: dialogueState.serialize,
+	deserialize: function(serialized) {
+	    dialogueState = dialogue.load(serialized);
+	},
+	
 	informUser : function(text) {
 	    console.log(text);
-	    
+
 	    var infoMsg = messages
 		    .append("div")
 		    .classed("info", true)
@@ -57,7 +93,7 @@ module.exports = function(container, toolbar) {
 	},
 	warnUser : function(text) {
 	    console.warn(text);
-	    
+
 	    var errorMsg = messages
 		    .append("div")
 		    .classed("error", true);
@@ -77,7 +113,8 @@ module.exports = function(container, toolbar) {
 
 	    hideNoErrors();
 
-	    dialogue.show();
+	    dialogueState.setVisibility(true);
+	    draw();
 	}
     };
 };

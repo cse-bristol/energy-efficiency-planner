@@ -27,22 +27,23 @@ var shapeHeaders = function(shapeData) {
  Provides access to our data as a table structure.
 
  Describes how we want our data to be displayed:
- * Sort
+ * Sort columns
  * Colour
- * Size (for points)
+ * Currently selected shape
  */
 module.exports = function() {
     return function(shapeData) {
 	var headers = shapeHeaders(shapeData),
 	    sortProperties = [],
 	    reverseSort = [],
+
+	    clickedShapeId = null,
 	    
 	    sortPropertyChanged = callbacks(),
 	    baseColourChanged = callbacks(),
 
-	    colourFun,
- 
-	    baseColour = nextColour(),
+	    colourFun = null,
+ 	    baseColour = nextColour(),
 	    propertyIsNum = d3.map();
 
 	sortPropertyChanged.add(function() {
@@ -172,6 +173,27 @@ module.exports = function() {
 
 	    headers: function() {
 		return headers;
+	    },
+
+	    columns: function() {
+		return headers.map(function(header) {
+		    var sort = sortProperties.indexOf(header);
+		    
+		    return {
+			name: header,
+			sort: sort >= 0 ?
+			    (reverseSort[sort] ? "ascending" : "descending") :
+			null
+		    };
+		});
+	    },
+
+	    selectShape: function(id) {
+		selectedShapeId = id;
+	    },
+
+	    getSelectedShapeId: function() {
+		return selectedShapeId;
 	    },
 
 	    /*
