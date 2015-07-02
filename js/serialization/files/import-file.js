@@ -3,10 +3,10 @@
 /*global module, require*/
 
 var d3 = require("d3"),
-    helpers = require("../helpers.js"),
+    helpers = require("../../helpers.js"),
     noDrag = helpers.noDrag,
-    geometries = require("../geometries.js"),
-    asLayerName = require("../id-maker.js").fromString,
+    geometries = require("../../geometries.js"),
+    asLayerName = require("../../id-maker.js").fromString,
     /* See https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode */
     arrowDown = 40,
     arrowUp = 38,

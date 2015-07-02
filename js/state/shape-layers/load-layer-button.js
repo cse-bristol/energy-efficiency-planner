@@ -2,7 +2,7 @@
 
 /*global module, require*/
 
-var helpers = require("../helpers.js"),
+var helpers = require("../../helpers.js"),
     noop = helpers.noop;
 
 module.exports = function(collection, shapeLayerFactory, getShapeLayers, load, makeButton) {

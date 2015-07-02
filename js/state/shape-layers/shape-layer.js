@@ -4,20 +4,19 @@
 
 
 var d3 = require("d3"),
-    idMaker = require("../id-maker.js"),
-    helpers = require("../helpers.js"),
+    idMaker = require("../../id-maker.js"),
+    helpers = require("../../helpers.js"),
     callbacks = helpers.callbackHandler,
     fixGeometryIdsFactory = require("./fix-geometry-ids.js"),
     worksheetFactory = require("./worksheet/worksheet.js")(),
-    resultsTableFactory = require("./results-table.js"),
-    legendFactory = require("../legend-data.js");
+    legendFactory = require("../../legend/legend-data.js");
 
 /*
  Create a new shape layer.
 
  The geometry of the layer is represented as a deserialized GeoJSON object (see: http://geojson.org/geojson-spec.html).
  */
-module.exports = function(errors, resultsTables) {
+module.exports = function(errors, createResultsTableDialogueData, createLegendDialogueState) {
     var fixGeometryIds = fixGeometryIdsFactory(errors);
 
     return function(namePreference, geometry, boundingbox) {
@@ -113,10 +112,12 @@ module.exports = function(errors, resultsTables) {
 	    },
 
 	    worksheet: worksheetFactory(geometry),
-	    resultsTable: resultsTables.createData(name),
+	    resultsTable: createResultsTableDialogueData(name),
 
 	    onSetOpacity: onSetOpacity.add
 	};
+
+	l.legend.dialogueState = createLegendDialogueState();
 
 	geometry.forEach(function(g) {
 	    g.key = name + "/" + g.id;

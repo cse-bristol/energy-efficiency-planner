@@ -2,7 +2,7 @@
 
 /*global module, require, FileReader*/
 
-var dialogueFactory = require("./import-dialogue.js"),
+var dialogueFactory = require("floating-dialogue"),
     dropFactory = require("./file-drop.js"),
     handlersFactory = require("./file-handlers.js"),
     importCSV = require("./import-csv-file.js"),
@@ -16,9 +16,8 @@ var dialogueFactory = require("./import-dialogue.js"),
 module.exports = function(toolbar, container, state, shapeLayerFactory, saveLayerGeometry, errors, progress) {
     var
     go = function() {
-	dialogueState.setVisibility(true);
-	drawing.dialogues();
-	drawing.buttons(toolbar);
+	dialogue.getState.setVisibility(true);
+	drawing.update();
     },
     addLayer = function(name, geometry, bbox) {
 	var layer = shapeLayerFactory(name, geometry, bbox);
@@ -83,30 +82,41 @@ module.exports = function(toolbar, container, state, shapeLayerFactory, saveLaye
     dialogue = dialogueFactory(
 	"import",
 	{
-	    position: true,
+	    reposition: true,
 	    lockToScreen: true
 	}
-    ),
+    ).single(),
 
     dialogueElement,
 
-    dialogueState = dialogueState.createData(),
-
     drawing = dialogue.drawing(
-	function() {
-	    return dialogueState;
-	},
 	container,
 	function(dialogues, newDialogues) {
 	    dialogueElement = dialogues;
+
+	    newDialogues.append("form")
+		.append("input")
+		.attr("type", "file")
+		.attr("multiple", true)
+		.attr("accept", ".csv,.tsv,.json,.shp,.dbf,.prj")
+		.attr("id", "import-file-picker")
+		.on("change", function(d, i) {
+		    handlers(
+			Array.prototype.slice.call(this.files)
+		    );
+		    /*
+		     Clear the files so that this will work if the user selects the same files twice in a row.
+		     */
+		    this.parentElement.reset();
+		});
 	},
+	toolbar,
 	function(buttons, newButtons) {
 	    newButtons.text("I");
-	},
-	function() {
-	    return dialogueState;
 	}
     );
 
     dropFactory(container, errors, handle);
+
+    drawing.update();
 };

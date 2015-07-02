@@ -3,7 +3,7 @@
 /*global module, require*/
 
 var d3 = require("d3"),
-    idMaker = require("../id-maker.js");
+    idMaker = require("../../id-maker.js");
 
 module.exports = function(errors) {
     return function(geometry) {

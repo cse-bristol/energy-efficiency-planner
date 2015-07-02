@@ -4,9 +4,9 @@
 
 var d3 = require("d3"),
     _ = require("lodash"),
-    helpers = require("./helpers.js"),
+    helpers = require("../helpers.js"),
     callbacks = helpers.callbackHandler,
-    legendFactory = require("./legend-data.js"),
+    legendFactory = require("../legend/legend-data.js"),
     maxZoom = 17,
 
     broken = false;

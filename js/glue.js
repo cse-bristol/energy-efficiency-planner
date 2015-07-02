@@ -9,25 +9,11 @@
 
 var d3 = require("d3"),
     _ = require("lodash"),
-    dialogue = require("floating-dialogue"),
     leaflet = require("leaflet"),
 
     body = d3.select("body"),
     menuBar = body.append("div").classed("file-menu", true),
     toolbar = body.append("div").classed("toolbar", true),
-
-    resultsTables = dialogue(
-	"results-table",
-	{
-	    reposition: true,
-	    close: true,
-	    resize: true,
-	    sticky: true,
-	    bringToFront: true,
-	    findSpace: true,
-	    lockToScreen: true
-	}
-    ),
 
     update = function() {
 	draw.update();
@@ -36,32 +22,38 @@ var d3 = require("d3"),
     errors = require("./errors.js")(toolbar, body),
     progress = require("./progress.js")(body),
 
-    shapeLayerFactory = require("./shape-layers/shape-layer.js")(errors, resultsTables),
-
     map = require("./map.js")(body),
     
-    tableForLayer = require("./shape-layers/table-for-layer.js")(
-	body,
-	map.zoomTo,
-	paint.onClick,
-	paint.onHover,
-	update
-    ),
-    
-    state = require("./state.js")(
+    state = require("./state/state.js")(
 	errors,
 	map,
 	toolbar,
-	tableForLayer,
 	update
     ),
 
-    draw = require("./draw/draw.js")(body, resultsTables, state.getShapeLayers, state.getTileLayers),
+    legend = require("./legend/legend.js")(body, state.getTileLayers, state.getShapeLayers, state.onSet),
+
+    resultsTables = require("./results-tables/results-tables.js")(body, state.getShapeLayers),
+
+    layerControl = require("./layer-control/layer-control.js")(body, toolbar, legend.tileButtons, legend.shapeButtons, resultsTables.updateButtons, state.getTileLayers, state.getShapeLayers, map.zoomTo),
+
+    draw = require("./draw/draw.js")(
+	body,
+	resultsTables,
+	legend.update,
+	layerControl.update,
+	state.getTileLayers,
+	state.getShapeLayers,
+	map
+    ),
+
+    shapeLayerFactory = require("./state/shape-layers/shape-layer.js")(errors, resultsTables.createData, legend.shapeCreate),
     
-    dataTransfer = require("./data-transfer.js")(
+    dataTransfer = require("./serialization/data-transfer.js")(
 	shapeLayerFactory,
 	errors,
-	state.fresh
+	state.fresh,
+	resultsTables.deserialize
     ),
     
     menu = require("multiuser-file-menu")(
@@ -73,7 +65,7 @@ var d3 = require("d3"),
 	state.fresh
     ),
     
-    fetchLayers = require("./shape-layers/fetch-layers.js")(
+    fetchLayers = require("./state/shape-layers/fetch-layers.js")(
 	menu.backend.load,
 	menu.backend.loadSnapshot,
 	dataTransfer.onDeserializeLayer,
@@ -101,7 +93,7 @@ require("./serialization/files/import.js")(
 );
 
 menu.buildMenu(menuBar, [
-    require("./shape-layers/load-layer-button.js")(
+    require("./state/shape-layers/load-layer-button.js")(
 	fetchLayers.collection,
 	shapeLayerFactory,
 	state.getShapeLayers,
@@ -112,7 +104,7 @@ menu.buildMenu(menuBar, [
     viewportButtons.get
 ]);
 
-require("./autosave-and-autoload.js")(
+require("./serialization/autosave-and-autoload.js")(
     menu.store.writeOp,
     menu.store.onOp,
     state,

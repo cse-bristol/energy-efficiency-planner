@@ -1,4 +1,4 @@
-#import-dialogue {
+#import {
     background-color: white;
     top: 3em;
     left: 3em;
@@ -57,7 +57,7 @@
 }
 
 @media print {
-    #import-dialogue {
+    #import {
 	display: none;
     }
 }

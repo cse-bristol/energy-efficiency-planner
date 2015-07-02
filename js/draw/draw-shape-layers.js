@@ -4,7 +4,7 @@
 
 var d3 = require("d3");
 
-module.exports = function(container, projection, getHoveredShape, setHoveredShape, getShapeLayers, updateShapeLayer) {
+module.exports = function(container, projection, getHoveredShape, setHoveredShape, getShapeLayers) {
     var path = d3.geo.path()
 	    .projection(projection),
 
@@ -76,10 +76,11 @@ module.exports = function(container, projection, getHoveredShape, setHoveredShap
 			}();
 
 		    el
-			.classed(d.geometry.type, true)
+			.classed(d.shape.geometry.type, true)
 			.style(feature, function(d, i) {
 			    return colour(
-				d.layer.worksheet.getShapeData(d, column));
+				column ? d.layer.worksheet.getShapeData(d, column) : null
+			    );
 			});
 		});
 

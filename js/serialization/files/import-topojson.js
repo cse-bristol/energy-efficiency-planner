@@ -4,7 +4,7 @@
 
 var _ = require("lodash"),
     makeForm = require("./import-file.js"),
-    geometries = require("../geometries.js");
+    geometries = require("../../geometries.js");
 
 module.exports = function(container, progress, errors, coordinateSearch, name, topojsonData, addLayer) {
     var layers = geometries.manyFromTopoJSON(topojsonData);

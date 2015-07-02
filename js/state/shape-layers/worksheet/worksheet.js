@@ -4,11 +4,14 @@
 
 var d3 = require("d3"),
     _ = require("lodash"),
-    colour = require("../colour.js"),
-    nextColour = colour.next,
-    helpers = require("../helpers.js"),
+    colourCacheFactory = require("./colour-cache.js"),
+    indexFactory = require("./worksheet-index.js"),
+    cooerceNumericsFactory = require("./cooerce-numerics.js"),
+    
+    nextColour = require("../../../colour.js").next,
+    helpers = require("../../../helpers.js"),
     callbacks = helpers.callbackHandler,
-    isNum = helpers.isNum,
+
     bin = helpers.bin;
 
 var shapeHeaders = function(shapeData) {
@@ -33,80 +36,76 @@ var shapeHeaders = function(shapeData) {
  */
 module.exports = function() {
     return function(shapeData) {
-	var headers = shapeHeaders(shapeData),
+	var getColourColumn = function() {
+	    return sortProperties.length > 0 ? sortProperties[0] : null;
+	},
+	    getBaseColour = function() {
+		return baseColour;
+	    },
+
+	    getShapeData = function(shape, column) {
+		if (column === "id") {
+		    return shape.id;
+		} else {
+		    return shape.properties[column];
+		}
+	    },
+
+	    getColumnData = function(column) {
+		return shapeData.map(function(shape) {
+		    return getShapeData(shape, column);
+		});
+	    },
+
+	    getSortProperties = function() {
+		return {
+		    "properties" : sortProperties, 
+		    "reverse" : reverseSort
+		};
+	    },
+	    
+	    headers = shapeHeaders(shapeData),
+	    /* 
+	     Modifies shapeData by rewriting properties where all the values are numeric strings to be actual numbers.
+	     */
+	    cooerceNumerics = cooerceNumericsFactory(shapeData, headers, getColumnData),
 	    sortProperties = [],
 	    reverseSort = [],
 
-	    clickedShapeId = null,
+	    selectedShapeId = null,
+ 	    baseColour = nextColour(),
 	    
 	    sortPropertyChanged = callbacks(),
 	    baseColourChanged = callbacks(),
 
-	    colourFun = null,
- 	    baseColour = nextColour(),
-	    propertyIsNum = d3.map();
+	    colourCache = colourCacheFactory(sortPropertyChanged, baseColourChanged, getBaseColour, getColourColumn, getColumnData),
+	    sortIndex = indexFactory(shapeData, sortPropertyChanged, getSortProperties);
 
-	sortPropertyChanged.add(function() {
-	    colourFun = null;
-	});
-	
-	baseColourChanged.add(function() {
-	    colourFun = null;
-	});	    	
-	    
-	var m = {
+	return {
 	    setBaseColour: function(newColour) {
 		baseColour = newColour;
 		baseColourChanged(newColour);
-		return m;		
 	    },
 
 	    /*
 	     The colour from which the scale will be derived.
 	     */
-	    baseColour: function() {
-		return baseColour;
-	    },
+	    baseColour: getBaseColour,
 
 	    /*
 	     Returns a function which will take a piece of data and give back a colour.
 	     */
-	    getColourFunction: function() {
-		if (!colourFun) {
-		    if (sortProperties.length === 0) {
-			colourFun = function(data) {
-			    return baseColour;
-			};
-			
-		    } else {
-			var column = sortProperties[0],
-			    data = m.data([column]),
-			    scale = colour.scale(data, baseColour);
-
-			colourFun = scale;
-		    }
-		}
-
-		return colourFun;
-	    },
+	    getColourFunction: colourCache.getColourFunction,
 
 	    /*
 	     Given a shape and a named column, get the data from it.
 	     */
-	    getShapeData: function(d, column) {
-		if (column === "id") {
-		    return d.id;
-		} else {
-		    return d.properties[column];
-		}
-	    },
+	    getShapeData: getShapeData,
 
 	    /*
 	     Returns the column which should be used to colour data or shapes.
 	     */
-	    getColourColumn: function() {
-		return sortProperties[0];
-	    },
+	    getColourColumn: getColourColumn,
 
 	    sortProperty : function(property, additional) {
 		if (property) {
@@ -140,12 +139,7 @@ module.exports = function() {
 		sortPropertyChanged();
 	    },
 
-	    getSortProperties : function() {
-		return {
-		    "properties" : sortProperties, 
-		    "reverse" : reverseSort
-		};
-	    },
+	    getSortProperties: getSortProperties,
 
 	    firstSortPropertyI: function() {
 		if (sortProperties.length === 0) {
@@ -155,27 +149,11 @@ module.exports = function() {
 		return headers.indexOf(sortProperties[0]);
 	    },
 
-	    data: function(columns) {
-		if (columns === undefined) {
-		    return m.data(headers);
-		} else {
-		    return shapeData.map(function(s) {
-			return columns.map(function(c) {
-			    if (c === "id") {
-				return s[c];
-			    } else {
-				return s.properties[c];
-			    }
-			});
-		    });
-		}
-	    },
-
 	    headers: function() {
 		return headers;
 	    },
 
-	    columns: function() {
+	    headersWithSort: function() {
 		return headers.map(function(header) {
 		    var sort = sortProperties.indexOf(header);
 		    
@@ -186,6 +164,34 @@ module.exports = function() {
 			null
 		    };
 		});
+	    },
+
+	    /*
+	     Given a column name, load an array of the data for that column (not sorted).
+	     */
+	    getColumnData: getColumnData,
+
+	    /*
+	     Return an array of arrays of the data in this shape.
+
+	     This will be sorted by the sort properties.
+	     */
+	    getRowData: function() {
+		return sortIndex.order()
+		    .map(function(i) {
+			var shape = shapeData[i];
+			
+			return {
+			    id: shape.id,
+			    cells: headers.map(function(header) {
+				return getShapeData(
+				    shape,
+				    header
+				);
+			    }),
+			    selected: selectedShapeId === shape.id
+			};
+		    });
 	    },
 
 	    selectShape: function(id) {
@@ -212,18 +218,13 @@ module.exports = function() {
 		    return [""];
 		} else {
 		    var p = sortProperties[0],
-			columnData = _.flatten(
-			    m.data([p])
-			);
-		    
-		    if (!propertyIsNum.has(p)) {
-			propertyIsNum.set(
-			    p,
-			    _.all(columnData, isNum)
-			);
-		    }
+			columnData = getColumnData(p);
 
-		    if (propertyIsNum.get(p)) {
+		    if (columnData.length < bins) {
+			return columnData;
+		    }
+		    
+		    if (cooerceNumerics.isNumeric(p)) {
 			columnData = columnData.map(parseFloat);
 			
 			return bin(
@@ -242,6 +243,5 @@ module.exports = function() {
 
 	    baseColourChanged: baseColourChanged.add
 	};
-	return m;
     };
 };

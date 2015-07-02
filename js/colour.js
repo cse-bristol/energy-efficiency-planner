@@ -9,7 +9,7 @@ var scale = function(data, colour) {
     var numeric = [];
     var len = data.length;
     for (var i = 0; i < len; i++) {
-	var d = data[i][0];
+	var d = data[i];
 
 	if (!d) {
 	    // Ignore this data point.

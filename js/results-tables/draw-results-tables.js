@@ -19,15 +19,17 @@ var d3 = require("d3"),
  ToDo: column widths 
  ToDo: table size
  */
-module.exports = function(getShapeLayers, updateShapeLayer) {
-    var maybeNumber = function(n) {
-	var num = parseFloat(n);
-	if (isNaN(num) || !isFinite(n)) {
-	    return n;
-	} else {
-	    return num;
-	}
-    },
+module.exports = function(getShapeLayers) {
+    var headerClicked = callbacks(),
+
+	maybeNumber = function(n) {
+	    var num = parseFloat(n);
+	    if (isNaN(num) || !isFinite(n)) {
+		return n;
+	    } else {
+		return num;
+	    }
+	},
 
 	sort = function(head, body, ordering) {
 	    var indices = ordering.properties.map(function(p) {
@@ -52,6 +54,7 @@ module.exports = function(getShapeLayers, updateShapeLayer) {
 		}
 		return 0;
 	    });
+
 	},
 
 	drawHeaders = function(tables, newTables) {
@@ -66,7 +69,7 @@ module.exports = function(getShapeLayers, updateShapeLayer) {
 		    .data(
 			function(d, i) {
 			    return d.worksheet
-				.columns()
+				.headersWithSort()
 				.map(function(column) {
 				    return {
 					layerId: d.name,
@@ -90,7 +93,7 @@ module.exports = function(getShapeLayers, updateShapeLayer) {
 			    .worksheet
 			    .sortProperty(d.column, d3.event.shiftKey);
 			
-			updateShapeLayer(d.layerId);
+			headerClicked(d.layerId);
 		    });
 
 	    th
@@ -123,7 +126,7 @@ module.exports = function(getShapeLayers, updateShapeLayer) {
 		tr = tBody.selectAll("tr")
 		    .data(
 			function(d, i) {
-			    return d.worksheet.rows()
+			    return d.worksheet.getRowData()
 				.map(function(row) {
 				    return {
 					layerId: d.name,
@@ -182,28 +185,43 @@ module.exports = function(getShapeLayers, updateShapeLayer) {
 	    });
 	};
     
+    return {
+	drawDialogues: function(dialogues, newDialogues) {
+	    var newTables = newDialogues.append("table")
+		    .classed("results-table", true),
+		
+		tables = dialogues.select(".results-table");
 
-    return function(dialogues, newDialogues) {
-	var newTables = newDialogues.append("table")
-		.classed("results-table", true),
+	    tables.datum(function(d, i) {
+		return getShapeLayers().get(d.id);
+	    });
 
-	    tables = dialogues.select("table");
+	    drawHeaders(tables, newTables);
 
-	drawHeaders(tables, newTables);
+	    drawBody(tables, newTables);
 
-	drawBody(tables, newTables);
+	    var newReset = newDialogues
+		    .append("span")
+		    .classed("reset-results", true)
+		    .text("RESET")
+		    .on("click", function(d, i) {
+			getShapeLayers()
+			    .get(d.id)
+			    .worksheet
+			    .sortProperty();
+		    });
+	},
 
+	addEmphasis: function(selection, shapeId) {
+	},
 
-	var newReset = newDialogues
-		.append("span")
-		.classed("reset-results", true)
-		.text("RESET")
-		.on("click", function(d, i) {
-		    getShapeLayers()
-			.get(d.id)
-			.worksheet
-			.sortProperty();
-		});
+	clearEmphasis: function(selection) {
+	},
+
+	selectTable: function(layerId) {
+	},
+
+	headerClicked: headerClicked.add
     };
 };
 

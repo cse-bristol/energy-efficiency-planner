@@ -10,15 +10,13 @@ module.exports = function(toolbar, body) {
     var dialogue = float(
 	"errors",
 	{
-	    position: true,
-	    size: true,
+	    reposition: true,
+	    resize: true,
 	    close: true,
 	    visible: false,
 	    lockToScreen: true
 	}
-    ),
-
-	dialogueState = dialogue.createData(),
+    ).single(),
 
 	drawDialogueContent = function(dialogues, newDialogues) {
 	    messages = dialogues;
@@ -51,33 +49,21 @@ module.exports = function(toolbar, body) {
 		});
 	},
 
-	draw = function() {
-	    drawing.dialogues([dialogueState]);
-	    drawing.buttons(toolbar);
-	},
-
 	drawing = dialogue.drawing(
-	    function() {
-		return dialogueState;
-	    },
 	    body,
 	    drawDialogueContent,
-	    drawButtonContent,
-	    function() {
-		return dialogueState;
-	    }
+	    toolbar,
+	    drawButtonContent
 	),	
 
 	messages,
 	noErrors;
 
-    draw();
-    
+    drawing.update();
+
     return {
-	serialize: dialogueState.serialize,
-	deserialize: function(serialized) {
-	    dialogueState = dialogue.load(serialized);
-	},
+	save: dialogue.save,
+	load: dialogue.load,
 	
 	informUser : function(text) {
 	    console.log(text);
@@ -113,8 +99,8 @@ module.exports = function(toolbar, body) {
 
 	    hideNoErrors();
 
-	    dialogueState.setVisibility(true);
-	    draw();
+	    dialogue.getState().setVisibility(true);
+	    drawing.update();
 	}
     };
 };

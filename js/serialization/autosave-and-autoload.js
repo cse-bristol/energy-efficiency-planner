@@ -40,7 +40,6 @@ module.exports = function(
 	state.getTileLayers,
 	state.getShapeLayers,
 	state.getViewport,
-	toolbar,
 	data.serializeShapeLayer,
 	data.serializeViewport
     ),
@@ -49,8 +48,7 @@ module.exports = function(
 	state.set, data.deserialize,
 	state.getShapeLayers, data.deserializeShapeSort, data.deserializeShapeLayer,
 	state.getTileLayers,
-	state.getViewport, data.deserializeViewport,
-	toolbar
+	state.getViewport, data.deserializeViewport
     );
     
     onReadOp(function(op) {

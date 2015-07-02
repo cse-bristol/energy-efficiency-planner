@@ -3,7 +3,7 @@
 /*global require, module*/
 
 var d3 = require("d3"), 
-    toArray = require("../helpers.js").toArray;
+    toArray = require("../../helpers.js").toArray;
 
 module.exports = function(container, errors, handle) {
     container.on("dragover", function(d, i){

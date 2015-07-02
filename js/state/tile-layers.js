@@ -4,7 +4,7 @@
 
 var leaflet = require("leaflet"),
     d3 = require("d3"),
-    helpers = require("./helpers.js"),
+    helpers = require("../helpers.js"),
     callbacks = helpers.callbackHandler,
 
     heatMapLayerFactory = require("./heat-map-layer.js");

@@ -2,10 +2,9 @@
 
 /*global module, require*/
 
-var drawShapeLayersFactory = require("./draw-shape-layers.js"),
-    layerControlFactory = require("./layer-control/draw-layer-control.js");
+var drawShapeLayersFactory = require("./draw-shape-layers.js");
 
-module.exports = function(container, resultsTables, getTileLayers, getShapeLayers, map) {
+module.exports = function(container, resultsTables, updateLegends, updateLayerControl, getTileLayers, getShapeLayers, map) {
     var hovered = {
 	layerId: null,
 	shapeId: null
@@ -23,42 +22,39 @@ module.exports = function(container, resultsTables, getTileLayers, getShapeLayer
 		hovered.layerId,
 		hovered.shapeId
 	    ),
-		oldTable = drawResultsTables.selectTable(
+		oldTable = resultsTables.selectTable(
 		    hovered.layerId
 		),
 
 		newShape = drawShapeLayers.selectShapeAndLayer(
 		    layerId, shapeId
 		),
-		newTable = drawResultsTables.selectTable(
+		newTable = resultsTables.selectTable(
 		    layerId
 		);
 	    
 	    hovered.layerId = layerId;
 	    hovered.shapeId = shapeId;
 	    
-	    drawShapeLayers.updateEmphasis(oldShape);
-	    drawResultsTables.updateEmphasis(oldTable);
-	    drawShapeLayers.updateEmphasis(newShape);
-	    drawResultsTables.updateEmphasis(newTable);
+	    drawShapeLayers.clearEmphasis(oldShape);
+	    resultsTables.clearEmphasis(oldTable);
+	    drawShapeLayers.addEmphasis(newShape, hovered.shapeId);
+	    resultsTables.addEmphasis(newTable, hovered.shapeId);
 	},
 
-	
-	updateShapeLayer = function() {
+	updateShapeLayer = function(layerId) {
 	    // ToDo
-	    // decide if this takes a selection or an id
-	    // update layer control for that shape?
-	    // layer control is responsible for updating tables, legends, opacity sliders
-	    // redraw the shapes themselves
+	    updateAll();	    
 	},
-	
+
 	updateAll = function() {
 	    var orderedShapeLayers = getShapeLayers().ordered().reverse();
-	    layerControl.update(getTileLayers(), orderedShapeLayers);
-	    drawLegends(getTileLayers(), orderedShapeLayers);
-	    drawResultsTables.draw(orderedShapeLayers);
-	    toolbar.update();
+
+	    resultsTables.updateDialogues(orderedShapeLayers);
 	    drawShapeLayers.fromData(orderedShapeLayers);
+
+	    updateLegends();
+	    updateLayerControl();
 	},
 
 	drawShapeLayers = drawShapeLayersFactory(
@@ -66,30 +62,11 @@ module.exports = function(container, resultsTables, getTileLayers, getShapeLayer
 	    map.projectTile,
 	    getHoveredShape,
 	    setHoveredShape,
-	    getShapeLayers,
-	    updateShapeLayer
-	),
-    
-	drawResultsTables = resultsTables.drawing(
-	    function(id) {
-		return getShapeLayers().get(id);
-	    },
-	    container,
-	    drawDialogueContent,
-	    drawButtonContent,
-	    function(d, i) {
-		return [d.resultsTable];
-	    }
-	),
-
-	layerControl = layerControlFactory(
-	    container,
-	    toolbar,
-	    getShapeLayers,
-	    getTileLayers,
-	    map.zoomTo
+	    getShapeLayers
 	);
 
+    resultsTables.headerClicked(updateShapeLayer);
+    
     return {
 	update: updateAll
     };

@@ -5,20 +5,15 @@
     z-index: 1;
 }
 
-#toolbar {
-    opacity: 0.6;
+.toolbar {
     position: absolute;
-    top: 7em;
-    left: 0.6em;
+    top: 10em;
+    left: 0.7em;
     z-index: 1;
 }
 
-#toolbar .open-button {
+.toolbar .open-button {
     display: block;
-}
-
-#toolbar:hover {
-    opacity: 1.0;
 }
 
 @media print {

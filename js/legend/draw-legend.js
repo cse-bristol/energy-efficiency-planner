@@ -3,12 +3,11 @@
 /*global module, require*/
 
 var d3 = require("d3"),
-    dialogue = require("floating-dialogue"),
-    helpers = require("./helpers.js"),
-    colours = require("./colour.js"),
+    helpers = require("../helpers.js"),
+    colours = require("../colour.js"),
     isNum = helpers.isNum,
     rounded = helpers.rounded,
-    asId = require("./id-maker.js").fromString,
+    asId = require("../id-maker.js").fromString,
     
     groupHeight = 10,
     textWidth = 80,
@@ -24,13 +23,14 @@ var d3 = require("d3"),
  + The name of the layer.
  + A legend for the layer.
  */
-module.exports = function(container, getShapeLayers, getTileLayers) {
-    var makeLegends = function(selection, newSelection) {
-	newSelection
+module.exports = function(getShapeLayers, getTileLayers) {
+    var makeLegends = function(dialogues, newDialogues, getLayerData) {
+	newDialogues
 	    .append("svg")
 	    .classed(chartClass, true);
 
-	var svg = selection.select("." + chartClass)
+	var svg = dialogues.select("." + chartClass)
+		.data(getLayerData)
 		.attr("width", function(layer, i) {
 		    if (layer.legend) {
 			return textPadding + (textWidth * layer.legend().width);
@@ -137,101 +137,26 @@ module.exports = function(container, getShapeLayers, getTileLayers) {
 		    return text;
 		}
 	    });
-    },
+    };
 
-	getColouringPropertyText = function(layer) {
-	    if (layer.worksheet) {
-		var props = layer.worksheet.getSortProperties().properties;
-		if (props[0]) {
-		    return " (" + props[0] + ")";
-		}
-	    }
-
-	    return "";
-	},
-
-	makeLegendsForLayers = function(className, layers, hookNewDivs) {
-	    var divs = container.selectAll("div." + className)
-		    .data(
-			layers,
-			function(layer) {
-			    return layer.name();
-			}
-		    );
-
-	    divs.exit().remove();
-
-	    var newDivs = divs.enter().append("div")
-		    .classed(legendClass, true)
-		    .classed(className, true)
-		    .attr("id", function(layer, i) {
-			return className + "-" + asId(layer.name());
-		    })
-		    .each(hookNewDivs)
-		    .each(function(d, i) {
-			var el = d3.select(this);
-			d.legendDisplay = dialogue(el)
-			    .drag()
-			    .close()
-			    .sticky()
-			    .findSpace();
-		    });
-
-	    newDivs.append("div")
-	    	.classed(legendLabelClass, true);
-
-	    divs.select("." + legendLabelClass)
-		.html(function(layer, i) {
-		    return layer.name() +
-			(
-			    layer.legend && layer.legend.units ?
-				" (" + layer.legend.units + ")" :
-				""
-			) +
-			getColouringPropertyText(layer);
-		});
-
-	    divs
-		.sort();
-
-	    makeLegends(divs, newDivs);
-	},
-
-	redraw = function() {
-	    makeLegendsForLayers(
-		"tile-legend",
-		getTileLayers().overlays.values(),
-		function(tileLayer, i) {
-		    if (tileLayer.legend && tileLayer.legend.onLoad) {
-			tileLayer.legend.onLoad(redraw);
-			var name = asId(tileLayer.name());
-
-			tileLayer.colourChanged(function(pixelColour) {
-			    var tileDiv = container.select("#tile-legend-" + name);
-
-			    var colourString = pixelColour.toString();
-
-			    if (!tileDiv.empty()) {
-				tileDiv
-				    .select("svg.legend-chart")
-				    .selectAll("rect")
-				    .classed("highlight", function(rectColour, i) {
-					return rectColour === colourString;
-				    });
-			    }
-			});
-		    }		    
+    return {
+	shapes: function(dialogues, newDialogues) {
+	    makeLegends(
+		dialogues,
+		newDialogues,
+		function(d, i) {
+		    return d === undefined ? [] : getShapeLayers().get(d.id);
 		}
 	    );
-	    
-	    makeLegendsForLayers(
-	    	"shape-legend",
-	    	getShapeLayers().all(),
-	    	function(shapeLayer, i) {
-	    	    // Noop - shape layer legends currently have no interactions.
-	    	}
+	},
+	tiles: function(dialogues, newDialogues) {
+	    makeLegends(
+		dialogues,
+		newDialogues,
+		function(d, i) {
+		    return d === undefined ? [] : getTileLayers().overlays.get(d.id);
+		}
 	    );
-	};
-
-    redraw();
+	}
+    };
 };

@@ -1,8 +1,8 @@
-#messages {
+#errors {
     position: absolute;
-    top: 0.6em;
-    left: 25em;
-    width: 25em;
+    top: calc(100% - 15em);
+    left: 0;
+    width: 99vw;
     height: 13em;
     background-color: white;
     z-index: 1;    

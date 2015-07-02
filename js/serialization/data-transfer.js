@@ -4,14 +4,14 @@
 
 var _ = require("lodash"),
     leaflet = require("leaflet"),
-    helpers = require("./helpers.js"),
+    helpers = require("../helpers.js"),
     callbacks = helpers.callbackHandler,
     asNum = helpers.asNum;
 
 /*
  Converts between the state of the world (as defined in state.js) and data transfer objects which can be turned into JSON and sent out across the wire.
  */
-module.exports = function(shapeLayerFactory, errors, freshState) {
+module.exports = function(shapeLayerFactory, errors, freshState, deserializeResultsTable) {
     var reading = false,
 	onDeserializeLayer = callbacks(),
 
@@ -31,13 +31,13 @@ module.exports = function(shapeLayerFactory, errors, freshState) {
 	},
 
 	serializeShapeLayer = function(layer) {
-	    var table = layer.resultsTable.dialogue();
+	    var table = layer.resultsTable;
 
 	    return {
 		opacity: layer.getOpacity(),
 		colour: layer.worksheet.baseColour(),
 		sort: layer.worksheet.getSortProperties(),
-		table: serializeResultsTable(layer.resultsTable.dialogue())
+		table: layer.resultsTable.serialize()
 	    };
 	},
 	
@@ -88,19 +88,10 @@ module.exports = function(shapeLayerFactory, errors, freshState) {
 
 		    deserializeShapeSort(layerData.sort, layer.worksheet.sortProperty);
 
-		    var table = layer.resultsTable.dialogue();
-		    if (layerData.table.visible) {
-			table.show();
-		    } else {
-			table.hide();
+		    if (layerData.table) {
+			layer.resultsTable = deserializeResultsTable(layerData.table);
 		    }
 		    
-		    if (layerData.table.size !== undefined) {
-			table.size(layerData.table.size);
-		    }
-		    if (layerData.table.position !== undefined) {
-			table.position(layerData.table.position);
-		    }
 		} finally {
 		    reading = false;
 		}

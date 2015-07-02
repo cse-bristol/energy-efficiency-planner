@@ -8,7 +8,7 @@ var _ = require("lodash"),
 /*
  Sends changes we make to the map back to the server automatically.
  */
-module.exports = function(writeOp, canWrite, onStateReplaced, getTileLayers, getShapeLayers, getViewport, toolbar, serializeShapeLayer, serializeViewport) {
+module.exports = function(writeOp, canWrite, onStateReplaced, getTileLayers, getShapeLayers, getViewport, serializeShapeLayer, serializeViewport) {
     /*
      A convenience device to help set up lots of hooks on an object hierarchy.
 
@@ -89,7 +89,7 @@ module.exports = function(writeOp, canWrite, onStateReplaced, getTileLayers, get
     hookShapeLayer = function(shapeLayer) {
 	var layerHook = hook(["shapeLayers", shapeLayer.name()]),
 	    tableHook = layerHook.p("table"),
-	    table = shapeLayer.resultsTable.dialogue();
+	    table = shapeLayer.resultsTable;
 	
 	shapeLayer.onSetOpacity(layerHook.p("opacity").delay());
 
@@ -140,28 +140,13 @@ module.exports = function(writeOp, canWrite, onStateReplaced, getTileLayers, get
 		oi: serializeViewport(viewport)
 	    });
 	});
-    },
+    };
 
-    hookToolbar = hook(
-	["tools"]
-    );
-    
     onStateReplaced(function() {
 	hookTileLayers(getTileLayers());
 	hookShapeLayers(getShapeLayers());
 	hookViewport(getViewport());
 
-	toolbar.eachData(function(toolText, dialogueData) {
-	    var toolHook = hookToolbar.p(toolText);
-
-	    dialogueData.onVisibilityChanged(
-		toolHook.p("visible"));
-	    
-	    dialogueData.onSizeChanged(
-		toolHook.p("size").delay());
-	    
-	    dialogueData.onPositionChanged(
-		toolHook.p("position").delay());
-	});
+	// ToDo hook errors, layer control, import
     });
 };

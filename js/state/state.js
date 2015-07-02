@@ -5,14 +5,14 @@
 var leaflet = require("leaflet"),
     layersFactory = require("./shape-layers/shape-layers-collection.js"),
     tileLayersFactory = require("./tile-layers.js"),
-    viewportFactory = require("./viewport.js"),
-    helpers = require("./helpers.js"),
+    viewportFactory = require("../viewport.js"),
+    helpers = require("../helpers.js"),
     callbacks = helpers.callbackHandler;
 
 /*
  Bundles together all aspect of the state of the map into a Javascript object.
  */
-module.exports = function(errors, map, toolbar, tableForLayer, update) {
+module.exports = function(errors, map, toolbar, update) {
     var shapeLayers = layersFactory(errors),
 	tileLayers = tileLayersFactory(map.getZoom, errors),
 	baseLayer,
@@ -98,8 +98,6 @@ module.exports = function(errors, map, toolbar, tableForLayer, update) {
 		    layer.onSetOpacity(update);
 		});
 
-		shapeLayers.all().forEach(tableForLayer);
-		shapeLayers.onAdd(tableForLayer);
 		shapeLayers.onAdd(update);
 		shapeLayers.onRemove(function(layer) {
 		    layer.resultsTable.remove();
@@ -108,7 +106,7 @@ module.exports = function(errors, map, toolbar, tableForLayer, update) {
 		shapeLayers.onReorder(update);
 
 		if (state.tools) {
-		    toolbar.setState(state.tools);
+		    // ToDo deserialize import, errors, layer control
 		}
 
 		viewport = state.viewport;

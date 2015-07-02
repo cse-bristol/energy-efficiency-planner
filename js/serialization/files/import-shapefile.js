@@ -2,7 +2,7 @@
 
 /*global module, require*/
 
-var geometries = require("../geometries.js"),
+var geometries = require("../../geometries.js"),
     makeForm = require("./import-file.js");
 
 module.exports = function(container, progress, errors, coordinateSearch, fileName, shapeFileData, dbfFileData, prjFileData, createLayer) {

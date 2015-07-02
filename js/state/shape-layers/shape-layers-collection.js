@@ -4,7 +4,7 @@
 
 var d3 = require("d3"),
     _ = require("lodash"),
-    helpers = require("../helpers.js"),
+    helpers = require("../../helpers.js"),
     callbacks = helpers.callbackHandler;
 
 /*

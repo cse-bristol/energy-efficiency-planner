@@ -5,7 +5,7 @@
 var _ = require("lodash"),
     d3 = require("d3"),
     leaflet = require("leaflet"),
-    helpers = require("../helpers.js"),
+    helpers = require("../../helpers.js"),
     noDrag = helpers.noDrag,
     isNum = helpers.isNum,
     asNum = helpers.asNum,

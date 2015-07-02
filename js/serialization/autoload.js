@@ -16,8 +16,7 @@ module.exports = function(
     setState, deserialize,
     getShapeLayers, deserializeShapeSort, deserializeShapeLayer,
     getTileLayers,
-    getViewport, deserializeViewport,
-    toolbar
+    getViewport, deserializeViewport
 )
 {
     
@@ -155,30 +154,6 @@ module.exports = function(
 		break;
 	    default:
 		throw new Error("Unknown shape table property " + prop);
-	    }
-	},
-
-	readTools = function(op) {
-	    var toolText = op.p[1];
-
-	    if (toolbar.has(toolText)) {
-		var tool = toolbar.get(toolText);
-		
-		switch(op.p[2]) {
-		case "visible":
-		    tool.setVisibility(op.oi);
-		    break;
-		case "size":
-		    tool.setSize(op.oi);
-		    break;
-		case "position":
-		    tool.setPosition(op.oi);
-		    break;
-		default:
-		    throw new Error("Unknown tool property " + op.p[2]);
-		}
-	    } else {
-		// No-op, this tool no longer exists in the code.
 	    }
 	};
 
