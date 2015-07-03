@@ -78,8 +78,8 @@ module.exports = function() {
 	    sortPropertyChanged = callbacks(),
 	    baseColourChanged = callbacks(),
 
-	    colourCache = colourCacheFactory(sortPropertyChanged, baseColourChanged, getBaseColour, getColourColumn, getColumnData),
-	    sortIndex = indexFactory(shapeData, sortPropertyChanged, getSortProperties);
+	    colourCache = colourCacheFactory(sortPropertyChanged.add, baseColourChanged.add, getBaseColour, getColourColumn, getColumnData),
+	    sortIndex = indexFactory(shapeData, sortPropertyChanged.add, getSortProperties);
 
 	return {
 	    setBaseColour: function(newColour) {

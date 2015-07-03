@@ -12,19 +12,6 @@ module.exports = function(shapeData, sortPropertyChanged, getSortProperties) {
     var sort = null,
 	indices = null,
 
-	sorted = function(column, reverse) {
-	    return _.sortBy(
-		shapeData,
-		function(a, b) {
-		    return (a.properties[column] - b.properties[column]) * (reverse ? -1 : 1);
-		}
-	    ).map(
-		function(shape) {
-		    return shapeData.id;
-		}
-	    );
-	},
-
 	/*
 	 Sort the indicies of the array, rather than the data.
 	 */
@@ -35,8 +22,8 @@ module.exports = function(shapeData, sortPropertyChanged, getSortProperties) {
 		indices = _.sortByOrder(
 		    originalIndices,
 		    sort.properties.map(function(p) {
-			return function(a, b) {
-			    return shapeData[a].properties[p] - shapeData[b].properties[p];
+			return function(index) {
+			    return shapeData[index].properties[p];
 			};
 		    }),
 		    sort.reverse.map(function(r) {
