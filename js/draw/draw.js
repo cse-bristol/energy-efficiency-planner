@@ -66,6 +66,8 @@ module.exports = function(container, resultsTables, updateLegends, updateLayerCo
 	);
 
     resultsTables.headerClicked(updateShapeLayer);
+
+    map.onViewReset(updateAll);
     
     return {
 	update: updateAll
