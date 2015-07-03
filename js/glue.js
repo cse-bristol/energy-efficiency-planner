@@ -27,7 +27,6 @@ var d3 = require("d3"),
     state = require("./state/state.js")(
 	errors,
 	map,
-	toolbar,
 	update
     ),
 

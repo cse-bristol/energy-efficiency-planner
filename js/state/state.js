@@ -12,7 +12,7 @@ var leaflet = require("leaflet"),
 /*
  Bundles together all aspect of the state of the map into a Javascript object.
  */
-module.exports = function(errors, map, toolbar, update) {
+module.exports = function(errors, map, update) {
     var shapeLayers = layersFactory(errors),
 	tileLayers = tileLayersFactory(map.getZoom, errors),
 	baseLayer,
@@ -51,8 +51,7 @@ module.exports = function(errors, map, toolbar, update) {
 	    return {
 		shapeLayers: shapeLayers,
 		tileLayers: tileLayers,
-		viewport: viewport,
-		tools: toolbar.getState()
+		viewport: viewport
 	    };
 	},
 
@@ -99,10 +98,6 @@ module.exports = function(errors, map, toolbar, update) {
 		});
 
 		shapeLayers.onAdd(update);
-		shapeLayers.onRemove(function(layer) {
-		    layer.resultsTable.remove();
-		    update();
-		});
 		shapeLayers.onReorder(update);
 
 		if (state.tools) {
