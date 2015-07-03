@@ -187,11 +187,25 @@ module.exports = function(container, toolbar, updateTileLegendButtons, updateSha
 	drawing = dialogue.drawing(
 	    container,
 	    function(dialogues, newDialogues) {
-		control = newDialogues;
-		baseForm = control.append("form").datum(getTileLayers().getBaseLayer().name());
-		baseDiv = baseForm.append("div");
-		tilesForm = control.append("form");
-		shapesForm = control.append("form");
+		newDialogues.append("form")
+		    .classed("base-form", true)
+		    .append("div");
+
+		newDialogues.append("form")
+		    .classed("tile-overlay-form", true);
+
+		newDialogues.append("form")
+		    .classed("shape-overlay-form", true);
+
+		control = dialogues;
+
+		baseForm = dialogues.select(".base-form")
+		    .datum(getTileLayers().getBaseLayer().name());
+		baseDiv = baseForm.select("div");
+
+		tilesForm = dialogues.select(".tile-overlay-form");
+
+		shapesForm = dialogues.select(".shape-overlay-form");
 
 		var tileLayers = getTileLayers(),
 		    shapeLayers = getShapeLayers().ordered().reverse();
