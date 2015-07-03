@@ -4,7 +4,7 @@
 
 var colour = require("../../../colour.js");
 
-module.exports = function(sortPropertyChanged, baseColourChanged, getBaseColour, getColourColumn, getColumnData) {
+module.exports = function(sortPropertyChanged, baseColourChanged, getBaseColour, getColourColumn, getColumnData, isNumericColumn) {
     var colourFunction = null;
 
 	sortPropertyChanged(function() {
@@ -19,10 +19,12 @@ module.exports = function(sortPropertyChanged, baseColourChanged, getBaseColour,
 	getColourFunction: function() {
 	    if (!colourFunction) {
 		var column = getColourColumn();
-		
+
 		if (column) {
-		    var data = getColumnData(),
-			scale = colour.scale(data, getBaseColour());
+		    var data = getColumnData(column),
+
+			scaleF = isNumericColumn(column) ? colour.numericScale : colour.categoricalScale,
+			scale = scaleF(data, getBaseColour());
 
 		    colourFunction = scale;
 		    

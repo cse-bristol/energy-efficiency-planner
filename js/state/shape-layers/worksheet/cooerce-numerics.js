@@ -29,11 +29,7 @@ module.exports = function(rawShapeData, headers, getColumnData) {
 
 	if (isNumeric.get(header)) {
 	    rawShapeData.forEach(function(shape) {
-		if (header === "id") {
-		    shape.id = asNum(shape.id);
-		} else {
-		    shape.properties[header] = asNum(shape.properties[header]);
-		}
+		shape.properties[header] = asNum(shape.properties[header]);
 	    });
 	}
     });

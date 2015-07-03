@@ -36,6 +36,10 @@ var shapeHeaders = function(shapeData) {
  */
 module.exports = function() {
     return function(shapeData) {
+	shapeData.forEach(function(shape) {
+	    shape.properties.id = shape.id;
+	});
+	
 	var getColourColumn = function() {
 	    return sortProperties.length > 0 ? sortProperties[0] : null;
 	},
@@ -44,14 +48,14 @@ module.exports = function() {
 	    },
 
 	    getShapeData = function(shape, column) {
-		if (column === "id") {
-		    return shape.id;
-		} else {
-		    return shape.properties[column];
-		}
+		return shape.properties[column];
 	    },
 
 	    getColumnData = function(column) {
+		if (column === undefined) {
+		    throw new Error("Define a column when getting column data.");
+		}
+		
 		return shapeData.map(function(shape) {
 		    return getShapeData(shape, column);
 		});
@@ -78,7 +82,7 @@ module.exports = function() {
 	    sortPropertyChanged = callbacks(),
 	    baseColourChanged = callbacks(),
 
-	    colourCache = colourCacheFactory(sortPropertyChanged.add, baseColourChanged.add, getBaseColour, getColourColumn, getColumnData),
+	    colourCache = colourCacheFactory(sortPropertyChanged.add, baseColourChanged.add, getBaseColour, getColourColumn, getColumnData, cooerceNumerics.isNumeric),
 	    sortIndex = indexFactory(shapeData, sortPropertyChanged.add, getSortProperties);
 
 	return {

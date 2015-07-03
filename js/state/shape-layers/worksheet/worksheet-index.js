@@ -26,9 +26,7 @@ module.exports = function(shapeData, sortPropertyChanged, getSortProperties) {
 			    return shapeData[index].properties[p];
 			};
 		    }),
-		    sort.reverse.map(function(r) {
-			return r ? "desc" : "asc";
-		    })
+		    sort.reverse
 		);
 	    } else {
 		indices = originalIndices;
