@@ -35,7 +35,6 @@ module.exports = function(container, toolbar, updateTileLegendButtons, updateSha
 	    lockToScreen: true
 	}
     ).single(),
-
 	control,
 	baseForm,
 	baseDiv,
@@ -90,10 +89,6 @@ module.exports = function(container, toolbar, updateTileLegendButtons, updateSha
 		.attr("checked", function(d, i) {
 		    return d === baseLayer.name() ? "checked" : null;
 		});
-
-	    opacitySlider(baseForm, empty, function(noIdRequiredHere) {
-		return getTileLayers().getBaseLayer();
-	    });
 	};
 
     var updateTiles = function(tileOverlays) {
@@ -187,8 +182,10 @@ module.exports = function(container, toolbar, updateTileLegendButtons, updateSha
 	drawing = dialogue.drawing(
 	    container,
 	    function(dialogues, newDialogues) {
-		newDialogues.append("form")
-		    .classed("base-form", true)
+		var newBaseForm = newDialogues.append("form")
+			.classed("base-form", true);
+
+		newBaseForm
 		    .append("div");
 
 		newDialogues.append("form")
@@ -201,6 +198,11 @@ module.exports = function(container, toolbar, updateTileLegendButtons, updateSha
 
 		baseForm = dialogues.select(".base-form")
 		    .datum(getTileLayers().getBaseLayer().name());
+
+		opacitySlider(baseForm, newBaseForm, function(noIdRequiredHere) {
+		    return getTileLayers().getBaseLayer();
+		});
+		
 		baseDiv = baseForm.select("div");
 
 		tilesForm = dialogues.select(".tile-overlay-form");
