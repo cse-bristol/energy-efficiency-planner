@@ -19,8 +19,10 @@ var d3 = require("d3"),
  ToDo: column widths 
  ToDo: table size
  */
-module.exports = function(getShapeLayers) {
+module.exports = function(getShapeLayers, updateShapeLayer) {
     var headerClicked = callbacks(),
+	rowClicked = callbacks(),
+	rowHovered = callbacks(),
 
 	maybeNumber = function(n) {
 	    var num = parseFloat(n);
@@ -72,7 +74,7 @@ module.exports = function(getShapeLayers) {
 				.headersWithSort()
 				.map(function(column) {
 				    return {
-					layerId: d.name,
+					layerId: d.name(),
 					column: column.name,
 					sort: column.sort
 				    };
@@ -104,7 +106,7 @@ module.exports = function(getShapeLayers) {
 		    return !!d.sort;
 		})
 		.classed("reverse", function(d, i) {
-		    return d.sort === "reverse";
+		    return d.sort === "ascending";
 		});
 	},
 
@@ -129,7 +131,7 @@ module.exports = function(getShapeLayers) {
 			    return d.worksheet.getRowData()
 				.map(function(row) {
 				    return {
-					layerId: d.name,
+					layerId: d.name(),
 					shapeId: row.id,
 					selected: row.selected,
 					cells: row.cells
@@ -151,12 +153,10 @@ module.exports = function(getShapeLayers) {
 			    .worksheet;
 
 		    worksheet.selectShape(d.shapeId);
-		    
-		    updateShapeLayer();
-		    panAndZoom(d.layerId, worksheet.getSelectedShapeId());
+		    rowClicked(d.layerId, d.shapeId);
 		})
 		.on("mouseenter", function(d, i) {
-		    // ToDo highlight the shape
+		    rowHovered(d.layerId, d.shapeId);
 		});
 
 	    tr
@@ -181,7 +181,7 @@ module.exports = function(getShapeLayers) {
 	    td.enter().append("td");
 
 	    td.text(function(d, i) {
-		return d;
+		return rounded(d);
 	    });
 	};
     
@@ -218,10 +218,9 @@ module.exports = function(getShapeLayers) {
 	clearEmphasis: function(selection) {
 	},
 
-	selectTable: function(layerId) {
-	},
-
-	headerClicked: headerClicked.add
+	headerClicked: headerClicked.add,
+	rowClicked: rowClicked.add,
+	rowHovered: rowHovered.add
     };
 };
 

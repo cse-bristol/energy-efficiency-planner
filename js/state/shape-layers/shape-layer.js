@@ -117,7 +117,7 @@ module.exports = function(errors, createResultsTableDialogueData, createLegendDi
 	    onSetOpacity: onSetOpacity.add
 	};
 
-	l.legend.dialogueState = createLegendDialogueState();
+	l.legend.dialogueState = createLegendDialogueState(name);
 
 	geometry.forEach(function(g) {
 	    g.key = name + "/" + g.id;

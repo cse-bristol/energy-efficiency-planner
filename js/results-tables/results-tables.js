@@ -8,7 +8,7 @@ var dialogueFactory = require("floating-dialogue"),
 
 module.exports = function(container, getShapeLayers) {
     var resultsTables = dialogueFactory(
-	"results-table",
+	"results",
 	{
 	    reposition: true,
 	    close: true,
@@ -31,8 +31,8 @@ module.exports = function(container, getShapeLayers) {
 	    function(buttons, newButtons) {
 		newButtons.text("⊞");
 	    },
-	    function(d, i) {
-		return [d.resultsTable];
+	    function(layerName) {
+		return getShapeLayers().get(layerName).resultsTable;
 	    }
 	);
 
@@ -47,6 +47,17 @@ module.exports = function(container, getShapeLayers) {
 	    );
 	},
 	updateButtons: drawing.buttons,
-	headerClicked: drawResultsTables.headerClicked
+	
+	headerClicked: drawResultsTables.headerClicked,
+	rowClicked: drawResultsTables.rowClicked,
+	rowHovered: drawResultsTables.rowHovered,
+	
+	selectTable: function(layerId) {
+	    return container.select("#results-table-" + layerId)
+		.select("table");
+	},
+
+	addEmphasis: drawResultsTables.addEmphasis,
+	clearEmphasis: drawResultsTables.clearEmphasis
     };
 };

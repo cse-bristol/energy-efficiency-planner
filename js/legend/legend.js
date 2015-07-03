@@ -34,8 +34,8 @@ module.exports = function(container, getTileLayers, getShapeLayers, onSetState) 
 	    container,
 	    drawLegends.shapes,
 	    drawButtonContent,
-	    function(shapeLayerData) {
-		return shapeLayerData.legend.dialogueState;
+	    function(layerName) {
+		return getShapeLayers().get(layerName).legend.dialogueState;
 	    }
 	),
 
@@ -74,6 +74,10 @@ module.exports = function(container, getTileLayers, getShapeLayers, onSetState) 
 			return e.value.legend.dialogueState;
 		    })
 	    );
+	},
+
+	overlaysWithLegends = function(layerName, i) {
+	    return getTileLayers().overlays.get(layerName).legend;
 	};
 
     onSetState(function() {

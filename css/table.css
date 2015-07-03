@@ -13,10 +13,6 @@
     background-color: #F0F0F0;
 }
 
-.results .close-button {
-    background-color: #F0F0F0;
-}
-
 .results .content {
     height: 100%;
     padding: 0.5em 0.5em 0 0.5em;
@@ -83,9 +79,15 @@ th.reverse:before {
 
 .reset-results {
     position: absolute;
-    bottom: 0.5em;
-    left: 0.5em;
+    bottom: 0.2em;
+    left: 0.3em;
     font-family: monospace;
     font-weight: bold;
     cursor: pointer;
+    visibility: hidden;
+    background-color: white;
+}
+
+.results:hover .reset-results {
+    visibility: visible;
 }

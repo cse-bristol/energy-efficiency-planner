@@ -23,14 +23,16 @@ var d3 = require("d3"),
  + The name of the layer.
  + A legend for the layer.
  */
-module.exports = function(getShapeLayers, getTileLayers) {
+module.exports = function(getTileLayers, getShapeLayers) {
     var makeLegends = function(dialogues, newDialogues, getLayerData) {
+	newDialogues.classed("legend", true);
+	
 	newDialogues
 	    .append("svg")
 	    .classed(chartClass, true);
 
 	var svg = dialogues.select("." + chartClass)
-		.data(getLayerData)
+		.datum(getLayerData)
 		.attr("width", function(layer, i) {
 		    if (layer.legend) {
 			return textPadding + (textWidth * layer.legend().width);

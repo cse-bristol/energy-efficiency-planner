@@ -8,12 +8,8 @@ module.exports = function(container, projection, getHoveredShape, setHoveredShap
     var path = d3.geo.path()
 	    .projection(projection),
 
-	updateEmphasis = function(shapeLayers) {
-	    shapeLayers
-		.select("path")
-	    	.classed("highlight", function(d, i) {
-		    return d.layer.name === getHoveredShape().layerId && d.shape.id === getHoveredShape().shapeId;
-		});
+	updateEmphasis = function(shape, enable) {
+	    shape.classed("highlight", enable);
 	},
 
 	drawPaths = function(shapeLayers) {
@@ -42,14 +38,14 @@ module.exports = function(container, projection, getHoveredShape, setHoveredShap
 		})
 		.on("click", function(d, i) {
 		    getShapeLayers()
-			.get(p.layer.name)
+			.get(d.layer.name())
 			.worksheet
 			.selectShape(
 			    d.shape.id
 			);
 		})
 		.on("mouseenter", function(d, i) {
-		    setHoveredShape(d.layer.name, d.shape.id);
+		    setHoveredShape(d.layer.name(), d.shape.id);
 		});
 
 	    p
@@ -79,7 +75,7 @@ module.exports = function(container, projection, getHoveredShape, setHoveredShap
 			.classed(d.shape.geometry.type, true)
 			.style(feature, function(d, i) {
 			    return colour(
-				column ? d.layer.worksheet.getShapeData(d, column) : null
+				column ? d.layer.worksheet.getShapeData(d.shape, column) : null
 			    );
 			});
 		});
@@ -124,11 +120,16 @@ module.exports = function(container, projection, getHoveredShape, setHoveredShap
 
 	fromSelection: fromSelection,
 
-	updateEmphasis: updateEmphasis,
+	addEmphasis: function(shapes) {
+	    updateEmphasis(shapes, true);
+	},
 
-	selectShapeAndLayer: function(layerId, shapeId) {
-	    return container.select("g#" + layerId)
-		.select("path#" + shapeId);
+	clearEmphasis: function(shapes) {
+	    updateEmphasis(shapes, false);
+	},
+
+	selectShape: function(layerId, shapeId) {
+	    return d3.select("path#" + shapeId);
 	}
     };
 };

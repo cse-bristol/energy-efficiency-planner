@@ -18,13 +18,18 @@ path {
     cursor: pointer;
 }
 
-path.highlight {
-    stroke: pink;
-}
-
 path.LineString {
     fill: none;
     stroke-width: 3px !important;
+}
+
+
+path.LineString.highlight {
+    stroke-width: 5px !important;
+}
+
+path.Point.highlight {
+    stroke-width: 2px !important;
 }
 
 .leaflet-overlay-pane {

@@ -18,7 +18,7 @@ module.exports = function(container, resultsTables, updateLegends, updateLayerCo
 		return;
 	    }
 
-	    var oldShape = drawShapeLayers.selectShapeAndLayer(
+	    var oldShape = drawShapeLayers.selectShape(
 		hovered.layerId,
 		hovered.shapeId
 	    ),
@@ -26,7 +26,7 @@ module.exports = function(container, resultsTables, updateLegends, updateLayerCo
 		    hovered.layerId
 		),
 
-		newShape = drawShapeLayers.selectShapeAndLayer(
+		newShape = drawShapeLayers.selectShape(
 		    layerId, shapeId
 		),
 		newTable = resultsTables.selectTable(
@@ -35,10 +35,10 @@ module.exports = function(container, resultsTables, updateLegends, updateLayerCo
 	    
 	    hovered.layerId = layerId;
 	    hovered.shapeId = shapeId;
-	    
+
 	    drawShapeLayers.clearEmphasis(oldShape);
 	    resultsTables.clearEmphasis(oldTable);
-	    drawShapeLayers.addEmphasis(newShape, hovered.shapeId);
+	    drawShapeLayers.addEmphasis(newShape);
 	    resultsTables.addEmphasis(newTable, hovered.shapeId);
 	},
 
@@ -66,6 +66,11 @@ module.exports = function(container, resultsTables, updateLegends, updateLayerCo
 	);
 
     resultsTables.headerClicked(updateShapeLayer);
+    resultsTables.rowClicked(function(layerId, shapeId) {
+	var shape = drawShapeLayers.selectShape(layerId, shapeId);
+	map.zoomTo(shape.node().getBoundingClientRect());
+    });
+    resultsTables.rowHovered(setHoveredShape);
 
     map.onViewReset(updateAll);
     
