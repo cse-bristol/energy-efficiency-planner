@@ -209,6 +209,8 @@ module.exports = function(getShapeLayers, updateShapeLayer) {
 			    .get(d.id)
 			    .worksheet
 			    .sortProperty();
+
+			headerClicked(d.id);
 		    });
 	},
 
