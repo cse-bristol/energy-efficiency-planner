@@ -34,16 +34,6 @@ module.exports = function(errors, map, update) {
 		    "I": {visibility: false}
 		}
 	    };
-	},
-	cleanUp = function() {
-	    if (shapeLayers) {
-		/*
-		 Clean out these now unhelpful elements.
-		 */
-		shapeLayers.all().forEach(function(l) {
-		    l.resultsTable.remove();
-		});
-	    }
 	};
     
     return {
@@ -71,8 +61,6 @@ module.exports = function(errors, map, update) {
 	    loading = true;
 
 	    try {
-		cleanUp();
-		
 		shapeLayers = state.shapeLayers;
 		tileLayers = state.tileLayers;
 
