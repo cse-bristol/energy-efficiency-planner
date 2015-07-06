@@ -32,7 +32,6 @@ var shapeHeaders = function(shapeData) {
  Describes how we want our data to be displayed:
  * Sort columns
  * Colour
- * Currently selected shape
  */
 module.exports = function() {
     return function(shapeData) {
@@ -76,7 +75,6 @@ module.exports = function() {
 	    sortProperties = [],
 	    reverseSort = [],
 
-	    selectedShapeId = null,
  	    baseColour = nextColour(),
 	    
 	    sortPropertyChanged = callbacks(),
@@ -192,18 +190,9 @@ module.exports = function() {
 				    shape,
 				    header
 				);
-			    }),
-			    selected: selectedShapeId === shape.id
+			    })
 			};
 		    });
-	    },
-
-	    selectShape: function(id) {
-		selectedShapeId = id;
-	    },
-
-	    getSelectedShapeId: function() {
-		return selectedShapeId;
 	    },
 
 	    /*
