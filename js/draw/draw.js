@@ -62,7 +62,6 @@ module.exports = function(container, resultsTables, updateLegends, updateLayerCo
 	drawShapeLayers = drawShapeLayersFactory(
 	    map.overlay,
 	    map.projectTile,
-	    getHoveredShape,
 	    setHoveredShape,
 	    getShapeLayers
 	);

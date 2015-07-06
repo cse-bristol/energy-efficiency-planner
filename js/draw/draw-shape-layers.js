@@ -4,7 +4,7 @@
 
 var d3 = require("d3");
 
-module.exports = function(container, projection, getHoveredShape, setHoveredShape, getShapeLayers) {
+module.exports = function(container, projection, setHoveredShape, getShapeLayers) {
     var path = d3.geo.path()
 	    .projection(projection),
 
