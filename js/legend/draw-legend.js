@@ -26,6 +26,18 @@ var d3 = require("d3"),
 module.exports = function(getTileLayers, getShapeLayers) {
     var makeLegends = function(dialogues, newDialogues, getLayerData) {
 	newDialogues.classed("legend", true);
+
+	newDialogues.append("div")
+	    .classed(legendLabelClass, true);
+
+	var labels = dialogues.select("." + legendLabelClass)
+		.datum(getLayerData)
+		.text(function(d, i) {
+		    var column = d.worksheet.getColourColumn(),
+			units = d.legend.units;
+		    
+		    return d.name() + (column ? (": " + column) : "") + (units ? ("(" + units + ")") : "");
+		});
 	
 	newDialogues
 	    .append("svg")
