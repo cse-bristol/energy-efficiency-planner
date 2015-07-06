@@ -7,6 +7,7 @@ var d3 = require("d3"),
     colourCacheFactory = require("./colour-cache.js"),
     indexFactory = require("./worksheet-index.js"),
     cooerceNumericsFactory = require("./cooerce-numerics.js"),
+    columnSizesFactory = require("./column-size-cache.js"),
     
     nextColour = require("../../../colour.js").next,
     helpers = require("../../../helpers.js"),
@@ -81,7 +82,8 @@ module.exports = function() {
 	    baseColourChanged = callbacks(),
 
 	    colourCache = colourCacheFactory(sortPropertyChanged.add, baseColourChanged.add, getBaseColour, getColourColumn, getColumnData, cooerceNumerics.isNumeric),
-	    sortIndex = indexFactory(shapeData, sortPropertyChanged.add, getSortProperties);
+	    sortIndex = indexFactory(shapeData, sortPropertyChanged.add, getSortProperties),
+	    columnSizes = columnSizesFactory(shapeData, headers);
 
 	return {
 	    setBaseColour: function(newColour) {
@@ -168,14 +170,15 @@ module.exports = function() {
 	    },
 
 	    headersWithSort: function() {
-		return headers.map(function(header) {
+		return headers.map(function(header, i) {
 		    var sort = sortProperties.indexOf(header);
 		    
 		    return {
 			name: header,
 			sort: sort >= 0 ?
 			    (reverseSort[sort] ? "ascending" : "descending") :
-			null
+			null,
+			width: columnSizes.byIndex(i)
 		    };
 		});
 	    },
@@ -197,11 +200,14 @@ module.exports = function() {
 			
 			return {
 			    id: shape.id,
-			    cells: headers.map(function(header) {
-				return getShapeData(
-				    shape,
-				    header
-				);
+			    cells: headers.map(function(header, i) {
+				return {
+				    value: getShapeData(
+					shape,
+					header
+				    ),
+				    width: columnSizes.byIndex(i)
+				};
 			    })
 			};
 		    });

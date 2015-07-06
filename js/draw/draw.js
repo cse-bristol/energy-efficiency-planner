@@ -65,17 +65,26 @@ module.exports = function(container, resultsTables, updateLegends, updateLayerCo
 	    }
 	},
 
+	zoomShape = function(layerId, shapeId) {
+	    map.zoomTo(
+		getShapeLayers()
+		    .get(layerId)
+		    .worksheet
+		    .getGeometry(shapeId)
+		    .bbox
+	    );
+	},
+
 	drawShapeLayers = drawShapeLayersFactory(
 	    map.overlay,
 	    map.projectTile,
 	    setHoveredShape,
+	    zoomShape,
 	    getShapeLayers
 	);
 
     resultsTables.headerClicked(updateShapeLayer);
-    resultsTables.rowClicked(function(shapeGeometry) {
-	map.zoomTo(shapeGeometry.bbox);
-    });
+    resultsTables.rowClicked(zoomShape);
     resultsTables.rowHovered(setHoveredShape);
 
     map.onViewReset(updateAll);

@@ -4,7 +4,7 @@
 
 var d3 = require("d3");
 
-module.exports = function(container, projection, setHoveredShape, getShapeLayers) {
+module.exports = function(container, projection, setHoveredShape, zoomShape, getShapeLayers) {
     var path = d3.geo.path()
 	    .projection(projection),
 
@@ -37,12 +37,10 @@ module.exports = function(container, projection, setHoveredShape, getShapeLayers
 		    return d.shape.id;
 		})
 		.on("click", function(d, i) {
-		    getShapeLayers()
-			.get(d.layer.name())
-			.worksheet
-			.selectShape(
-			    d.shape.id
-			);
+		    zoomShape(
+			d.layer.name(),
+			d.shape.id
+		    );
 		})
 		.on("mouseenter", function(d, i) {
 		    setHoveredShape(d.layer.name(), d.shape.id);

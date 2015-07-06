@@ -8,15 +8,14 @@ var d3 = require("d3"),
     callbacks = helpers.callbackHandler,
     rounded = function(d, i) {
 	return helpers.rounded(d, 5);
-    };
+    },
+
+    widthPerChar = 1.1;
 
 /*
  Make an table describing a shape layer on the map.
 
  ToDo: colours
- ToDo: shape hover (extra-row)
- ToDo: shape clicks (focus) - this should come from the worksheet
- ToDo: column widths 
  ToDo: table size
  */
 module.exports = function(getShapeLayers, updateShapeLayer) {
@@ -37,30 +36,14 @@ module.exports = function(getShapeLayers, updateShapeLayer) {
 	    return layerId + "-" + shapeId;
 	},
 
-	sort = function(head, body, ordering) {
-	    var indices = ordering.properties.map(function(p) {
-		return head.indexOf(p);
-	    });
+	width = function(d, i) {
+	    return (d.width * widthPerChar) + "ch";
+	},
 
-	    var len = indices.length;
-	    body.sort(function(a, b){
-		for (var i = 0; i < len; i++) {
-		    var direction = ordering.reverse[i] ? -1 : 1;
-		    var j = indices[i];
-		    var first = maybeNumber(a[j]);
-		    var second = maybeNumber(b[j]);
-		    
-		    if (first > second) {
-			return 1 * direction;
-		    } else if (first < second) {
-			return -1 * direction;
-		    } else {
-			// No-op, we'll carry on looping.
-		    }
-		}
-		return 0;
-	    });
-
+	cellWidth = function(selection) {
+	    return selection
+		.style("min-width", width)
+		.style("max-width", width);
 	},
 
 	drawHeaders = function(tables, newTables) {
@@ -80,7 +63,8 @@ module.exports = function(getShapeLayers, updateShapeLayer) {
 				    return {
 					layerId: d.name(),
 					column: column.name,
-					sort: column.sort
+					sort: column.sort,
+					width: column.width
 				    };
 				});
 			},
@@ -93,6 +77,7 @@ module.exports = function(getShapeLayers, updateShapeLayer) {
 
 	    var newTh = th.enter()
 		    .append("th")
+	    	    .call(cellWidth)
 	    	    .on("click", function(d, i) {
 			getShapeLayers()
 			    .get(d.layerId)
@@ -112,6 +97,7 @@ module.exports = function(getShapeLayers, updateShapeLayer) {
 		.classed("reverse", function(d, i) {
 		    return d.sort === "ascending";
 		});
+
 	},
 
 	drawBody = function(tables, newTables) {
@@ -137,7 +123,6 @@ module.exports = function(getShapeLayers, updateShapeLayer) {
 				    return {
 					layerId: d.name(),
 					shapeId: row.id,
-					selected: row.selected,
 					cells: row.cells
 				    };
 				});
@@ -155,20 +140,13 @@ module.exports = function(getShapeLayers, updateShapeLayer) {
 		    return rowId(d.layerId, d.shapeId);
 		})
 		.on("click", function(d, i) {
-		    var worksheet = getShapeLayers()
-			    .get(d.layerId)
-			    .worksheet;
-
-		    rowClicked(worksheet.getGeometry(d.shapeId));
+		    rowClicked(d.layerId, d.shapeId);
 		})
 		.on("mouseenter", function(d, i) {
 		    rowHovered(d.layerId, d.shapeId);
 		});
 
 	    tr
-		.classed("selected-row", function(d, i) {
-		    return d.selected;
-		})
 		.order();
 
 	    
@@ -184,10 +162,11 @@ module.exports = function(getShapeLayers, updateShapeLayer) {
 
 	    td.exit().remove();
 
-	    td.enter().append("td");
+	    td.enter().append("td")
+		.call(cellWidth);
 
 	    td.text(function(d, i) {
-		return rounded(d);
+		return rounded(d.value);
 	    });
 	};
     
