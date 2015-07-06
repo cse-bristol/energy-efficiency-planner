@@ -73,7 +73,7 @@ th.reverse:before {
     background-color: LightSlateGray;
 }
 
-.selected {
+tr.highlight {
     outline: 1px solid red;
 }
 

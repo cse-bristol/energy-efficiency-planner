@@ -52,9 +52,8 @@ module.exports = function(container, getShapeLayers) {
 	rowClicked: drawResultsTables.rowClicked,
 	rowHovered: drawResultsTables.rowHovered,
 	
-	selectTable: function(layerId) {
-	    return container.select("#results-table-" + layerId)
-		.select("table");
+	selectTableRow: function(layerId, shapeId) {
+	    return container.select("#" + drawResultsTables.rowId(layerId, shapeId));
 	},
 
 	addEmphasis: drawResultsTables.addEmphasis,

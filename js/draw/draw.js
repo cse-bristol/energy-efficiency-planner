@@ -22,24 +22,26 @@ module.exports = function(container, resultsTables, updateLegends, updateLayerCo
 		hovered.layerId,
 		hovered.shapeId
 	    ),
-		oldTable = resultsTables.selectTable(
-		    hovered.layerId
+		oldRow = resultsTables.selectTableRow(
+		    hovered.layerId,
+		    hovered.shapeId
 		),
 
 		newShape = drawShapeLayers.selectShape(
 		    layerId, shapeId
 		),
-		newTable = resultsTables.selectTable(
-		    layerId
+		newRow = resultsTables.selectTableRow(
+		    layerId,
+		    shapeId
 		);
 	    
 	    hovered.layerId = layerId;
 	    hovered.shapeId = shapeId;
 
 	    drawShapeLayers.clearEmphasis(oldShape);
-	    resultsTables.clearEmphasis(oldTable);
+	    resultsTables.clearEmphasis(oldRow);
 	    drawShapeLayers.addEmphasis(newShape);
-	    resultsTables.addEmphasis(newTable, hovered.shapeId);
+	    resultsTables.addEmphasis(newRow);
 	},
 
 	updateShapeLayer = function(layerId) {

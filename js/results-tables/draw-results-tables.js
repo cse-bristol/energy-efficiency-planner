@@ -33,6 +33,10 @@ module.exports = function(getShapeLayers, updateShapeLayer) {
 	    }
 	},
 
+	rowId = function(layerId, shapeId) {
+	    return layerId + "-" + shapeId;
+	},
+
 	sort = function(head, body, ordering) {
 	    var indices = ordering.properties.map(function(p) {
 		return head.indexOf(p);
@@ -147,6 +151,9 @@ module.exports = function(getShapeLayers, updateShapeLayer) {
 
 	    tr.enter()
 		.append("tr")
+		.attr("id", function(d, i) {
+		    return rowId(d.layerId, d.shapeId);
+		})
 		.on("click", function(d, i) {
 		    var worksheet = getShapeLayers()
 			    .get(d.layerId)
@@ -214,11 +221,15 @@ module.exports = function(getShapeLayers, updateShapeLayer) {
 		    });
 	},
 
-	addEmphasis: function(selection, shapeId) {
+	addEmphasis: function(rowSelection) {
+	    rowSelection.classed("highlight", true);
 	},
 
-	clearEmphasis: function(selection) {
+	clearEmphasis: function(rowSelection) {
+	    rowSelection.classed("highlight", false);
 	},
+
+	rowId: rowId,
 
 	headerClicked: headerClicked.add,
 	rowClicked: rowClicked.add,
