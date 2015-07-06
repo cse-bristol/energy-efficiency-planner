@@ -44,11 +44,6 @@ module.exports = function(container, resultsTables, updateLegends, updateLayerCo
 	    resultsTables.addEmphasis(newRow);
 	},
 
-	updateShapeLayer = function(layerId) {
-	    // ToDo
-	    updateAll();	    
-	},
-
 	updateAll = function() {
 	    var orderedShapeLayers = getShapeLayers().ordered().reverse();
 
@@ -83,7 +78,7 @@ module.exports = function(container, resultsTables, updateLegends, updateLayerCo
 	    getShapeLayers
 	);
 
-    resultsTables.headerClicked(updateShapeLayer);
+    resultsTables.headerClicked(updateAll);
     resultsTables.rowClicked(zoomShape);
     resultsTables.rowHovered(setHoveredShape);
 
