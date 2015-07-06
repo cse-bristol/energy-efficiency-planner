@@ -57,6 +57,12 @@ module.exports = function(container, resultsTables, updateLegends, updateLayerCo
 
 	    updateLegends();
 	    updateLayerControl();
+
+	    if (hovered.shapeId !== null) {
+		drawShapeLayers.addEmphasis(
+		    drawShapeLayers.selectShape(hovered.layerId, hovered.shapeId)
+		);
+	    }
 	},
 
 	drawShapeLayers = drawShapeLayersFactory(
