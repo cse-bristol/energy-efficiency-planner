@@ -159,8 +159,7 @@ module.exports = function(getShapeLayers, updateShapeLayer) {
 			    .get(d.layerId)
 			    .worksheet;
 
-		    worksheet.selectShape(d.shapeId);
-		    rowClicked(d.layerId, d.shapeId);
+		    rowClicked(worksheet.getGeometry(d.shapeId));
 		})
 		.on("mouseenter", function(d, i) {
 		    rowHovered(d.layerId, d.shapeId);

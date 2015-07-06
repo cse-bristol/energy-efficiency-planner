@@ -109,7 +109,19 @@ module.exports = function() {
 	     */
 	    getColourColumn: getColourColumn,
 
-	    sortProperty : function(property, additional) {
+	    getGeometry: function(shapeId) {
+		var matches = shapeData.filter(function(shape) {
+		    return shape.id === shapeId;
+		});
+
+		if (matches.length === 1) {
+		    return matches[0];
+		} else {
+		    return null;
+		}
+	    },
+
+	    sortProperty: function(property, additional) {
 		if (property) {
 
 		    var i = sortProperties.indexOf(property);

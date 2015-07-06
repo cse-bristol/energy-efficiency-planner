@@ -68,9 +68,8 @@ module.exports = function(container, resultsTables, updateLegends, updateLayerCo
 	);
 
     resultsTables.headerClicked(updateShapeLayer);
-    resultsTables.rowClicked(function(layerId, shapeId) {
-	var shape = drawShapeLayers.selectShape(layerId, shapeId);
-	map.zoomTo(shape.node().getBoundingClientRect());
+    resultsTables.rowClicked(function(shapeGeometry) {
+	map.zoomTo(shapeGeometry.bbox);
     });
     resultsTables.rowHovered(setHoveredShape);
 
