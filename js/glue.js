@@ -79,7 +79,11 @@ var d3 = require("d3"),
 	state.getViewport,
 	menu.spec.button,
 	update
-    );
+    ),
+
+    standardButtonsWithoutAuto = menu.standard.buttonSpec().filter(function(button) {
+	return button.text !== "Auto";
+    });
 
 require("./serialization/files/import.js")(
     toolbar,
@@ -91,24 +95,19 @@ require("./serialization/files/import.js")(
     progress
 );
 
-menu.buildMenu(menuBar, [
-    require("./state/shape-layers/load-layer-button.js")(
-	fetchLayers.collection,
-	shapeLayerFactory,
-	state.getShapeLayers,
-	fetchLayers.load,
-	menu.spec.button
-    ),
-    viewportButtons.set,
-    viewportButtons.get
-]);
-
-require("./serialization/autosave-and-autoload.js")(
-    menu.store.writeOp,
-    menu.store.onOp,
-    state,
-    dataTransfer,
-    toolbar
+menu.buildCustomMenu(
+    menuBar,
+    standardButtonsWithoutAuto.concat([
+	require("./state/shape-layers/load-layer-button.js")(
+	    fetchLayers.collection,
+	    shapeLayerFactory,
+	    state.getShapeLayers,
+	    fetchLayers.load,
+	    menu.spec.button
+	),
+	viewportButtons.set,
+	viewportButtons.get
+    ])
 );
 
 menu.queryString.fromURL();
