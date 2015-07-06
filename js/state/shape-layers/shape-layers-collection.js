@@ -25,7 +25,6 @@ module.exports = function(errors) {
 		    order
 		)
 	    );
-	    onReorder();
 	};
 
 
@@ -83,6 +82,7 @@ module.exports = function(errors) {
 	setOrder: function(newOrder) {
 	    order = newOrder;
 	    verifyOrderChange();
+	    onReorder();
 	},
 
 	getOrder: function() {
@@ -98,6 +98,7 @@ module.exports = function(errors) {
 		order.splice(fromIndex, 1);
 		order.splice(toIndex, 0, layerName);
 		verifyOrderChange();
+		onReorder();
 	    }
 	},
 
