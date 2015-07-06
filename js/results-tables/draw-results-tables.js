@@ -32,7 +32,7 @@ module.exports = function(getShapeLayers, updateShapeLayer) {
 	},
 
 	rowId = function(layerId, shapeId) {
-	    return layerId + "-" + shapeId;
+	    return "results-row-" + layerId + "-" + shapeId;
 	},
 
 	width = function(d, i) {
