@@ -9,7 +9,9 @@ var d3 = require("d3"),
     cooerceNumericsFactory = require("./cooerce-numerics.js"),
     columnSizesFactory = require("./column-size-cache.js"),
     
-    nextColour = require("../../../colour.js").next,
+    colours = require("../../../colour.js"),
+    nextColour = colours.next,
+    reverseColour = colours.reverse,
     helpers = require("../../../helpers.js"),
     callbacks = helpers.callbackHandler,
 
@@ -201,12 +203,19 @@ module.exports = function() {
 			return {
 			    id: shape.id,
 			    cells: headers.map(function(header, i) {
-				return {
-				    value: getShapeData(
+				var isColoured = header === getColourColumn(),
+				    value = getShapeData(
 					shape,
 					header
 				    ),
-				    width: columnSizes.byIndex(i)
+				    colour = isColoured ? colourCache.getColourFunction()(value) : null,
+				    textColour = isColoured ? reverseColour(colour) : null;
+				
+				return {
+				    value: value,
+				    width: columnSizes.byIndex(i),
+				    colour: colour,
+				    textColour: textColour
 				};
 			    })
 			};

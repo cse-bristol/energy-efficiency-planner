@@ -16,7 +16,6 @@ var d3 = require("d3"),
  Make an table describing a shape layer on the map.
 
  ToDo: colours
- ToDo: table size
  */
 module.exports = function(getShapeLayers, updateShapeLayer) {
     var headerClicked = callbacks(),
@@ -167,7 +166,13 @@ module.exports = function(getShapeLayers, updateShapeLayer) {
 
 	    td.text(function(d, i) {
 		return rounded(d.value);
-	    });
+	    })
+		.style("background-color", function(d, i) {
+		    return d.colour;
+		})
+		.style("color", function(d, i) {
+		    return d.textColour;
+		});
 	};
     
     return {
