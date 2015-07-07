@@ -33,10 +33,7 @@ module.exports = function(getTileLayers, getShapeLayers) {
 	var labels = dialogues.select("." + legendLabelClass)
 		.datum(getLayerData)
 		.text(function(d, i) {
-		    var column = d.worksheet.getColourColumn(),
-			units = d.legend.units;
-		    
-		    return d.name() + (column ? (": " + column) : "") + (units ? ("(" + units + ")") : "");
+		    return d.legend.header();
 		});
 	
 	newDialogues

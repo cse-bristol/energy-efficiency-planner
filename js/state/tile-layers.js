@@ -67,11 +67,11 @@ module.exports = function(getZoom, errors) {
 	makeHeatMapLayer = heatMapLayerFactory(getZoom, errors),
 
 	heatMapLayers = [
-	    // "Total Heat Density",
-	    // "Public Buildings Heat Density",
-	    // "Commercial Heat Density",
-	    // "Industrial Heat Density",
-	    // "Residential Heat Density"
+	    "Total Heat Density",
+	    "Public Buildings Heat Density",
+	    "Commercial Heat Density",
+	    "Industrial Heat Density",
+	    "Residential Heat Density"
 	],
 	
 	overlays = d3.map();

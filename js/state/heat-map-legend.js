@@ -12,7 +12,7 @@ var d3 = require("d3"),
     broken = false;
 
 module.exports = function(getZoom, errors) {
-    return function(baseUrl) {
+    return function(layerName, baseUrl) {
 	var legendByZoom = d3.map(),
 	    onLoad = callbacks();
 
@@ -46,7 +46,9 @@ module.exports = function(getZoom, errors) {
 		legendFactory.bins([]);
 	};
 
-	f.units = 'kWh/m<sup>2</sup>/year';
+	f.header = function() {
+	    return layerName + ' kWh/m<sup>2</sup>/year';
+	};
 	f.onLoad = onLoad.add;
 	
 	return f;

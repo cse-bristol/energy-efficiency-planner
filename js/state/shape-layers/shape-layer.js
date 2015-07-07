@@ -118,6 +118,10 @@ module.exports = function(errors, createResultsTableDialogueData, createLegendDi
 	};
 
 	l.legend.dialogueState = createLegendDialogueState(name);
+	l.legend.header = function() {
+	    var col = l.worksheet.getColourColumn();
+	    return name + (col ? (": " + col) : "");
+	};
 
 	geometry.forEach(function(g) {
 	    g.key = name + "/" + g.id;
