@@ -14,12 +14,9 @@ var d3 = require("d3"),
 
 /*
  Make an table describing a shape layer on the map.
-
- ToDo: colours
  */
-module.exports = function(getShapeLayers, updateShapeLayer) {
-    var headerClicked = callbacks(),
-	rowClicked = callbacks(),
+module.exports = function(getShapeLayers, update) {
+    var rowClicked = callbacks(),
 	rowHovered = callbacks(),
 
 	maybeNumber = function(n) {
@@ -83,7 +80,7 @@ module.exports = function(getShapeLayers, updateShapeLayer) {
 			    .worksheet
 			    .sortProperty(d.column, d3.event.shiftKey);
 			
-			headerClicked(d.layerId);
+			update();
 		    });
 
 	    th
@@ -200,7 +197,7 @@ module.exports = function(getShapeLayers, updateShapeLayer) {
 			    .worksheet
 			    .sortProperty();
 
-			headerClicked(d.id);
+			update();
 		    });
 	},
 
@@ -214,7 +211,6 @@ module.exports = function(getShapeLayers, updateShapeLayer) {
 
 	rowId: rowId,
 
-	headerClicked: headerClicked.add,
 	rowClicked: rowClicked.add,
 	rowHovered: rowHovered.add
     };

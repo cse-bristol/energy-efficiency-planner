@@ -32,9 +32,9 @@ var d3 = require("d3"),
 
     legend = require("./legend/legend.js")(body, state.getTileLayers, state.getShapeLayers, state.onSet),
 
-    resultsTables = require("./results-tables/results-tables.js")(body, state.getShapeLayers),
+    resultsTables = require("./results-tables/results-tables.js")(body, state.getShapeLayers, update),
 
-    layerControl = require("./layer-control/layer-control.js")(body, toolbar, legend.tileButtons, legend.shapeButtons, resultsTables.updateButtons, state.getTileLayers, state.getShapeLayers, map.zoomTo),
+    layerControl = require("./layer-control/layer-control.js")(body, toolbar, legend.tileButtons, legend.shapeButtons, resultsTables.updateButtons, state.getTileLayers, state.getShapeLayers, map.zoomTo, update),
 
     draw = require("./draw/draw.js")(
 	body,
@@ -92,7 +92,8 @@ require("./serialization/files/import.js")(
     shapeLayerFactory,
     fetchLayers.save,
     errors,
-    progress
+    progress,
+    update
 );
 
 menu.buildCustomMenu(
@@ -103,7 +104,8 @@ menu.buildCustomMenu(
 	    shapeLayerFactory,
 	    state.getShapeLayers,
 	    fetchLayers.load,
-	    menu.spec.button
+	    menu.spec.button,
+	    update
 	),
 	viewportButtons.set,
 	viewportButtons.get

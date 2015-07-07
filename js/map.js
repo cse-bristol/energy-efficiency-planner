@@ -24,7 +24,9 @@ module.exports = function(container) {
     // Remove any existing map.
     container.select("#map").remove();
     
-    var mapDiv = container.append("div").attr("id", "map"),
+    var baseLayer = null,
+
+	mapDiv = container.append("div").attr("id", "map"),
 	map = new leaflet.Map(
 	    mapDiv.node(),
 	    {
@@ -89,6 +91,19 @@ module.exports = function(container) {
 
 	onViewReset: function(callback) {
 	    map.on("viewreset", callback);
+	},
+
+	setBaseLayer: function(newBaseLayer) {
+	    if (baseLayer) {
+		if (baseLayer === newBaseLayer) {
+		    return;
+		} else {
+		    map.removeLayer(baseLayer);
+		}
+	    }
+
+	    baseLayer = newBaseLayer;
+	    map.addLayer(newBaseLayer);
 	}
     };
 };

@@ -5,7 +5,7 @@
 var helpers = require("../../helpers.js"),
     noop = helpers.noop;
 
-module.exports = function(collection, shapeLayerFactory, getShapeLayers, load, makeButton) {
+module.exports = function(collection, shapeLayerFactory, getShapeLayers, load, makeButton, update) {
     return makeButton(
 	"Layers",
 	function(name) {
@@ -15,6 +15,7 @@ module.exports = function(collection, shapeLayerFactory, getShapeLayers, load, m
 		    getShapeLayers().add(
 			shapeLayerFactory(name, geometry, bbox)
 		    );
+		    update();
 		}
 	    );
 	},

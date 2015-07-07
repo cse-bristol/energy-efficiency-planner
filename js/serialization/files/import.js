@@ -13,16 +13,17 @@ var dialogueFactory = require("floating-dialogue"),
 /*
  Hooks up the various file import parts to each other.
  */
-module.exports = function(toolbar, container, state, shapeLayerFactory, saveLayerGeometry, errors, progress) {
+module.exports = function(toolbar, container, state, shapeLayerFactory, saveLayerGeometry, errors, progress, update) {
     var
     go = function() {
-	dialogue.getState.setVisibility(true);
+	dialogue.getState().setVisibility(true);
 	drawing.update();
     },
     addLayer = function(name, geometry, bbox) {
 	var layer = shapeLayerFactory(name, geometry, bbox);
 	state.getShapeLayers().add(layer);
 	saveLayerGeometry(layer);
+	update();
     },
 
     coordinateSearch = coordinateSearchFactory(container, errors.warnUser),
@@ -101,7 +102,7 @@ module.exports = function(toolbar, container, state, shapeLayerFactory, saveLaye
 		.attr("accept", ".csv,.tsv,.json,.shp,.dbf,.prj")
 		.attr("id", "import-file-picker")
 		.on("change", function(d, i) {
-		    handlers(
+		    handle(
 			Array.prototype.slice.call(this.files)
 		    );
 		    /*

@@ -4,8 +4,6 @@
 
 var leaflet = require("leaflet"),
     d3 = require("d3"),
-    helpers = require("../helpers.js"),
-    callbacks = helpers.callbackHandler,
 
     heatMapLayerFactory = require("./heat-map-layer.js");
 
@@ -15,22 +13,9 @@ var decorateTileLayers = function(tileLayers, opacity) {
 	    return name;
 	};
 
-	/*
-	 Add callback event to setOpacity method.
-	 */
-	var onSetOpacity = callbacks(),
-	    wrapped = layer.setOpacity;
-	
-	layer.setOpacity = function(opacity) {
-	    var result = wrapped.call(layer, opacity);
-	    onSetOpacity(opacity);
-	    return result;
-	};
 	layer.getOpacity = function() {
 	    return layer.options.opacity;
 	};
-	layer.onSetOpacity = onSetOpacity.add;
-	layer.clearOnSetOpacity = onSetOpacity.clear;
 
 	if (opacity !== undefined) {
 	    layer.setOpacity(opacity);
@@ -82,11 +67,11 @@ module.exports = function(getZoom, errors) {
 	makeHeatMapLayer = heatMapLayerFactory(getZoom, errors),
 
 	heatMapLayers = [
-	    "Total Heat Density",
-	    "Public Buildings Heat Density",
-	    "Commercial Heat Density",
-	    "Industrial Heat Density",
-	    "Residential Heat Density"
+	    // "Total Heat Density",
+	    // "Public Buildings Heat Density",
+	    // "Commercial Heat Density",
+	    // "Industrial Heat Density",
+	    // "Residential Heat Density"
 	],
 	
 	overlays = d3.map();
@@ -98,44 +83,7 @@ module.exports = function(getZoom, errors) {
     decorateTileLayers(baseLayers);
     decorateTileLayers(overlays, 0);
     
-    /*
-     Set up hover to see the value of a tile's pixel.
-     */
-    overlays.values().forEach(function(tileLayer) {
-	var colourChanged = callbacks();
-	tileLayer.colourChanged = colourChanged.add;
-
-	if (tileLayer.legend !== undefined) {
-
-	    tileLayer.on("tileload", function(e) {
-		var cache;
-
-		d3.select(e.tile)
-		    .on("mousemove", function() {
-			if (cache === undefined) {
-			    var canvas = document.createElement("canvas");
-			    canvas.width = this.width;
-			    canvas.height = this.height;
-
-			    var cache = canvas.getContext("2d");
-			    cache.drawImage(this, 0, 0);
-			}
-
-			var rect = this.getBoundingClientRect(),
-			    x = d3.event.offsetX ? d3.event.offsetX : d3.event.clientX - rect.left,
-			    y = d3.event.offsetY ? d3.event.offsetY : d3.event.clientY - rect.top,
-			    colourData = cache.getImageData(x, y, 1, 1).data,
-			    transparent = colourData[3] === 0;
-
-			colourChanged(d3.rgb(colourData[0], colourData[1], colourData[2]), transparent);
-		    });
-	    });
-	}
-    });
-
-    var baseLayer = osmLayer,
-	onSetBaseLayer = callbacks();
-
+    var baseLayer = osmLayer;
     return {
 	base: baseLayers,
 	
@@ -147,8 +95,6 @@ module.exports = function(getZoom, errors) {
 	    var old = baseLayer;
 	    value.setOpacity(baseLayer.getOpacity());
 	    baseLayer = value;
-	    onSetBaseLayer(old, baseLayer);
-	},
-	onSetBaseLayer: onSetBaseLayer.add
+	}
     };
 };

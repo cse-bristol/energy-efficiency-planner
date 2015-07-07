@@ -6,7 +6,7 @@ var dialogueFactory = require("floating-dialogue"),
     drawResultsTablesFactory = require("./draw-results-tables.js");
 
 
-module.exports = function(container, getShapeLayers) {
+module.exports = function(container, getShapeLayers, update) {
     var resultsTables = dialogueFactory(
 	"results",
 	{
@@ -20,7 +20,7 @@ module.exports = function(container, getShapeLayers) {
 	}
     ),
 
-	drawResultsTables = drawResultsTablesFactory(getShapeLayers),
+	drawResultsTables = drawResultsTablesFactory(getShapeLayers, update),
 	
 	drawing = resultsTables.drawing(
 	    function(id) {
@@ -48,7 +48,6 @@ module.exports = function(container, getShapeLayers) {
 	},
 	updateButtons: drawing.buttons,
 	
-	headerClicked: drawResultsTables.headerClicked,
 	rowClicked: drawResultsTables.rowClicked,
 	rowHovered: drawResultsTables.rowHovered,
 	

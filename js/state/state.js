@@ -68,25 +68,9 @@ module.exports = function(errors, map, update) {
 		    map.removeLayer(layer);
 		});
 		
-		map.addLayer(tileLayers.getBaseLayer());
-		tileLayers.getBaseLayer().onSetOpacity(update);
-		
-		tileLayers.onSetBaseLayer(function(oldBaseLayer, baseLayer) {
-		    map.removeLayer(oldBaseLayer);
-		    map.addLayer(baseLayer);
-
-		    oldBaseLayer.clearOnSetOpacity();
-		    baseLayer.onSetOpacity(update);
-		    update();
-		});
-
 		tileLayers.overlays.forEach(function(name, layer) {
 		    map.addLayer(layer);
-		    layer.onSetOpacity(update);
 		});
-
-		shapeLayers.onAdd(update);
-		shapeLayers.onReorder(update);
 
 		if (state.tools) {
 		    // ToDo deserialize import, errors, layer control

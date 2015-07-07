@@ -58,6 +58,8 @@ module.exports = function(container, resultsTables, updateLegends, updateLayerCo
 		    drawShapeLayers.selectShape(hovered.layerId, hovered.shapeId)
 		);
 	    }
+
+	    map.setBaseLayer(getTileLayers().getBaseLayer());
 	},
 
 	zoomShape = function(layerId, shapeId) {
@@ -78,7 +80,6 @@ module.exports = function(container, resultsTables, updateLegends, updateLayerCo
 	    getShapeLayers
 	);
 
-    resultsTables.headerClicked(updateAll);
     resultsTables.rowClicked(zoomShape);
     resultsTables.rowHovered(setHoveredShape);
 

@@ -3,9 +3,7 @@
 /*global module, require*/
 
 var d3 = require("d3"),
-    _ = require("lodash"),
-    helpers = require("../../helpers.js"),
-    callbacks = helpers.callbackHandler;
+    _ = require("lodash");
 
 /*
  A collection of shape (GeoJSON vector) layers which will be drawn as map overlays.
@@ -15,9 +13,6 @@ var d3 = require("d3"),
 module.exports = function(errors) {
     var layers = d3.map([]),
 	order = [],
-	onAdd = callbacks(),
-	onRemove = callbacks(),
-	onReorder = callbacks(),
 	verifyOrderChange = function() {
 	    // Make sure this doesn't get out of sync.
 	    order = _.uniq(
@@ -60,8 +55,6 @@ module.exports = function(errors) {
 	    }
 	    
 	    layers.set(layer.name(), layer);
-	    
-	    onAdd(layer);
 	},
 
 	remove: function(layer) {
@@ -73,8 +66,6 @@ module.exports = function(errors) {
 			layer.name()),
 		    1
 		);
-		
-		onRemove(layer);
 		verifyOrderChange();
 	    }
 	},
@@ -82,7 +73,6 @@ module.exports = function(errors) {
 	setOrder: function(newOrder) {
 	    order = newOrder;
 	    verifyOrderChange();
-	    onReorder();
 	},
 
 	getOrder: function() {
@@ -98,13 +88,8 @@ module.exports = function(errors) {
 		order.splice(fromIndex, 1);
 		order.splice(toIndex, 0, layerName);
 		verifyOrderChange();
-		onReorder();
 	    }
-	},
-
-	onAdd: onAdd.add,
-	onRemove: onRemove.add,
-	onReorder: onReorder.add
+	}
     };
 };
 
