@@ -14,7 +14,8 @@ module.exports = function(toolbar, body) {
 	    resize: true,
 	    close: true,
 	    visible: false,
-	    lockToScreen: true
+	    lockToScreen: true,
+	    initialVisibility: false
 	}
     ).single(),
 
