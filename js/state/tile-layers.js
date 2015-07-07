@@ -5,7 +5,7 @@
 var leaflet = require("leaflet"),
     d3 = require("d3"),
 
-    heatMapLayerFactory = require("./heat-map-layer.js");
+    heatMapLayerFactory = require("./heat-map-layers/heat-map-layers.js");
 
 var decorateTileLayers = function(tileLayers, opacity) {
     tileLayers.forEach(function(name, layer) {
@@ -28,7 +28,7 @@ var decorateTileLayers = function(tileLayers, opacity) {
 
  Keeps track of the current base layer, and provides notifications when it changes.
  */
-module.exports = function(getZoom, errors) {
+module.exports = function(getZoom) {
     /*
      Define all our layers.
      */
@@ -64,19 +64,11 @@ module.exports = function(getZoom, errors) {
 	    "ESRI World Topography": Esri_WorldTopoMap
 	}),
 
-	makeHeatMapLayer = heatMapLayerFactory(getZoom, errors),
+	makeHeatMapLayer = heatMapLayerFactory.leafletLayers(getZoom),
 
-	heatMapLayers = [
-	    "Total Heat Density",
-	    "Public Buildings Heat Density",
-	    "Commercial Heat Density",
-	    "Industrial Heat Density",
-	    "Residential Heat Density"
-	],
-	
 	overlays = d3.map();
 
-    heatMapLayers.forEach(function(heatMapLayer) {
+    heatMapLayerFactory.layerNames.forEach(function(heatMapLayer) {
 	overlays.set(heatMapLayer, makeHeatMapLayer(heatMapLayer));
     });
 
