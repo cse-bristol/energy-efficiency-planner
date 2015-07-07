@@ -32,7 +32,7 @@ module.exports = function(getTileLayers, getShapeLayers) {
 
 	var labels = dialogues.select("." + legendLabelClass)
 		.datum(getLayerData)
-		.text(function(d, i) {
+		.html(function(d, i) {
 		    return d.legend.header();
 		});
 	
