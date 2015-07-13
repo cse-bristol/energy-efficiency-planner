@@ -227,7 +227,7 @@ module.exports = function(container, toolbar, updateTileLegendButtons, updateSha
 		shapesForm = dialogues.select(".shape-overlay-form");
 
 		var tileLayers = getTileLayers(),
-		    shapeLayers = getShapeLayers().ordered().reverse();
+		    shapeLayers = getShapeLayers().ordered();
 
 		updateBase(tileLayers.getBaseLayer(), tileLayers.base.keys());
 		updateTiles(tileLayers.overlays);
