@@ -33,6 +33,7 @@
 .results-table tbody {
     display: block;
     overflow: auto;
+    /* Make the body resize when the dialogue is manually sized. */
     height: calc(100% - 4em);
 }
 
