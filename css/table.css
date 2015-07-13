@@ -36,10 +36,6 @@
     height: calc(100% - 4em);
 }
 
-.extra-row {
-    background-color: lightblue;
-}
-
 .results-table thead tr th {
     padding: 0.1em 0.4em 0.1em 0.4em;
     cursor: pointer;

@@ -174,6 +174,27 @@ module.exports = function(getShapeLayers, update) {
     
     return {
 	drawDialogues: function(dialogues, newDialogues) {
+	    /*
+	     Vertical table scrolling won't work unless we manually set a height style on the element.
+	     */
+	    dialogues
+		.filter(function(d, i) {
+		    return !d.manuallySized();
+		})
+		.style("height", function(d, i) {
+		    return "height",
+		    (
+			4 + 
+			    (
+				getShapeLayers().get(d.id)
+				    .worksheet
+				    .getRowCount()
+				    * 1.6
+			    )
+			
+		    ) + "em";
+		});
+	    
 	    var newTables = newDialogues.append("table")
 		    .classed("results-table", true),
 		

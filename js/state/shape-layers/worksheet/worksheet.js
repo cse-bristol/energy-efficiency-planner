@@ -190,6 +190,10 @@ module.exports = function() {
 	     */
 	    getColumnData: getColumnData,
 
+	    getRowCount: function() {
+		return shapeData.length;
+	    },
+	    
 	    /*
 	     Return an array of arrays of the data in this shape.
 
