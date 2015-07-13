@@ -3,8 +3,7 @@
 /*global module, require*/
 
 var float = require("floating-dialogue"),
-    d3 = require("d3"),
-    toolText = "!";
+    d3 = require("d3");
 
 module.exports = function(toolbar, body) {
     var dialogue = float(
@@ -65,6 +64,7 @@ module.exports = function(toolbar, body) {
     return {
 	save: dialogue.save,
 	load: dialogue.load,
+	reset: dialogue.reset,
 	
 	informUser : function(text) {
 	    console.log(text);

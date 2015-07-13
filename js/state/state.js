@@ -26,13 +26,7 @@ module.exports = function(errors, map, update) {
 	    return {
 		shapeLayers: layersFactory(errors),
 		tileLayers: t,
-		viewport: viewportFactory(),
-
-		tools: {
-		    "L": {visibility: true},
-		    "!": {visibility: false},
-		    "I": {visibility: false}
-		}
+		viewport: viewportFactory()
 	    };
 	};
     
@@ -61,6 +55,13 @@ module.exports = function(errors, map, update) {
 	    loading = true;
 
 	    try {
+		if (state.errors) {
+		    errors.load(state.errors);
+		    
+		} else {
+		    errors.reset();
+		}
+		
 		shapeLayers = state.shapeLayers;
 		tileLayers = state.tileLayers;
 
@@ -72,10 +73,6 @@ module.exports = function(errors, map, update) {
 		    map.addLayer(layer);
 		});
 
-		if (state.tools) {
-		    // ToDo deserialize import, errors, layer control
-		}
-
 		viewport = state.viewport;
 		
 		map.setView(
@@ -83,7 +80,7 @@ module.exports = function(errors, map, update) {
 		    viewport.zoom()
 		);
 
-		onSet();
+		onSet(state);
 		update();
 	    } finally {
 		loading = false;

@@ -101,7 +101,7 @@ module.exports = function(container, getTileLayers, getShapeLayers, onSetState) 
 	    );
 	},
 	shapeCreate: shapeDialogues.createData,
-	shapeDeserialize: shapeDialogues.load,
-	tileDeserialize: tileDialogues.load
+	shapeDeserialize: shapeDialogues.deserialize,
+	tileDeserialize: tileDialogues.deserialize
     };
 };

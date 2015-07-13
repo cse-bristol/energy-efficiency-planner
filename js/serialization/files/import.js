@@ -120,4 +120,16 @@ module.exports = function(toolbar, container, state, shapeLayerFactory, saveLaye
     dropFactory(container, errors, handle);
 
     drawing.update();
+
+    state.onSet(function(state) {
+	if (state.importControl) {
+	    dialogue.load(state.importControl);
+	} else {
+	    dialogue.reset();
+	}
+    });
+
+    return {
+	save: dialogue.save
+    };
 };

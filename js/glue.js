@@ -18,6 +18,14 @@ var d3 = require("d3"),
     update = function() {
 	draw.update();
     },
+
+    serialize = function() {
+	return serialization.serialize.apply(this, arguments);
+    },
+
+    deserialize = function() {
+	return serialization.deserialize.apply(this, arguments);
+    },
     
     errors = require("./errors.js")(toolbar, body),
     progress = require("./progress.js")(body),
@@ -34,7 +42,18 @@ var d3 = require("d3"),
 
     resultsTables = require("./results-tables/results-tables.js")(body, state.getShapeLayers, update),
 
-    layerControl = require("./layer-control/layer-control.js")(body, toolbar, legend.tileButtons, legend.shapeButtons, resultsTables.updateButtons, state.getTileLayers, state.getShapeLayers, map.zoomTo, update),
+    layerControl = require("./layer-control/layer-control.js")(
+	body,
+	toolbar,
+	legend.tileButtons,
+	legend.shapeButtons,
+	resultsTables.updateButtons,
+	state.getTileLayers,
+	state.getShapeLayers,
+	state.onSet,
+	map.zoomTo,
+	update
+    ),
 
     draw = require("./draw/draw.js")(
 	body,
@@ -47,30 +66,51 @@ var d3 = require("d3"),
     ),
 
     shapeLayerFactory = require("./state/shape-layers/shape-layer.js")(errors, resultsTables.createData, legend.shapeCreate),
-    
-    dataTransfer = require("./serialization/data-transfer.js")(
-	shapeLayerFactory,
-	errors,
-	state.fresh,
-	resultsTables.deserialize
-    ),
-    
+
     menu = require("multiuser-file-menu")(
 	"maps",
-	dataTransfer.serialize,
-	dataTransfer.deserialize,
+	serialize,
+	deserialize,
 	state.get,
 	state.set,
 	state.fresh
+    ),
+
+    shapeLayerSerialization = require("./serialization/serialize-shape-layer.js")(
+	shapeLayerFactory,
+	resultsTables.deserialize,
+	legend.shapeDeserialize,
+	update
     ),
     
     fetchLayers = require("./state/shape-layers/fetch-layers.js")(
 	menu.backend.load,
 	menu.backend.loadSnapshot,
-	dataTransfer.onDeserializeLayer,
+	shapeLayerSerialization.onDeserializeLayer,
 	progress,
 	errors
     ),
+
+    importControl = require("./serialization/files/import.js")(
+	toolbar,
+	body,
+	state,
+	shapeLayerFactory,
+	fetchLayers.save,
+	errors,
+	progress,
+	update
+    ),
+
+    serialization = require("./serialization/serialize.js")(
+	shapeLayerSerialization.serialize,
+	shapeLayerSerialization.deserialize,
+	legend.tileDeserialize,
+	errors,
+	layerControl,
+	importControl,
+	state.fresh
+    ),    
     
     viewportButtons = require("./viewport-buttons.js")(
 	map.setView,
@@ -84,17 +124,6 @@ var d3 = require("d3"),
     standardButtonsWithoutAuto = menu.standard.buttonSpec().filter(function(button) {
 	return button.text !== "Auto";
     });
-
-require("./serialization/files/import.js")(
-    toolbar,
-    body,
-    state,
-    shapeLayerFactory,
-    fetchLayers.save,
-    errors,
-    progress,
-    update
-);
 
 menu.buildCustomMenu(
     menuBar,

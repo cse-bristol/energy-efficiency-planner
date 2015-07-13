@@ -5,43 +5,13 @@
 var _ = require("lodash"),
     leaflet = require("leaflet"),
     helpers = require("../helpers.js"),
-    callbacks = helpers.callbackHandler,
     asNum = helpers.asNum;
 
 /*
  Converts between the state of the world (as defined in state.js) and data transfer objects which can be turned into JSON and sent out across the wire.
  */
-module.exports = function(shapeLayerFactory, errors, freshState, deserializeResultsTable) {
-    var reading = false,
-	onDeserializeLayer = callbacks(),
-
-	serializeResultsTable = function(table) {
-	    var result = {
-		visible: table.visible()
-	    };
-
-	    if (table.manuallySized()) {
-		result.size = table.size();
-	    }
-	    if (table.manuallyPositioned()) {
-		result.position = table.position();
-	    }
-
-	    return result;
-	},
-
-	serializeShapeLayer = function(layer) {
-	    var table = layer.resultsTable;
-
-	    return {
-		opacity: layer.getOpacity(),
-		colour: layer.worksheet.baseColour(),
-		sort: layer.worksheet.getSortProperties(),
-		table: layer.resultsTable.serialize()
-	    };
-	},
-	
-	serializeShapeLayers = function(layers) {
+module.exports = function(serializeShapeLayer, deserializeShapeLayer, deserializeTileLegend, errors, layerControl, importControl, freshState) {
+    var serializeShapeLayers = function(layers) {
 	    var result = {};
 	    
 	    layers.all().forEach(function(layer) {
@@ -49,53 +19,6 @@ module.exports = function(shapeLayerFactory, errors, freshState, deserializeResu
 	    });
 
 	    return result;
-	},
-
-	deserializeShapeSort = function(serialized, setSortProperty) {
-	    _.zip(serialized.properties, serialized.reverse)
-		.forEach(function(sort, i) {
-
-		    setSortProperty(
-			sort[0],
-			/*
-			 The first property in the list replaces any existing sort.
-			 */
-			i !== 0
-		    );
-		    
-		    /*
-		     In order to reverse the sort order, sort again by the same property.
-		     */
-		    if (sort[1]) {
-			setSortProperty(sort[1], true);
-		    }
-		});
-	},
-
-	deserializeShapeLayer = function(shapeLayers, layerName, layerData) {
-	    /*
-	     Schedule the layer's geometry to be loaded from the database. When it is, fill in the created layer.
-	     */
-	    onDeserializeLayer(layerName, function(geometry, bbox) {
-		try {
-		    reading = true;
-		    
-		    var layer = shapeLayerFactory(layerName, geometry, bbox);
-		    shapeLayers.add(layer);
-		    
-		    layer.setOpacity(layerData.opacity);
-		    layer.worksheet.setBaseColour(layerData.colour);
-
-		    deserializeShapeSort(layerData.sort, layer.worksheet.sortProperty);
-
-		    if (layerData.table) {
-			layer.resultsTable = deserializeResultsTable(layerData.table);
-		    }
-		    
-		} finally {
-		    reading = false;
-		}
-	    });
 	},
 
 	deserializeShapeLayers = function(shapeLayers, serializedLayers) {
@@ -112,6 +35,10 @@ module.exports = function(shapeLayerFactory, errors, freshState, deserializeResu
 		overlays[name] = {
 		    opacity: overlay.getOpacity()
 		};
+
+		if (overlay.legend) {
+		    overlays[name].legend = overlay.legend.dialogueState.serialize();
+		}
 	    });
 	    
 	    return {
@@ -144,6 +71,12 @@ module.exports = function(shapeLayerFactory, errors, freshState, deserializeResu
 				if (serializedOverlay.opacity) {
 				    overlay.setOpacity(asNum(serializedOverlay.opacity));
 				}
+
+				if (serializedOverlay.legend && overlay.legend) {
+				    overlay.legend.dialogueState = deserializeTileLegend(
+					serializedOverlay.legend
+				    );
+				}
 			    }
 			}
 		    );
@@ -166,23 +99,17 @@ module.exports = function(shapeLayerFactory, errors, freshState, deserializeResu
 	};
 
     return {
-	reading: function() {
-	    return reading;
-	},
-	
 	serialize: function(state) {
 	    return {
 		shapeLayers: serializeShapeLayers(state.shapeLayers),
 		shapeLayerOrder: state.shapeLayers.getOrder(),
 		tileLayers: serializeTileLayers(state.tileLayers),
 		viewport: serializeViewport(state.viewport),
-		tools: state.tools
+		errors: errors.save(),
+		layerControl: layerControl.save(),
+		importControl: importControl.save()
 	    };
 	},
-
-	deserializeShapeSort: deserializeShapeSort,
-	deserializeShapeLayer: deserializeShapeLayer,
-	serializeShapeLayer: serializeShapeLayer,
 
 	deserializeViewport: deserializeViewport,
 	serializeViewport: serializeViewport,
@@ -190,6 +117,18 @@ module.exports = function(shapeLayerFactory, errors, freshState, deserializeResu
 	deserialize: function(serialized) {
 	    var state = freshState();
 
+	    if (serialized.errors) {
+		state.errors = serialized.errors;
+	    }
+
+	    if (serialized.layerControl) {
+		state.layerControl = serialized.layerControl;
+	    }
+
+	    if (serialized.importControl) {
+		state.importControl = serialized.importControl;
+	    }
+	    
 	    if (serialized.tileLayers) {
 		deserializeTileLayers(state.tileLayers, serialized.tileLayers);
 	    }
@@ -206,13 +145,7 @@ module.exports = function(shapeLayerFactory, errors, freshState, deserializeResu
 		deserializeViewport(state.viewport, serialized.viewport);
 	    }
 
-	    if (serialized.tools) {
-		state.tools = serialized.tools;
-	    }
-
 	    return state;
-	},
-
-	onDeserializeLayer: onDeserializeLayer.add
+	}
     };
 };

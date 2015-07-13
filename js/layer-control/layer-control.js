@@ -29,7 +29,7 @@ var d3 = require("d3"),
     layerNameClass = "layer-name",
     toolText = "L";
 
-module.exports = function(container, toolbar, updateTileLegendButtons, updateShapeLegendButtons, updateResultsTableButtons, getTileLayers, getShapeLayers, zoomTo, update) {
+module.exports = function(container, toolbar, updateTileLegendButtons, updateShapeLegendButtons, updateResultsTableButtons, getTileLayers, getShapeLayers, onSetState, zoomTo, update) {
     var getBaseLayer = function(ignored) {
 	    return getTileLayers().getBaseLayer();
 	},
@@ -243,9 +243,17 @@ module.exports = function(container, toolbar, updateTileLegendButtons, updateSha
 	    }
 	);
 
+    onSetState(function(state) {
+	if (state.layerControl) {
+	    dialogue.load(state.layerControl);
+	} else {
+	    dialogue.reset();
+	}
+    });
+
+
     return {
 	update: drawing.update,
-	save: dialogue.save,
-	load: dialogue.load
+	save: dialogue.save
     };
 };
