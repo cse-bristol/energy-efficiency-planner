@@ -36,9 +36,8 @@ module.exports = {
 		var f = function() {
 		    var z = getZoom();
 
-		    if (z > maxZoom) {
-			z = maxZoom;
-		    }
+		    z = Math.min(z, maxZoom);
+		    z = Math.max(z, 1);
 
 		    return bins.get(layerName)[z - 1];
 		};
