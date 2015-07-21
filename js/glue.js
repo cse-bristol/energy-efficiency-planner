@@ -46,40 +46,15 @@ var d3 = require("d3"),
 
     resultsTables = require("./results-tables/results-tables.js")(body, state.getShapeLayers, update),
 
-    layerControl = require("./layer-control/layer-control.js")(
-	leftPane,
-	rightPane,
-	toolbar,
-	legend.tileButtons,
-	legend.shapeButtons,
-	resultsTables.updateButtons,
-	state.getTileLayers,
-	state.getShapeLayers,
-	state.onSet,
-	map.zoomTo,
-	update,
-	errors
-    ),
-
-    draw = require("./draw/draw.js")(
-	leftPane,
-	resultsTables,
-	legend.update,
-	layerControl.update,
-	state.getTileLayers,
-	state.getShapeLayers,
-	map
-    ),
-
     shapeLayerFactory = require("./state/shape-layers/shape-layer.js")(errors, resultsTables.createData, legend.shapeCreate),
 
     menu = require("multiuser-file-menu")(
-	"maps",
-	serialize,
-	deserialize,
-	state.get,
-	state.set,
-	state.fresh
+    	"maps",
+    	serialize,
+    	deserialize,
+    	state.get,
+    	state.set,
+    	state.fresh
     ),
 
     shapeLayerSerialization = require("./serialization/serialize-shape-layer.js")(
@@ -97,15 +72,47 @@ var d3 = require("d3"),
 	errors
     ),
 
-    importControl = require("./serialization/files/import.js")(
-	toolbar,
+    sidePanel = require("./side-panel/side-panel.js")(
 	leftPane,
+	rightPane,
+	toolbar,
+	state.onSet,
+	errors
+    ),
+
+    importControl = require("./serialization/files/import.js")(
+	body,
+	sidePanel.upload(),
+	sidePanel.focusUpload,
 	state,
 	shapeLayerFactory,
 	fetchLayers.save,
 	errors,
 	progress,
 	update
+    ),    
+
+    layerControl = require("./layer-control/layer-control.js")(
+	sidePanel.active(),
+	sidePanel.base(),
+	legend.tileButtons,
+	legend.shapeButtons,
+	resultsTables.updateButtons,
+	state.getTileLayers,
+	state.getShapeLayers,
+	state.onSet,
+	map.zoomTo,
+	update
+    ),
+
+    draw = require("./draw/draw.js")(
+	leftPane,
+	resultsTables,
+	legend.update,
+	layerControl.update,
+	state.getTileLayers,
+	state.getShapeLayers,
+	map
     ),
 
     serialization = require("./serialization/serialize.js")(
@@ -113,8 +120,7 @@ var d3 = require("d3"),
 	shapeLayerSerialization.deserialize,
 	legend.tileDeserialize,
 	errors,
-	layerControl,
-	importControl,
+	sidePanel,
 	state.fresh
     ),    
     

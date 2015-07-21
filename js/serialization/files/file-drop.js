@@ -5,14 +5,14 @@
 var d3 = require("d3"), 
     toArray = require("../../helpers.js").toArray;
 
-module.exports = function(container, errors, handle) {
-    container.on("dragover", function(d, i){
+module.exports = function(body, errors, handle) {
+    body.on("dragover", function(d, i){
 	d3.event.preventDefault();
 	d3.event.stopPropagation();
 	d3.event.dataTransfer.dropEffect = "copy";
     });
     
-    container.on("drop", function(data, index){
+    body.on("drop", function(data, index){
 	d3.event.preventDefault();
 	d3.event.stopPropagation();
 	

@@ -84,14 +84,8 @@ module.exports = function(container, progress, errors, coordinateSearch, layerNa
 	    .attr("placeholder", "Search for a coordinate system")
 	    .attr("type", "text")
 	    .on("input", function() {
-		var bbox = this.getBoundingClientRect();
-		
 		coordinateSearch.search(
 		    coordinateSearchBox.node().value,
-		    [
-			bbox.right,
-			bbox.top
-		    ],
 		    function(result) {
 			coordinateSearchBox.node().value = result.srid;
 			coordinateSystem.node().value = result.srtext;
