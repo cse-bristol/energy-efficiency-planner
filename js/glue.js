@@ -57,7 +57,8 @@ var d3 = require("d3"),
 	state.getShapeLayers,
 	state.onSet,
 	map.zoomTo,
-	update
+	update,
+	errors
     ),
 
     draw = require("./draw/draw.js")(

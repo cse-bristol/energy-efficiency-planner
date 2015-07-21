@@ -4,7 +4,7 @@
 }
 
 #left-pane.contracted {
-    width: 80%;
+    width: 85%;
     transition: width 0.3s;
 }
 
@@ -12,17 +12,52 @@
     right: 0;
     transition: right 0.3s;
     top: 0;
-    width: 20%;
+    width: 15%;
     height: 100%;
     background: white;
-    padding-top: 0.5em;
-    padding-bottom: 0.5em;
     position: absolute;
+    
+    box-sizing: border-box;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+
+#layer-control h3 {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    padding-left: 0.5em;
 }
 
 #layer-control.element-hidden {
-    right: -20%;
+    right: -15%;
     transition: right 0.3s;
+}
+
+.tabs {
+    border-bottom: 1px solid grey;
+}
+
+.tab {
+    padding: 0.5em;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.tab.enabled {
+    color: green;
+}
+
+#Upload-tab {
+    float: right;
+}
+
+.tab-content {
+    width: 100%;
+    display: none;
+}
+
+.tab-content.enabled {
+    display: block;
 }
 
 #layer-control label {

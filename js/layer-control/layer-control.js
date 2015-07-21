@@ -16,240 +16,87 @@
 
 var d3 = require("d3"),
     leaflet = require("leaflet"),
-    sort = require("sort-children"),
-    slideOutFactory = require("./slide-out.js"),
     
-    colourPickerFactory = require("./colour-picker.js"),
-    clickExpand = require("./click-to-expand.js"),
-    opacitySliderFactory = require("./opacity-slider.js"),
-    helpers = require("../helpers.js"),
-    noop = helpers.noop,
+    slideOutFactory = require("./slide-out.js"),
+    tabsFactory = require("./tabs.js"),
+
+    activeFactory = require("./active-layers-control.js"),
+    baseFactory = require("./base-layers-control.js"),
     
     empty = d3.select(),
-    overlayControlClass = "overlay-control",
-    layerNameClass = "layer-name",
-    toolText = "L";
+    toolText = "L",
 
-module.exports = function(leftPane, rightPane, toolbar, updateTileLegendButtons, updateShapeLegendButtons, updateResultsTableButtons, getTileLayers, getShapeLayers, onSetState, zoomTo, update) {
-    var getBaseLayer = function(ignored) {
-	return getTileLayers().getBaseLayer();
-    },
+    allTab = "All",
+    activeTab = "Active",
+    baseTab = "Base",
+    uploadTab = "Upload";
 
-	getTileOverlayById = function(layerId) {
-	    return getTileLayers().overlays.get(layerId);
-	},
-	
-	getShapeLayerById = function(layerId) {
-	    return getShapeLayers().get(layerId);
-	},
+module.exports = function(leftPane, rightPane, toolbar, updateTileLegendButtons, updateShapeLegendButtons, updateResultsTableButtons, getTileLayers, getShapeLayers, onSetState, zoomTo, update, errors) {
+    rightPane.append("h3")
+	.text("Layers");
+    
+    var slideOut = slideOutFactory(
+	    leftPane,
+	    rightPane
+		.attr("id", "layer-control"),
+	    toolbar.append("div")
+		.text(toolText),
+	    false
+	),
 
-	slideOut = slideOutFactory(leftPane, rightPane, toolbar, false),
+	tabs = tabsFactory(
+	    rightPane,
+	    [
+		allTab,
+		activeTab,
+		baseTab,
+		uploadTab
+	    ],
+	    activeTab,
+	    errors
+	),
 
-	colourPicker = colourPickerFactory(getShapeLayerById, update),
+	active = activeFactory(updateTileLegendButtons, updateShapeLegendButtons, updateResultsTableButtons, getTileLayers, getShapeLayers, tabs.get(activeTab), zoomTo, update),
+	base = baseFactory(getTileLayers, tabs.get(baseTab), update);
 
-	baseOpacitySlider = opacitySliderFactory(getBaseLayer, noop),
-	tileOpacitySlider = opacitySliderFactory(getTileOverlayById, noop),
-	shapeOpacitySlider = opacitySliderFactory(getShapeLayerById, update),
-	
-	baseForm,
-	baseDiv,
-	tilesForm,
-	shapesForm,    
+    onSetState(function(state) {
+	if (state.layerControl) {
+	    if (state.layerControl.visible !== undefined) {
+		slideOut.setVisibility(state.layerControl.visible);
+	    } else {
+		slideOut.reset();
+	    }
 
-	updateBase = function(baseLayer, baseLayerNames) {
-	    baseForm.datum(
-		baseLayer.name()
-	    );
-	    
-	    var baseLabels = baseDiv
-		    .selectAll("label")
-		    .data(
-			baseLayerNames,
-			function(d, i) {
-			    return d;
-			});
+	    if (state.layerControl.tab) {
+		tabs.setCurrentTab(state.layerControl.tab);
+	    } else {
+		tabs.reset();
+	    }
+	} else {
+	    slideOut.reset();
+	    tabs.reset();
+	}
+    });
 
-	    baseLabels.exit().remove();
-
-	    var newBaseLabels = baseLabels
-		    .enter()
-		    .append("label");
-
-	    newBaseLabels.append("input")
-		.attr("type", "radio")
-		.attr("name", "base-layer")
-		.attr("value", function(d, i) {
-		    return d;
-		})
-		.on("click", function(d, i) {
-		    var tileLayers = getTileLayers();
-		    tileLayers.setBaseLayer(
-			tileLayers.base.get(d));
-
-		    update();
-		});
-
-	    newBaseLabels.append("span")
-		.text(function(d, i) {
-		    return d;
-		});
-
-	    baseLabels.select("input")
-		.attr("checked", function(d, i) {
-		    return d === baseLayer.name() ? "checked" : null;
-		});
-	};
-
-    var updateTiles = function(tileOverlays) {
-	var tileDivs = tilesForm
-		.selectAll("div")
-		.data(
-		    tileOverlays.keys(),
-		    function(d, i) {
-			return d;
-		    });
-
-	tileDivs.exit().remove();
-
-	var newTileDivs = tileDivs
-		.enter()
-		.append("div")
-		.classed(overlayControlClass, true);
-
-	newTileDivs.append("span")
-	    .classed(layerNameClass, true)
-	    .text(function(d, i) {
-		return d;
-	    });
-
-	newTileDivs.call(clickExpand);
-
-	tileOpacitySlider(tileDivs, newTileDivs);
-	updateTileLegendButtons(tileDivs);
-    },
-
-	updateShapes = function(shapeLayerNames) {
-	    var shapes = shapesForm.selectAll("div")
-		    .data(
-			shapeLayerNames,
-			function(d, i) {
-			    return d;
-			});
-
-	    shapes.exit().remove();
-
-	    var newShapes = shapes.enter().append("div")
-		    .classed(overlayControlClass, true);
-
-	    newShapes.append("span")
-		.classed(layerNameClass, true)
-		.classed("shape-" + layerNameClass, true)
-		.text(function(d, i) {
-		    return d;
-		})
-		.on("click", function(d, i) {
-		    d3.event.stopPropagation();
-		    
-	    	    var layer = getShapeLayerById(d);
-	    	    if (layer.boundingbox) {
-	    		zoomTo(layer.boundingbox());
-	    	    }
-		});
-
-	    newShapes
-		.call(clickExpand);	
-
-	    sort(
-		newShapes,
-		function(moved, from, to) {
-		    getShapeLayers().moveLayer(
-			d3.select(moved).datum(),
-			from,
-			to
-		    );
-		    update();
-		}
-	    );
-
-	    shapes.order();
-
-	    colourPicker(shapes, newShapes);
-	    updateShapeLegendButtons(shapes);
-	    updateResultsTableButtons(shapes);
-
-	    newShapes.append("span")
-		.classed("shape-layer-delete", true)
-		.text("X")
-		.on("click", function(d, i) {
-		    var layers = getShapeLayers();
-		    layers.remove(
-			layers.get(d)
-		    );
-
-		    update();
-		});
-	    
-	    shapeOpacitySlider(shapes, newShapes);
-	},
-
-	drawing = function(slider, newSlider) {
-	    newSlider.attr("id", "layer-control");
-	    
-	    var newBaseForm = newSlider.append("form")
-		    .classed("base-form", true);
-
-	    newBaseForm
-		.append("div");
-
-	    newSlider.append("form")
-		.classed("tile-overlay-form", true);
-
-	    newSlider.append("form")
-		.classed("shape-overlay-form", true);
-
-	    baseForm = slider.select(".base-form")
-		.datum(getTileLayers().getBaseLayer().name());
-
-	    baseOpacitySlider(baseForm, newBaseForm);
-	    
-	    baseDiv = baseForm.select("div");
-
-	    tilesForm = slider.select(".tile-overlay-form");
-
-	    shapesForm = slider.select(".shape-overlay-form");
-
+    return {
+	update: function() {
 	    var tileLayers = getTileLayers(),
 		shapeLayers = getShapeLayers().ordered();
 
-	    updateBase(tileLayers.getBaseLayer(), tileLayers.base.keys());
-	    updateTiles(tileLayers.overlays);
-	    updateShapes(
+	    active.update(
+		tileLayers.overlays,
 		shapeLayers.map(function(layer) {
 		    return layer.name();
 		})
 	    );
+	    base.update(tileLayers.getBaseLayer(), tileLayers.base.keys());
+
 	},
-
-	buttonDrawing = function(button, newButton) {
-	    newButton.text("L");
-	};
-
-    onSetState(function(state) {
-	if (state.layerControl !== undefined) {
-	    slideOut.setVisibility(state.layerControl);
-	} else {
-	    slideOut.reset();
+	save: function() {
+	    return {
+		visible: slideOut.getVisibility(),
+		tab: tabs.getCurrentTab()
+	    };
 	}
-    });
-
-
-    return {
-	update: function() {
-	    slideOut.drawContent(
-		drawing,
-		buttonDrawing
-	    );
-	},
-	save: slideOut.getVisibility
     };
 };
