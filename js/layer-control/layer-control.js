@@ -15,9 +15,10 @@
  */
 
 var d3 = require("d3"),
-    floatingDialogue = require("floating-dialogue"),
     leaflet = require("leaflet"),
-    sort = require("sort-children"),    
+    sort = require("sort-children"),
+    slideOutFactory = require("./slide-out.js"),
+    
     colourPickerFactory = require("./colour-picker.js"),
     clickExpand = require("./click-to-expand.js"),
     opacitySliderFactory = require("./opacity-slider.js"),
@@ -29,10 +30,10 @@ var d3 = require("d3"),
     layerNameClass = "layer-name",
     toolText = "L";
 
-module.exports = function(container, toolbar, updateTileLegendButtons, updateShapeLegendButtons, updateResultsTableButtons, getTileLayers, getShapeLayers, onSetState, zoomTo, update) {
+module.exports = function(leftPane, rightPane, toolbar, updateTileLegendButtons, updateShapeLegendButtons, updateResultsTableButtons, getTileLayers, getShapeLayers, onSetState, zoomTo, update) {
     var getBaseLayer = function(ignored) {
-	    return getTileLayers().getBaseLayer();
-	},
+	return getTileLayers().getBaseLayer();
+    },
 
 	getTileOverlayById = function(layerId) {
 	    return getTileLayers().overlays.get(layerId);
@@ -42,21 +43,14 @@ module.exports = function(container, toolbar, updateTileLegendButtons, updateSha
 	    return getShapeLayers().get(layerId);
 	},
 
+	slideOut = slideOutFactory(leftPane, rightPane, toolbar, false),
+
 	colourPicker = colourPickerFactory(getShapeLayerById, update),
 
 	baseOpacitySlider = opacitySliderFactory(getBaseLayer, noop),
 	tileOpacitySlider = opacitySliderFactory(getTileOverlayById, noop),
 	shapeOpacitySlider = opacitySliderFactory(getShapeLayerById, update),
 	
-	dialogue = floatingDialogue(
-	    "layer-control",
-	    {
-		reposition: true,
-		close: true,
-		lockToScreen: true
-	    }
-	).single(),
-	control,
 	baseForm,
 	baseDiv,
 	tilesForm,
@@ -198,62 +192,64 @@ module.exports = function(container, toolbar, updateTileLegendButtons, updateSha
 	    shapeOpacitySlider(shapes, newShapes);
 	},
 
-	drawing = dialogue.drawing(
-	    container,
-	    function(dialogues, newDialogues) {
-		var newBaseForm = newDialogues.append("form")
-			.classed("base-form", true);
+	drawing = function(slider, newSlider) {
+	    newSlider.attr("id", "layer-control");
+	    
+	    var newBaseForm = newSlider.append("form")
+		    .classed("base-form", true);
 
-		newBaseForm
-		    .append("div");
+	    newBaseForm
+		.append("div");
 
-		newDialogues.append("form")
-		    .classed("tile-overlay-form", true);
+	    newSlider.append("form")
+		.classed("tile-overlay-form", true);
 
-		newDialogues.append("form")
-		    .classed("shape-overlay-form", true);
+	    newSlider.append("form")
+		.classed("shape-overlay-form", true);
 
-		control = dialogues;
+	    baseForm = slider.select(".base-form")
+		.datum(getTileLayers().getBaseLayer().name());
 
-		baseForm = dialogues.select(".base-form")
-		    .datum(getTileLayers().getBaseLayer().name());
+	    baseOpacitySlider(baseForm, newBaseForm);
+	    
+	    baseDiv = baseForm.select("div");
 
-		baseOpacitySlider(baseForm, newBaseForm);
-		
-		baseDiv = baseForm.select("div");
+	    tilesForm = slider.select(".tile-overlay-form");
 
-		tilesForm = dialogues.select(".tile-overlay-form");
+	    shapesForm = slider.select(".shape-overlay-form");
 
-		shapesForm = dialogues.select(".shape-overlay-form");
+	    var tileLayers = getTileLayers(),
+		shapeLayers = getShapeLayers().ordered();
 
-		var tileLayers = getTileLayers(),
-		    shapeLayers = getShapeLayers().ordered();
+	    updateBase(tileLayers.getBaseLayer(), tileLayers.base.keys());
+	    updateTiles(tileLayers.overlays);
+	    updateShapes(
+		shapeLayers.map(function(layer) {
+		    return layer.name();
+		})
+	    );
+	},
 
-		updateBase(tileLayers.getBaseLayer(), tileLayers.base.keys());
-		updateTiles(tileLayers.overlays);
-		updateShapes(
-		    shapeLayers.map(function(layer) {
-			return layer.name();
-		    })
-		);
-	    },
-	    toolbar,
-	    function(buttons, newButtons) {
-		newButtons.text("L");
-	    }
-	);
+	buttonDrawing = function(button, newButton) {
+	    newButton.text("L");
+	};
 
     onSetState(function(state) {
-	if (state.layerControl) {
-	    dialogue.load(state.layerControl);
+	if (state.layerControl !== undefined) {
+	    slideOut.setVisibility(state.layerControl);
 	} else {
-	    dialogue.reset();
+	    slideOut.reset();
 	}
     });
 
 
     return {
-	update: drawing.update,
-	save: dialogue.save
+	update: function() {
+	    slideOut.drawContent(
+		drawing,
+		buttonDrawing
+	    );
+	},
+	save: slideOut.getVisibility
     };
 };

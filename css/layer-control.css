@@ -1,12 +1,28 @@
+#left-pane {
+    width: 100%;
+    transition: width 0.3s;
+}
+
+#left-pane.contracted {
+    width: 80%;
+    transition: width 0.3s;
+}
+
 #layer-control {
-    left: calc(100% - 18em);
-    width: 15em;
-    top: 3em;
+    right: 0;
+    transition: right 0.3s;
+    top: 0;
+    width: 20%;
+    height: 100%;
     background: white;
     padding-top: 0.5em;
     padding-bottom: 0.5em;
-    padding-left: 0.5em;
-    z-index: 1;    
+    position: absolute;
+}
+
+#layer-control.element-hidden {
+    right: -20%;
+    transition: right 0.3s;
 }
 
 #layer-control label {
@@ -16,6 +32,7 @@
 
 #layer-control form {
     border-bottom: thin dotted grey;
+    padding-left: 0.5em;
 }
 
 #layer-control form:last-child {

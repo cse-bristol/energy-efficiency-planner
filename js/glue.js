@@ -12,8 +12,11 @@ var d3 = require("d3"),
     leaflet = require("leaflet"),
 
     body = d3.select("body"),
-    menuBar = body.append("div").classed("file-menu", true),
-    toolbar = body.append("div").classed("toolbar", true),
+    leftPane = body.append("div")
+	.attr("id", "left-pane"),
+    rightPane = body.append("div"),
+    menuBar = leftPane.append("div").classed("file-menu", true),
+    toolbar = leftPane.append("div").classed("toolbar", true),
 
     update = function() {
 	draw.update();
@@ -27,10 +30,11 @@ var d3 = require("d3"),
 	return serialization.deserialize.apply(this, arguments);
     },
     
-    errors = require("./errors.js")(toolbar, body),
     progress = require("./progress.js")(body),
 
-    map = require("./map.js")(body),
+    errors = require("./errors.js")(toolbar, leftPane),    
+
+    map = require("./map.js")(leftPane),
     
     state = require("./state/state.js")(
 	errors,
@@ -43,7 +47,8 @@ var d3 = require("d3"),
     resultsTables = require("./results-tables/results-tables.js")(body, state.getShapeLayers, update),
 
     layerControl = require("./layer-control/layer-control.js")(
-	body,
+	leftPane,
+	rightPane,
 	toolbar,
 	legend.tileButtons,
 	legend.shapeButtons,
@@ -56,7 +61,7 @@ var d3 = require("d3"),
     ),
 
     draw = require("./draw/draw.js")(
-	body,
+	leftPane,
 	resultsTables,
 	legend.update,
 	layerControl.update,
@@ -93,7 +98,7 @@ var d3 = require("d3"),
 
     importControl = require("./serialization/files/import.js")(
 	toolbar,
-	body,
+	leftPane,
 	state,
 	shapeLayerFactory,
 	fetchLayers.save,
