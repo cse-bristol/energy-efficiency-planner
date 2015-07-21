@@ -145,3 +145,8 @@ input.opacity-slider {
     height: 1em;
     display: block;
 }
+
+.map-example {
+    width: 100%;
+    height: 15vh;
+}

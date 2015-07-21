@@ -70,6 +70,21 @@ module.exports = function(getTileLayers, container, triggerUpdate) {
 		    return d;
 		});
 
+	    newBaseLabels.append("div")
+		.classed("map-example", true)
+		.style("background-image", function(d, i) {
+		    var url = getTileLayers()
+			    .base
+			    .get(d)
+			    .getTileUrl({
+				x: 62,
+				y: 44,
+				z: 7
+			    });
+
+		    return 'url("' + url + '")';
+		});	    
+
 	    baseLabels.select("input")
 		.attr("checked", function(d, i) {
 		    return d === baseLayer.name() ? "checked" : null;
