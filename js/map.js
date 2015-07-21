@@ -30,6 +30,7 @@ module.exports = function(container) {
 	map = new leaflet.Map(
 	    mapDiv.node(),
 	    {
+		zoomControl: false,
 		doubleClickZoom: false
 	    }
 	)
@@ -60,8 +61,12 @@ module.exports = function(container) {
 	    collapsed: false
 	})
     ).addControl(
-	leaflet.control.zoomBox()
-    );
+	leaflet.control.zoom({
+	    position: "topright"
+	})
+    ).addControl(leaflet.control.zoomBox({
+	position: "topright"
+    }));
 
     return {
 	zoomTo: function(bbox) {
