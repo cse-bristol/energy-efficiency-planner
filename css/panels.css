@@ -18,14 +18,14 @@
 
     left: 0;
     width: 100%;
-    
-    bottom: 0;
+
+    bottom: -30vh;
     height: 30vh;
     transition: bottom 0.3s;
 }
 
-#bottom-pane.element-hidden {
-    bottom: -30vh;
+#bottom-pane.enabled {
+    bottom: 0;
 }
 
 #top-left-pane {
@@ -45,8 +45,8 @@
 
 #top-right-pane {
     position: absolute;
-    
-    right: 0;
+
+    right: -15%;
     width: 15%;
     transition: right 0.3s;    
 
@@ -54,6 +54,6 @@
     height: 100%;
 }
 
-#top-right-pane.element-hidden {
-    right: -15%;
+#top-right-pane.enabled {
+    right: 0;
 }

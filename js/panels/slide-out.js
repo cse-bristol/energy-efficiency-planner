@@ -20,12 +20,12 @@ module.exports = function(mainPane, slidingPane, buttonText, visibleByDefault) {
 	},
 	activate: function() {
 	    mainPane.classed("contracted", true);
-	    slidingPane.classed("element-hidden", false);
+	    slidingPane.classed("enabled", true);
 	    leaflet.DomUtil.addClass(this._container, 'active');
 	},
 	deactivate: function() {
 	    mainPane.classed("contracted", false);
-	    slidingPane.classed("element-hidden", true);
+	    slidingPane.classed("enabled", false);
 	    leaflet.DomUtil.removeClass(this._container, 'active');
 	},
 	linkContent: function(link) {
