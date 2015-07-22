@@ -16,6 +16,11 @@
     display: block;
 }
 
+.toggle-button.active a {
+    color: white;
+    background-color: #606060;
+}
+
 @media print {
     #toolbar {
     	display: none !important;

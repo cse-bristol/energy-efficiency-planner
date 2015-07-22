@@ -3,7 +3,7 @@
 /*global module, require*/
 
 var d3 = require("d3"),
-    
+   
     slideOutFactory = require("./slide-out.js"),
     tabsFactory = require("./tabs.js"),
 
@@ -14,16 +14,15 @@ var d3 = require("d3"),
     baseTab = "Base",
     uploadTab = "Upload";
 
-module.exports = function(leftPane, rightPane, toolbar, onSetState, errors) {
+module.exports = function(leftPane, rightPane, map, onSetState, errors) {
     rightPane.append("h3")
 	.text("Layers");
-    
+
     var slideOut = slideOutFactory(
 	leftPane,
 	rightPane
 	    .attr("id", "layer-control"),
-	toolbar.append("div")
-	    .text(toolText),
+	map,
 	false
     ),
 

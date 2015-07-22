@@ -54,20 +54,14 @@ module.exports = function(container) {
 	    .attr("id", "overlay");
 
     map.setView(leaflet.latLng(0, 0), 2);
-    
+
     map.addControl(
 	new geocoder({
 	    email: "research@cse.org.uk",
 	    collapsed: false
 	})
-    ).addControl(
-	leaflet.control.zoom({
-	    position: "topright"
-	})
-    ).addControl(leaflet.control.zoomBox({
-	position: "topright"
-    }));
-
+    );
+    
     return {
 	zoomTo: function(bbox) {
 	    map.fitBounds([
@@ -93,6 +87,8 @@ module.exports = function(container) {
 	projectTile: projectTile,
 
 	overlay: overlay,
+
+	addControl: _.bind(map.addControl, map),
 
 	onViewReset: function(callback) {
 	    map.on("viewreset", callback);

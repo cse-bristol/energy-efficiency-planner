@@ -75,7 +75,7 @@ var d3 = require("d3"),
     sidePanel = require("./side-panel/side-panel.js")(
 	leftPane,
 	rightPane,
-	toolbar,
+	map,
 	state.onSet,
 	errors
     ),
@@ -136,6 +136,14 @@ var d3 = require("d3"),
     standardButtonsWithoutAuto = menu.standard.buttonSpec().filter(function(button) {
 	return button.text !== "Auto";
     });
+
+map.addControl(
+    leaflet.control.zoom({
+	position: "topright"
+    })
+).addControl(leaflet.control.zoomBox({
+    position: "topright"
+}));
 
 menu.buildCustomMenu(
     menuBar,
