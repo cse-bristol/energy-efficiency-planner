@@ -114,3 +114,23 @@ input.opacity-slider {
     width: 100%;
     height: 7em;
 }
+
+.colour-picker {
+    display: inline-block;
+}
+
+.colour-picker span {
+    width: 0.9em;
+    height: 0.9em;
+    margin: 0.1em;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.colour-picker span:hover {
+    outline: 1px solid grey;
+}
+
+.colour-picker span.selected {
+    border: 1px solid black;
+}

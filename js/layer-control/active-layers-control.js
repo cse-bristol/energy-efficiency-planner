@@ -63,7 +63,7 @@ module.exports = function(updateTileLegendButtons, updateShapeLegendButtons, upd
 	},
 
 	updateShapes = function(shapeLayerNames) {
-	    var shapes = shapesForm.selectAll("div")
+	    var shapes = shapesForm.selectAll("." + overlayControlClass)
 		    .data(
 			shapeLayerNames,
 			function(d, i) {

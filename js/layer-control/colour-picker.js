@@ -41,25 +41,36 @@ module.exports = function(getShapeLayerById, update) {
 	    newShapes.append("div")
 		.classed("colour-picker", true);
 
-	    var clickableColours = shapes.selectAll("span")
-		    .data(function(d, i) {
-			var currentColour = getShapeLayerById(d)
-				.worksheet
-				.baseColour();
-			
-			return choices.map(function(choice) {
-			    return {
-				colour: choice,
-				selected: choice === currentColour,
-				layer: d				
-			    };
-			});
-		    });
+	    var colourPickers = shapes.select(".colour-picker");
+
+	    var clickableColours = colourPickers
+		    .selectAll(".colour-picker span")
+		    .data(
+			function(d, i) {
+			    var currentColour = getShapeLayerById(d)
+				    .worksheet
+				    .baseColour();
+			    
+			    return choices.map(function(choice) {
+				return {
+				    colour: choice,
+				    selected: choice === currentColour,
+				    layer: d				
+				};
+			    });
+			},
+			function(d, i) {
+			    return d.colour;
+			}
+		    );
 
 	    clickableColours.exit().remove();
 
 	    clickableColours.enter()
 		.append("span")
+		.style("background-color", function(d, i) {
+		    return d.colour;
+		})
 		.on("mousedown", function(d, i) {
 		    d3.event.stopPropagation();
 		})
@@ -72,7 +83,7 @@ module.exports = function(getShapeLayerById, update) {
 
 		    update();
 		});
-		
+	    
 	    clickableColours.classed("selected", function(d, i) {
 		return d.selected;
 	    });
