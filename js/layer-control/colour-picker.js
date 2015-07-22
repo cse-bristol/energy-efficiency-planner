@@ -3,58 +3,79 @@
 /*global module, require*/
 
 var d3 = require("d3"),
-    colours = require("slippy-colors");
+    featureDetection = require("../browser-feature-detection.js");
 
-/*
- Adds a colour picker to the layer control for each shape layer.
-
- shapes and newShapes are d3 selections. They have the names of layers as their data.
- */
 module.exports = function(getShapeLayerById, update) {
+    var supported = featureDetection.input.colour,
+	choices = supported ? null : d3.scale.category10().range();
+
+    
     return function(shapes, newShapes) {
-	var newColours = newShapes.append("span")
-		.classed("choose-colour", true);
-	
-	newColours.append("span")
-	    .classed("colour-picker", true)
-	/*
-	 The slippy-colors colour picker only knows how to handle a selection of one element at a time, so we have to use each.
-	 */
-	    .each(function(d, i) {
-		var that = d3.select(this)
-	    		.call(
-			    colours()
-	      			.width(100)
-				.height(100)
-				.on("mouseup", function(colour) {
-				    var p = d3.select(
-					that.node().parentElement
-				    );
-				    
-				    p.select(".colour-indicator")
-					.style("background-color", colour);
+	if (supported) {
+	    newShapes.append("input")
+		.attr("type", "color")
+		.classed("colour-picker", true)
+		.on("mousedown", function(d, i) {
+		    d3.event.stopPropagation();
+		})
+		.on("click", function(d, i) {
+		    d3.event.stopPropagation();
+		})
+		.on("input", function(d, i) {
+		    getShapeLayerById(d)
+			.worksheet
+			.setBaseColour(
+			    this.value
+			);
+		    update();
+		});
 
-				    getShapeLayerById(p.datum())
-					.worksheet
-					.setBaseColour(colour);
+	    shapes.select(".colour-picker")
+		.each(function(d, i) {
+		    this.value = getShapeLayerById(d)
+			.worksheet
+			.baseColour();
+		});
+	    
+	} else {
+	    newShapes.append("div")
+		.classed("colour-picker", true);
 
-				    update();
-				}));
-	    })
-	    .on("click", function(d, i) {
-		d3.event.stopPropagation();
+	    var clickableColours = shapes.selectAll("span")
+		    .data(function(d, i) {
+			var currentColour = getShapeLayerById(d)
+				.worksheet
+				.baseColour();
+			
+			return choices.map(function(choice) {
+			    return {
+				colour: choice,
+				selected: choice === currentColour,
+				layer: d				
+			    };
+			});
+		    });
+
+	    clickableColours.exit().remove();
+
+	    clickableColours.enter()
+		.append("span")
+		.on("mousedown", function(d, i) {
+		    d3.event.stopPropagation();
+		})
+		.on("click", function(d, i) {
+		    d3.event.stopPropagation();
+		    
+		    getShapeLayerById(d.layer)
+			.worksheet
+			.setBaseColour(d.colour);
+
+		    update();
+		});
+		
+	    clickableColours.classed("selected", function(d, i) {
+		return d.selected;
 	    });
-	
-	newColours.append("span")
-	    .classed("colour-indicator", true)
-	    .html("&nbsp;");
-
-	shapes.select(".choose-colour")
-	    .select(".colour-indicator")
-	    .style("background-color", function(d, i) {
-		return getShapeLayerById(d)
-		    .worksheet
-		    .baseColour();
-	    });
+	}
     };
 };

@@ -18,7 +18,6 @@
 	,"proj4": "2.2.2"
 	,"lodash": "3.10.0"
 	
-	,"slippy-colors": "git://github.com/mapbox/slippy-colors.git"
 	,"js-shapefile-to-geojson--": "git://github.com/GlennS/js-shapefile-to-geojson.git"
 	,"floating-dialogue": "git://github.com/cse-bristol/floating-dialogue.git"
 	,"multiuser-file-menu": "git://github.com/cse-bristol/multiuser-file-menu"
