@@ -12,33 +12,31 @@ var d3 = require("d3"),
 /*
  The left pane will be contracted when the right pane is visible, and expanded when it is hidden.
  */
-module.exports = function(leftPane, rightPane, map, visibleByDefault) {
+module.exports = function(mainPane, slidingPane, buttonText, visibleByDefault) {
     var buttonClass = toggleButtonClass.extend({
 	options: {
 	    classname: "layers-control-button",
 	    enabled: visibleByDefault
 	},
 	activate: function() {
-	    leftPane.classed("contracted", true);
-	    rightPane.classed("element-hidden", false);
+	    mainPane.classed("contracted", true);
+	    slidingPane.classed("element-hidden", false);
 	    leaflet.DomUtil.addClass(this._container, 'active');
 	},
 	deactivate: function() {
-	    leftPane.classed("contracted", false);
-	    rightPane.classed("element-hidden", true);
+	    mainPane.classed("contracted", false);
+	    slidingPane.classed("element-hidden", true);
 	    leaflet.DomUtil.removeClass(this._container, 'active');
 	},
 	linkContent: function(link) {
-	    link.innerHTML = "L";
+	    link.innerHTML = buttonText;
 	}
     }),
 
 	button = new buttonClass();
 
-    rightPane
+    slidingPane
 	.classed("slide-out", true);
-
-    map.addControl(button);
 
     return {
 	setVisibility: function(visibility) {
@@ -51,6 +49,10 @@ module.exports = function(leftPane, rightPane, map, visibleByDefault) {
 
 	reset: function() {
 	    button.setEnabled(visibleByDefault);
+	},
+
+	attach: function(map) {
+	    map.addControl(button);
 	}
     };
 };

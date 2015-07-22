@@ -12,11 +12,17 @@ var d3 = require("d3"),
     leaflet = require("leaflet"),
 
     body = d3.select("body"),
-    leftPane = body.append("div")
-	.attr("id", "left-pane"),
-    rightPane = body.append("div"),
+    topPane = body.append("div")
+	.attr("id", "top-pane"),
+    bottomPane = body.append("div")
+	.attr("id", "bottom-pane"),
+    
+    leftPane = topPane.append("div")
+	.attr("id", "top-left-pane"),
+    rightPane = topPane.append("div")
+	.attr("id", "top-right-pane"),
+    
     menuBar = leftPane.append("div").classed("file-menu", true),
-    toolbar = leftPane.append("div").classed("toolbar", true),
 
     update = function() {
 	draw.update();
@@ -32,13 +38,26 @@ var d3 = require("d3"),
     
     progress = require("./progress.js")(body),
 
-    errors = require("./errors.js")(toolbar, leftPane),    
-
     map = require("./map.js")(leftPane),
-    
+
+    bottomPanel = require("./panels/bottom-panel.js")(
+	topPane,
+	bottomPane
+    ),
+
+    errors = require("./errors.js")(bottomPanel),
+
+    sidePanel = require("./panels/side-panel.js")(
+	leftPane,
+	rightPane,
+	errors
+    ),
+   
     state = require("./state/state.js")(
 	errors,
 	map,
+	sidePanel,
+	bottomPanel,
 	update
     ),
 
@@ -69,14 +88,6 @@ var d3 = require("d3"),
 	menu.backend.loadSnapshot,
 	shapeLayerSerialization.onDeserializeLayer,
 	progress,
-	errors
-    ),
-
-    sidePanel = require("./side-panel/side-panel.js")(
-	leftPane,
-	rightPane,
-	map,
-	state.onSet,
 	errors
     ),
 
@@ -119,8 +130,8 @@ var d3 = require("d3"),
 	shapeLayerSerialization.serialize,
 	shapeLayerSerialization.deserialize,
 	legend.tileDeserialize,
-	errors,
 	sidePanel,
+	bottomPanel,
 	state.fresh
     ),    
     
@@ -137,6 +148,7 @@ var d3 = require("d3"),
 	return button.text !== "Auto";
     });
 
+sidePanel.attach(map);
 map.addControl(
     leaflet.control.zoom({
 	position: "topright"
@@ -144,6 +156,7 @@ map.addControl(
 ).addControl(leaflet.control.zoomBox({
     position: "topright"
 }));
+bottomPanel.attach(map);
 
 menu.buildCustomMenu(
     menuBar,

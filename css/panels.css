@@ -1,0 +1,59 @@
+#top-pane {
+    position: absolute;
+
+    left: 0;
+    width: 100%;
+
+    top: 0;
+    height: 100vh;
+    transition: height 0.3s;
+}
+
+#top-pane.contracted {
+    height: 70vh;
+}
+
+#bottom-pane {
+    position: absolute;
+
+    left: 0;
+    width: 100%;
+    
+    bottom: 0;
+    height: 30vh;
+    transition: bottom 0.3s;
+}
+
+#bottom-pane.element-hidden {
+    bottom: -30vh;
+}
+
+#top-left-pane {
+    position: absolute;
+
+    left: 0;
+    width: 100%;
+    transition: width 0.3s;
+
+    top: 0;
+    height: 100%;
+}
+
+#top-left-pane.contracted {
+    width: 85%;
+}
+
+#top-right-pane {
+    position: absolute;
+    
+    right: 0;
+    width: 15%;
+    transition: right 0.3s;    
+
+    top: 0;
+    height: 100%;
+}
+
+#top-right-pane.element-hidden {
+    right: -15%;
+}

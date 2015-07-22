@@ -12,7 +12,7 @@ var leaflet = require("leaflet"),
 /*
  Bundles together all aspect of the state of the map into a Javascript object.
  */
-module.exports = function(errors, map, update) {
+module.exports = function(errors, map, sidePanel, bottomPanel, update) {
     var shapeLayers = layersFactory(errors),
 	tileLayers = tileLayersFactory(map.getZoom, errors),
 	baseLayer,
@@ -55,13 +55,9 @@ module.exports = function(errors, map, update) {
 	    loading = true;
 
 	    try {
-		if (state.errors) {
-		    errors.load(state.errors);
-		    
-		} else {
-		    errors.reset();
-		}
-		
+		sidePanel.load(state.sidePanel);
+		bottomPanel.load(state.bottomPanel);
+
 		shapeLayers = state.shapeLayers;
 		tileLayers = state.tileLayers;
 

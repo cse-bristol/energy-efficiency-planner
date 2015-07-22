@@ -5,37 +5,13 @@
 var float = require("floating-dialogue"),
     d3 = require("d3");
 
-module.exports = function(toolbar, body) {
-    var dialogue = float(
-	"errors",
-	{
-	    reposition: true,
-	    resize: true,
-	    close: true,
-	    visible: false,
-	    lockToScreen: true,
-	    initialVisibility: false
-	}
-    ).single(),
-
-	drawDialogueContent = function(dialogues, newDialogues) {
-	    messages = dialogues;
-	    
-	    noErrors = newDialogues.append("div")
-		.classed("info", true)
-		.text("No errors.");
-	},
-
-	drawButtonContent = function(button, newButton) {
-	    newButton.text("!");
-	},	
-
-	hideNoErrors = function() {
+module.exports = function(bottomPanel) {
+    var	hideNoErrors = function() {
 	    noErrors.style("display", "none");
 	},
 
 	maybeShowNoErrors = function() {
-	    if (messages.node().childNodes.length <= 1) {
+	    if (bottomPanel.getContainer().node().childNodes.length <= 1) {
 		noErrors.style("display", "block");
 	    }
 	},
@@ -49,27 +25,17 @@ module.exports = function(toolbar, body) {
 		});
 	},
 
-	drawing = dialogue.drawing(
-	    body,
-	    drawDialogueContent,
-	    toolbar,
-	    drawButtonContent
-	),	
-
-	messages,
-	noErrors;
-
-    drawing.update();
-
+	noErrors = bottomPanel.getContainer()
+	    .classed("errors", true)
+	    .append("div")
+	    .classed("info", true)
+	    .text("No errors.");
+    
     return {
-	save: dialogue.save,
-	load: dialogue.load,
-	reset: dialogue.reset,
-	
 	informUser : function(text) {
 	    console.log(text);
 
-	    var infoMsg = messages
+	    var infoMsg = bottomPanel.getContainer()
 		    .append("div")
 		    .classed("info", true)
 		    .text(text);
@@ -81,7 +47,7 @@ module.exports = function(toolbar, body) {
 	warnUser : function(text) {
 	    console.warn(text);
 
-	    var errorMsg = messages
+	    var errorMsg = bottomPanel.getContainer()
 		    .append("div")
 		    .classed("error", true);
 
@@ -100,8 +66,7 @@ module.exports = function(toolbar, body) {
 
 	    hideNoErrors();
 
-	    dialogue.getState().setVisibility(true);
-	    drawing.update();
+	    bottomPanel.open();
 	}
     };
 };

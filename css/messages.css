@@ -1,11 +1,5 @@
-#errors {
-    position: absolute;
-    top: calc(100% - 13em);
-    left: 0;
-    width: 100%;
-    height: 13em;
+.errors {
     background-color: white;
-    z-index: 1;    
 }
 
 .error {

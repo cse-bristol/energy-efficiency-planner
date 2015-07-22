@@ -10,7 +10,7 @@ var _ = require("lodash"),
 /*
  Converts between the state of the world (as defined in state.js) and data transfer objects which can be turned into JSON and sent out across the wire.
  */
-module.exports = function(serializeShapeLayer, deserializeShapeLayer, deserializeTileLegend, errors, sidePanel, freshState) {
+module.exports = function(serializeShapeLayer, deserializeShapeLayer, deserializeTileLegend, sidePanel, bottomPanel, freshState) {
     var serializeShapeLayers = function(layers) {
 	    var result = {};
 	    
@@ -105,8 +105,8 @@ module.exports = function(serializeShapeLayer, deserializeShapeLayer, deserializ
 		shapeLayerOrder: state.shapeLayers.getOrder(),
 		tileLayers: serializeTileLayers(state.tileLayers),
 		viewport: serializeViewport(state.viewport),
-		errors: errors.save(),
-		sidePanel: sidePanel.save()
+		sidePanel: sidePanel.save(),
+		bottomPanel: bottomPanel.save()		
 	    };
 	},
 
@@ -116,8 +116,8 @@ module.exports = function(serializeShapeLayer, deserializeShapeLayer, deserializ
 	deserialize: function(serialized) {
 	    var state = freshState();
 
-	    if (serialized.errors) {
-		state.errors = serialized.errors;
+	    if (serialized.bottomPanel) {
+		state.bottomPanel = serialized.bottomPanel;
 	    }
 
 	    if (serialized.sidePanel) {

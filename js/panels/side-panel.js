@@ -7,22 +7,20 @@ var d3 = require("d3"),
     slideOutFactory = require("./slide-out.js"),
     tabsFactory = require("./tabs.js"),
 
-    toolText = "L",
-
     allTab = "All",
     activeTab = "Active",
     baseTab = "Base",
     uploadTab = "Upload";
 
-module.exports = function(leftPane, rightPane, map, onSetState, errors) {
+module.exports = function(leftPane, rightPane, onSetState, errors) {
     rightPane.append("h3")
 	.text("Layers");
 
     var slideOut = slideOutFactory(
 	leftPane,
 	rightPane
-	    .attr("id", "layer-control"),
-	map,
+	    .classed("layer-control", true),
+	"L",
 	false
     ),
 
@@ -38,31 +36,26 @@ module.exports = function(leftPane, rightPane, map, onSetState, errors) {
 	    errors
 	);
 
-    onSetState(function(state) {
-	if (state.sidePanel) {
-	    if (state.sidePanel.visible !== undefined) {
-		slideOut.setVisibility(state.sidePanel.visible);
-	    } else {
-		slideOut.reset();
-	    }
-
-	    if (state.sidePanel.tab) {
-		tabs.setCurrentTab(state.sidePanel.tab);
-	    } else {
-		tabs.reset();
-	    }
-	} else {
-	    slideOut.reset();
-	    tabs.reset();
-	}
-    });
-
     return {
 	save: function() {
 	    return {
 		visible: slideOut.getVisibility(),
 		tab: tabs.getCurrentTab()
 	    };
+	},
+
+	load: function(state) {
+	    if (state && state.visible !== undefined) {
+		slideOut.setVisibility(state.visible);
+	    } else {
+		slideOut.reset();
+	    }
+		
+	    if (state && state.tab) {
+		tabs.setCurrentTab(state.tab);
+	    } else {
+		tabs.reset();
+	    }
 	},
 	
 	all: function() {
@@ -82,7 +75,12 @@ module.exports = function(leftPane, rightPane, map, onSetState, errors) {
 	},
 
 	focusUpload: function() {
-	    return tabs.setCurrentTab(uploadTab);
+	    slideOut.setVisibility(true);
+	    tabs.setCurrentTab(uploadTab);
+	},
+
+	attach: function(map) {
+	    slideOut.attach(map);
 	}
     };
 };
