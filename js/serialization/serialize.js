@@ -64,7 +64,9 @@ module.exports = function(serializeShapeLayer, deserializeShapeLayer, deserializ
 		Object.keys(serialized.overlays)
 		    .forEach(
 			function(overlayName) {
-			    if (tileLayers.overlays.has(overlayName)) {
+			    if (tileLayers.availableOverlays.has(overlayName)) {
+				tileLayers.addOverlay(overlayName);
+				
 				var overlay = tileLayers.overlays.get(overlayName),
 				    serializedOverlay = serialized.overlays[overlayName];
 

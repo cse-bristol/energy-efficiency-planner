@@ -32,7 +32,7 @@ module.exports = function(leftPane, rightPane, onSetState, errors) {
 		baseTab,
 		uploadTab
 	    ],
-	    activeTab,
+	    allTab,
 	    errors
 	);
 

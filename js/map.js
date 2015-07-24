@@ -82,6 +82,8 @@ module.exports = function(container) {
 
 	addLayer: _.bind(map.addLayer, map),
 
+	hasLayer: _.bind(map.hasLayer, map),
+
 	removeLayer: _.bind(map.removeLayer, map),
 
 	projectTile: projectTile,
@@ -105,6 +107,20 @@ module.exports = function(container) {
 
 	    baseLayer = newBaseLayer;
 	    map.addLayer(newBaseLayer);
+	},
+
+	update: function(layers) {
+	    map.eachLayer(function(l) {
+		if (l !== baseLayer && layers.indexOf(l) === -1) {
+		    map.removeLayer(l);
+		}
+	    });
+
+	    layers.forEach(function(l) {
+		if (!map.hasLayer(l)) {
+		    map.addLayer(l);
+		}
+	    });
 	}
     };
 };

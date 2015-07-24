@@ -63,13 +63,21 @@ module.exports = function(container, getTileLayers, getShapeLayers, onSetState) 
 			return layer.legend.dialogueState;
 		    })
 	    );
-	    
-	    tileDrawing.dialogues(
-		getTileLayers().overlays
+
+	    var tilesWithLegends = getTileLayers().overlays
 		    .entries()
 		    .filter(function(e) {
 			return e.value.legend;
-		    })
+		    });
+
+	    tilesWithLegends.forEach(function(e) {
+		if (!e.value.legend.dialogueState) {
+		    e.value.legend.dialogueState = tileDialogues.createData(e.key);
+		}
+	    });
+	    
+	    tileDrawing.dialogues(
+		tilesWithLegends
 		    .map(function(e) {
 			return e.value.legend.dialogueState;
 		    })
@@ -79,16 +87,6 @@ module.exports = function(container, getTileLayers, getShapeLayers, onSetState) 
 	overlaysWithLegends = function(layerName, i) {
 	    return getTileLayers().overlays.get(layerName).legend;
 	};
-
-    onSetState(function() {
-	getTileLayers()
-	.overlays
-	.forEach(function(name, layer) {
-	    if (layer.legend && !layer.legend.dialogueState) {
-		layer.legend.dialogueState = tileDialogues.createData(name);
-	    }
-	});
-    });
         
     return {
 	update: update,

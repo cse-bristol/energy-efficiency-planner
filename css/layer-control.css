@@ -134,3 +134,18 @@ input.opacity-slider {
 .colour-picker span.selected {
     border: 1px solid black;
 }
+
+#All-tab-content .search-result {
+    background-color: orange;
+    overflow: hidden;
+    whitespace: nowrap;
+    text-overflow: ellipsis;
+}
+
+#All-tab-content .search-result.built-in-tile {
+    border: 2px solid pink;
+}
+
+#All-tab-content .search-result.enabled {
+    background-color: green;
+}

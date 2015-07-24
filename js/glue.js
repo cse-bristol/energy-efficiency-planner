@@ -26,6 +26,7 @@ var d3 = require("d3"),
 
     update = function() {
 	draw.update();
+	map.update(state.getTileLayers().overlays.values());
     },
 
     serialize = function() {
@@ -104,6 +105,7 @@ var d3 = require("d3"),
     ),    
 
     layerControl = require("./layer-control/layer-control.js")(
+	sidePanel.all(),
 	sidePanel.active(),
 	sidePanel.base(),
 	legend.tileButtons,
@@ -111,8 +113,12 @@ var d3 = require("d3"),
 	resultsTables.updateButtons,
 	state.getTileLayers,
 	state.getShapeLayers,
+	fetchLayers,
+	shapeLayerFactory,
 	state.onSet,
 	map.zoomTo,
+	menu.backend.search,
+	errors,
 	update
     ),
 
@@ -161,14 +167,6 @@ bottomPanel.attach(map);
 menu.buildCustomMenu(
     menuBar,
     standardButtonsWithoutAuto.concat([
-	require("./state/shape-layers/load-layer-button.js")(
-	    fetchLayers.collection,
-	    shapeLayerFactory,
-	    state.getShapeLayers,
-	    fetchLayers.load,
-	    menu.spec.button,
-	    update
-	),
 	viewportButtons.set,
 	viewportButtons.get
     ])

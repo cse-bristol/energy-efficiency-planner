@@ -14,14 +14,14 @@ var leaflet = require("leaflet"),
  */
 module.exports = function(errors, map, sidePanel, bottomPanel, update) {
     var shapeLayers = layersFactory(errors),
-	tileLayers = tileLayersFactory(map.getZoom, errors),
+	tileLayers = tileLayersFactory(map.getZoom),
 	baseLayer,
 	viewport = viewportFactory(),
 	onSet = callbacks(),
 	loading = false,
 	
 	fresh = function() {
-	    var t = tileLayersFactory(map.getZoom, errors);
+	    var t = tileLayersFactory(map.getZoom);
 	    
 	    return {
 		shapeLayers: layersFactory(errors),

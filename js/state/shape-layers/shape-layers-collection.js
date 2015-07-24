@@ -42,8 +42,12 @@ module.exports = function(errors) {
 	    );
 	},
 	
-	get : function(name) {
+	get: function(name) {
 	    return layers.get(name);
+	},
+
+	has: function(name) {
+	    return layers.has(name);
 	},
 
 	add: function(layer) {

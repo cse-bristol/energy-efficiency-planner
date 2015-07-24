@@ -16,26 +16,33 @@
 
 var d3 = require("d3"),
     leaflet = require("leaflet"),
-    
+
+    allFactory = require("./all-layers-control.js"),
     activeFactory = require("./active-layers-control.js"),
     baseFactory = require("./base-layers-control.js"),
     
     empty = d3.select();
 
-module.exports = function(activeContainer, baseContainer, updateTileLegendButtons, updateShapeLegendButtons, updateResultsTableButtons, getTileLayers, getShapeLayers, onSetState, zoomTo, update) {
-    var active = activeFactory(updateTileLegendButtons, updateShapeLegendButtons, updateResultsTableButtons, getTileLayers, getShapeLayers, activeContainer, zoomTo, update),
+module.exports = function(allContainer, activeContainer, baseContainer, updateTileLegendButtons, updateShapeLegendButtons, updateResultsTableButtons, getTileLayers, getShapeLayers, fetchShapeLayer, shapeLayerFactory, onSetState, zoomTo, search, errors, update) {
+    var all = allFactory(allContainer, getTileLayers, getShapeLayers, fetchShapeLayer, shapeLayerFactory, search, errors, update),
+	active = activeFactory(updateTileLegendButtons, updateShapeLegendButtons, updateResultsTableButtons, getTileLayers, getShapeLayers, activeContainer, zoomTo, update),
 	base = baseFactory(getTileLayers, baseContainer, update);
 
     return {
 	update: function() {
 	    var tileLayers = getTileLayers(),
-		shapeLayers = getShapeLayers().ordered();
+		shapeLayerNames = getShapeLayers().ordered()
+		    .map(function(layer) {
+			return layer.name();
+		    });
 
+	    all.update(
+		tileLayers.overlays.keys(),
+		shapeLayerNames		
+	    );
 	    active.update(
 		tileLayers.overlays,
-		shapeLayers.map(function(layer) {
-		    return layer.name();
-		})
+		shapeLayerNames
 	    );
 	    base.update(tileLayers.getBaseLayer(), tileLayers.base.keys());
 	}

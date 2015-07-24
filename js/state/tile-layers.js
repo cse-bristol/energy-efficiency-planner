@@ -3,11 +3,12 @@
 /*global module, require*/
 
 var leaflet = require("leaflet"),
+    _ = require("lodash"),
     d3 = require("d3"),
 
     heatMapLayerFactory = require("./heat-map-layers/heat-map-layers.js");
 
-var decorateTileLayers = function(tileLayers, opacity) {
+var decorateTileLayers = function(tileLayers) {
     tileLayers.forEach(function(name, layer) {
 	layer.name = function() {
 	    return name;
@@ -17,9 +18,7 @@ var decorateTileLayers = function(tileLayers, opacity) {
 	    return layer.options.opacity;
 	};
 
-	if (opacity !== undefined) {
-	    layer.setOpacity(opacity);
-	}
+	layer.setOpacity(1);
     });
 };
 
@@ -66,20 +65,40 @@ module.exports = function(getZoom) {
 
 	makeHeatMapLayer = heatMapLayerFactory.leafletLayers(getZoom),
 
+	availableOverlays = d3.map(),
 	overlays = d3.map();
 
     heatMapLayerFactory.layerNames.forEach(function(heatMapLayer) {
-	overlays.set(heatMapLayer, makeHeatMapLayer(heatMapLayer));
+	availableOverlays.set(heatMapLayer, makeHeatMapLayer(heatMapLayer));
     });
 
     decorateTileLayers(baseLayers);
-    decorateTileLayers(overlays, 0);
+    decorateTileLayers(availableOverlays);
     
     var baseLayer = osmLayer;
     return {
 	base: baseLayers,
-	
+
+	availableOverlays: availableOverlays,
+
 	overlays: overlays,
+
+	addOverlay: function(overlayName) {
+	    if (!overlays.has(overlayName)) {
+		if (!availableOverlays.has(overlayName)) {
+		    throw new Error("Unknown overlay: " + overlayName);
+		}
+		
+		overlays.set(overlayName, availableOverlays.get(overlayName));
+	    }
+	},
+
+	removeOverlay: function(overlayName) {
+	    if (overlays.has(overlayName)) {
+		overlays.remove(overlayName);
+	    }
+	},
+	
 	getBaseLayer: function() {
 	    return baseLayer;
 	},
