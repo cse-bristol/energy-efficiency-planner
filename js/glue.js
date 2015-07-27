@@ -22,8 +22,6 @@ var d3 = require("d3"),
     rightPane = topPane.append("div")
 	.attr("id", "top-right-pane"),
     
-    menuBar = leftPane.append("div").classed("file-menu", true),
-
     update = function() {
 	draw.update();
 	map.update(state.getTileLayers().overlays.values());
@@ -164,12 +162,13 @@ map.addControl(
 }));
 bottomPanel.attach(map);
 
-menu.buildCustomMenu(
-    menuBar,
+menu.buildMenu(
+    leftPane,
     standardButtonsWithoutAuto.concat([
 	viewportButtons.set,
 	viewportButtons.get
-    ])
+    ]),
+    true
 );
 
 menu.queryString.fromURL();

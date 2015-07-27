@@ -6,6 +6,7 @@ module.exports = function(setView, getCenter, getZoom, getViewport, makeButton, 
     return {
 	set: makeButton(
 	    "Set Home",
+	    null,
 	    function() {
 		getViewport().set(
 		    getCenter(),
@@ -17,6 +18,7 @@ module.exports = function(setView, getCenter, getZoom, getViewport, makeButton, 
 	
 	get: makeButton(
 	    "Go Home",
+	    null,
 	    function() {
 		var viewport = getViewport();
 		

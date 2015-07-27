@@ -1,28 +1,6 @@
-.file-menu {
+#menu-bar {
     position: absolute;
-    top: 0.6em;
-    left: 3em;
-    z-index: 1;
-}
-
-.toolbar {
-    position: absolute;
-    top: 10em;
-    left: 0.7em;
-    z-index: 1;
-}
-
-.toolbar .open-button {
-    display: block;
-}
-
-.toggle-button.active a {
-    color: white;
-    background-color: #606060;
-}
-
-@media print {
-    #toolbar {
-    	display: none !important;
-    }
+    top: 1em;
+    left: 1em;
+    z: 1;
 }
