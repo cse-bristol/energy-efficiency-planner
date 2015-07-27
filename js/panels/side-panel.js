@@ -21,7 +21,7 @@ module.exports = function(leftPane, rightPane, onSetState, errors) {
 	rightPane
 	    .classed("layer-control", true),
 	"L",
-	false
+	true
     ),
 
 	tabs = tabsFactory(
