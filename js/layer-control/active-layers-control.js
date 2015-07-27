@@ -3,8 +3,8 @@
 /*global module, require*/
 
 var d3 = require("d3"),
-    sort = require("sort-children"),
 
+    sort = require("./sort-children.js"),
     colourPickerFactory = require("./colour-picker.js"),
     clickExpand = require("./click-to-expand.js"),
     opacitySliderFactory = require("./opacity-slider.js"),

@@ -149,3 +149,7 @@ input.opacity-slider {
 #All-tab-content .search-result.enabled {
     background-color: green;
 }
+
+.drag-reorder {
+    cursor: move;
+}
