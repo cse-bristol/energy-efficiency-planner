@@ -3,7 +3,7 @@
 /*global module, require*/
 
 var d3 = require("d3"),
-    sortChildren = require("./js/layer-control/sort-children.js"),
+    sortChildren = require("../js/layer-control/sort-children.js"),
     body = d3.select(document.body),
     listContainer = body.append("div"),
     data = "abcdefghi",

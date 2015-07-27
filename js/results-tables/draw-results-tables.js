@@ -3,7 +3,6 @@
 /*global module, require*/
 
 var d3 = require("d3"),
-    dialogue = require("floating-dialogue"),
     helpers = require("../helpers.js"),
     callbacks = helpers.callbackHandler,
     rounded = function(d, i) {

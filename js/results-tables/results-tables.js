@@ -2,7 +2,7 @@
 
 /*global module, require*/
 
-var dialogueFactory = require("floating-dialogue"),
+var dialogueFactory = require("../floating-dialogue/floating-dialogue.js"),
     drawResultsTablesFactory = require("./draw-results-tables.js");
 
 

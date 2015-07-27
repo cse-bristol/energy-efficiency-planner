@@ -2,7 +2,7 @@
 
 /*global module, require*/
 
-var dialogueFactory = require("floating-dialogue"),
+var dialogueFactory = require("../floating-dialogue/floating-dialogue.js"),
     drawLegendsFactory = require("./draw-legend.js");
 
 module.exports = function(container, getTileLayers, getShapeLayers, onSetState) {

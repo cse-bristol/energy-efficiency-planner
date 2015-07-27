@@ -2,25 +2,13 @@
 
 /*global module, require*/
 
-var floatDialogue = require("floating-dialogue"),
-    toolText = "I";
+var toolText = "I";
 
 /*
  Lets us import shape layers from a variety of file formats.
  */
 module.exports = function(toolbar, container, handlers) {
-    var dialogueFactory = floatDialogue(
-	container,
-	toolbar.get,
-	toolbar.update,
-	"imports",
-	{
-	    reposition: true,
-	    lockToScreen: true
-	}
-    ),
-
-	content,
+    var content,
 
 	drawContent = function(dialogues, newDialogues) {
 	    content = newDialogues;

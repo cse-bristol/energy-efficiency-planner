@@ -2,8 +2,7 @@
 
 /*global module, require*/
 
-var float = require("floating-dialogue"),
-    d3 = require("d3");
+var d3 = require("d3");
 
 module.exports = function(bottomPanel) {
     var	hideNoErrors = function() {
