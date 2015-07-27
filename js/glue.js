@@ -72,7 +72,9 @@ var d3 = require("d3"),
     	deserialize,
     	state.get,
     	state.set,
-    	state.fresh
+    	state.fresh,
+	null,
+	"http://tools.smartsteep.eu/wiki/User_Manual#Using_the_mapping_tool"
     ),
 
     shapeLayerSerialization = require("./serialization/serialize-shape-layer.js")(
