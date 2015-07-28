@@ -25,7 +25,7 @@ var d3 = require("d3"),
  + initialVisibility (boolean) determines whether or not the dialogue is visible by default.
  */
 module.exports = function(typeId, options) {
-    var dataFactory = createData(options);
+    var dataFactory = createData(typeId, options);
     
     return {
 	typeId: typeId,
@@ -108,11 +108,11 @@ module.exports = function(typeId, options) {
 	    Redraw a single dialogue and its associated button if appropriate.
 	     */
 	    var redrawOne = function(data) {
-		var dialogue = dialogueContainer
-			.select("#" + drawDialogues.id(data))
-			.datum(data);
-				
-		drawDialogues.fromSelection(dialogue, empty);
+		dialogueContainer
+		    .select("#" + drawDialogues.id(data))
+		    .datum(data);
+						
+		drawDialogues.fromSelection(d3.selectAll("." + typeId), empty);
 
 		if (drawButtons) {
 		    var button = d3

@@ -156,7 +156,7 @@ module.exports = function(container, getDataById, redraw, typeId, options, drawD
 	    while (i < len) {
 	    	var dialogue = d3.select(dialogues[0][i]);
 
-	    	if (el.datum().id !== dialogue.datum().id) {
+	    	if (el.attr("id") !== dialogue.attr("id")) {
 	    	    var target = enlarge(
 			dialogue.node().getBoundingClientRect(),
 			snappingMargin
@@ -174,6 +174,10 @@ module.exports = function(container, getDataById, redraw, typeId, options, drawD
 	    		var dx = directionVector[0] >= 0 ? (target.right - bbox.left) : (target.left - bbox.right),
 	    		    dy = directionVector[1] >= 0 ? (target.bottom - bbox.top) : (target.right - bbox.left);
 
+			// A little extra to stop the collision.
+			dx += 1;
+			dy += 1;
+			
 	    		// Make sure we're going in the right direction.
 	    		dx *= directionVector[0];
 	    		dy *= directionVector[1];
@@ -187,10 +191,12 @@ module.exports = function(container, getDataById, redraw, typeId, options, drawD
 			
 			lastI = i;
 	    		i = 0;
+			continue;
 	    	    }
 
-		    i++;
 	    	}
+
+		i++;		
 	    }
 
 	    if (!anyIntersections) {
@@ -207,8 +213,10 @@ module.exports = function(container, getDataById, redraw, typeId, options, drawD
 	findSpace = function(el, d, stillToMoveIds) {
 	    var dialogues = d3.selectAll("." + dialogueClass)
 		    .filter(function(otherData, i) {
-			return !stillToMoveIds.has(otherData.id)
-			    && otherData.getVisibility();
+			return !(
+			    otherData.typeId === d.typeId
+				&& stillToMoveIds.has(otherData.id)
+			) && otherData.getVisibility();
 		    }),
 	    	dialogueLen = dialogues.size(),
 		
@@ -239,9 +247,10 @@ module.exports = function(container, getDataById, redraw, typeId, options, drawD
 		return !d.manuallyPositioned();
 	    }),
 		unmoved = d3.set(
-		    toMove[0].map(function(dialogueNode) {
-			return dialogueNode.__data__.id;
-		    })
+		    toMove[0]
+			.map(function(dialogueNode) {
+			    return dialogueNode.__data__.id;
+			})
 		);
 
 	    toMove.each(function(d, i) {

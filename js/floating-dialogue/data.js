@@ -2,7 +2,7 @@
 
 /*global module, require*/
 
-module.exports = function(options) {
+module.exports = function(typeId, options) {
     var data = function(id, size, position, visible) {
 	var onVisibilityChanged,
 	    onSizeChanged,
@@ -18,6 +18,8 @@ module.exports = function(options) {
 	
 	return {
 	    id: id,
+
+	    typeId: typeId,
 	    
 	    manuallySized: function() {
 		return size !== undefined;
