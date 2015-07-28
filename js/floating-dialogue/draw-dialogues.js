@@ -10,6 +10,11 @@ var d3 = require("d3"),
     resizeButtonClass = "resize-dialgoue",
     bringToFrontClass = "bring-to-front",
 
+    /*
+     snappingMargin changes the target when finding a space, docking to be 10px past each of the borders, or trying to fit inside the browser window.
+     stickyness affects how close to the target we need to be before docking will kick in.
+     */
+    snappingMargin = 10,
     stickyness = 20,
 
     z = 10,
@@ -85,17 +90,17 @@ module.exports = function(container, getDataById, redraw, typeId, options, drawD
 		    x = bbox.left +
 			Math.min(
 			    dx,
-			    window.innerWidth - bbox.right
+			    window.innerWidth - bbox.right - snappingMargin
 			);
 
 		    y = bbox.top +
 			Math.min(
 			    dy,
-			    window.innerHeight - bbox.bottom
+			    window.innerHeight - bbox.bottom - snappingMargin
 			);
 
-		    x = Math.max(x, 0);
-		    y = Math.max(y, 0);
+		    x = Math.max(x, snappingMargin);
+		    y = Math.max(y, snappingMargin);
 		}
 
 		el
@@ -120,13 +125,13 @@ module.exports = function(container, getDataById, redraw, typeId, options, drawD
 		    width = bbox.width +
 			Math.min(
 			    dWidth,
-			    window.innerWidth - bbox.right
+			    window.innerWidth - bbox.right - snappingMargin
 			);
 
 		    height = bbox.height +
 			Math.min(
 			    dHeight,
-			    window.innerHeight - bbox.bottom
+			    window.innerHeight - bbox.bottom - snappingMargin
 			);
 		}
 
@@ -145,27 +150,29 @@ module.exports = function(container, getDataById, redraw, typeId, options, drawD
 	tryFindSpaceInDirection = function(el, directionVector, dialogues, len, x, y) {
 	    var i = 0,
 		lastI = null,
-		bbox = el.node().getBoundingClientRect();
+		bbox = el.node().getBoundingClientRect(),
+		anyIntersections = false;
 
 	    while (i < len) {
 	    	var dialogue = d3.select(dialogues[0][i]);
 
 	    	if (el.datum().id !== dialogue.datum().id) {
-	    	    var target = dialogue.node().getBoundingClientRect();
+	    	    var target = enlarge(
+			dialogue.node().getBoundingClientRect(),
+			snappingMargin
+		    );
 
 	    	    if (intersects(bbox, target)) {
 			if (lastI === i) {
 			    // We've collided with the same box twice in a row - we can't find a space in this direction.
 			    return false;
 			}
+
+			anyIntersections = true;
 			
 	    		// Move far enough to avoid the box we're colliding with.
 	    		var dx = directionVector[0] >= 0 ? (target.right - bbox.left) : (target.left - bbox.right),
 	    		    dy = directionVector[1] >= 0 ? (target.bottom - bbox.top) : (target.right - bbox.left);
-
-	    		// Add a little clearance.
-	    		dx += 1;
-	    		dy += 1;
 
 	    		// Make sure we're going in the right direction.
 	    		dx *= directionVector[0];
@@ -184,6 +191,13 @@ module.exports = function(container, getDataById, redraw, typeId, options, drawD
 
 		    i++;
 	    	}
+	    }
+
+	    if (!anyIntersections) {
+		/*
+		 We need to call drawPosition at least once, so that any browser window conditions kick in.
+		 */
+		drawPosition(el, true, x, y, bbox);
 	    }
 
 	    // Successfully found a space.
@@ -241,12 +255,12 @@ module.exports = function(container, getDataById, redraw, typeId, options, drawD
 	    });
 	},
 
-	enlarge = function(bbox) {
+	enlarge = function(bbox, amount) {
 	    return {
-		left: bbox.left - stickyness,
-		top: bbox.top - stickyness,
-		right: bbox.right + stickyness,
-		bottom: bbox.bottom + stickyness
+		left: bbox.left - amount,
+		top: bbox.top - amount,
+		right: bbox.right + amount,
+		bottom: bbox.bottom + amount
 	    };
 	},
 
@@ -261,12 +275,17 @@ module.exports = function(container, getDataById, redraw, typeId, options, drawD
 	    }
 	},
 
+	/*
+	 When opposite side borders are docking, we add the snapping margin.
+	 When the same side borders are docking, we don't.
+	 */
 	maybeDock = function(id, bbox, modifyLeft, modifyTop, modifyRight, modifyBottom) {
 	    if (options.sticky) {
 
 		var stickHorizontal = true,
 		    stickVertical = true,
-		    enlarged = enlarge(bbox),
+		    withMargin = enlarge(bbox, snappingMargin),
+		    enlarged = enlarge(withMargin, stickyness),
 		    dialogues = d3.selectAll("." + dialogueClass),
 		    i = 0,
 		    len = dialogues.size();
@@ -279,15 +298,18 @@ module.exports = function(container, getDataById, redraw, typeId, options, drawD
 		    if (dialogue.datum().getVisibility() && dialogue.datum().id !== id)  {
 			var target = dialogue.node().getBoundingClientRect();
 
+			/*
+			 For the purposes of possible collision detection, we always include the snapping margin (since this is only a heuristic).
+			 */
 			if (intersects(enlarged, target)) {
 			    
 			    if (stickHorizontal) {
-				stickHorizontal = maybeDockSide(modifyLeft, bbox.left, target.right) && maybeDockSide(modifyRight, bbox.right, target.left)
+				stickHorizontal = maybeDockSide(modifyLeft, withMargin.left, target.right) && maybeDockSide(modifyRight, withMargin.right, target.left)
 				    && maybeDockSide(modifyLeft, bbox.left, target.left) && maybeDockSide(modifyRight, bbox.right, target.right);
 			    }
 
 			    if (stickVertical) {
-				stickVertical = maybeDockSide(modifyTop, bbox.top, target.bottom) && maybeDockSide(modifyBottom, bbox.bottom, target.top)
+				stickVertical = maybeDockSide(modifyTop, withMargin.top, target.bottom) && maybeDockSide(modifyBottom, withMargin.bottom, target.top)
 				    && maybeDockSide(modifyTop, bbox.top, target.top) && maybeDockSide(modifyBottom, bbox.bottom, target.bottom);
 			    }
 			}
