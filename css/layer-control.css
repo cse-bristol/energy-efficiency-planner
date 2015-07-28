@@ -95,11 +95,17 @@ input.opacity-slider {
     vertical-align: top;
 }
 
-.shape-layer-delete {
-    float: right;
-    width: 0.9em;
-    cursor: pointer;
-    font-family: monospace;
+.close-layer {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-color: black;
+    color: white;
+    margin-left: 0.3em;
+    font-size: large;
+    padding: 0.2em;
+    text-align: center;
+    vertical-align: top;
 }
 
 .overlay-control .open-button {

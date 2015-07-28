@@ -36,7 +36,7 @@ module.exports = function(updateTileLegendButtons, updateShapeLegendButtons, upd
 
 	updateTiles = function(tileOverlays) {
 	    var tileDivs = tilesForm
-		    .selectAll("div")
+		    .selectAll("." + overlayControlClass)
 		    .data(
 			tileOverlays.keys(),
 			function(d, i) {
@@ -60,6 +60,16 @@ module.exports = function(updateTileLegendButtons, updateShapeLegendButtons, upd
 
 	    tileOpacitySlider(tileDivs, newTileDivs);
 	    updateTileLegendButtons(tileDivs);
+
+	    newTileDivs.append("div")
+		.classed("close-layer", true)
+		.text("X")
+		.on("click", function(d, i) {
+		    getTileLayers()
+			.removeOverlay(d);
+
+		    update();
+		});
 	},
 
 	updateShapes = function(shapeLayerNames) {
@@ -111,8 +121,8 @@ module.exports = function(updateTileLegendButtons, updateShapeLegendButtons, upd
 	    updateShapeLegendButtons(shapes);
 	    updateResultsTableButtons(shapes);
 
-	    newShapes.append("span")
-		.classed("shape-layer-delete", true)
+	    newShapes.append("div")
+		.classed("close-layer", true)
 		.text("X")
 		.on("click", function(d, i) {
 		    var layers = getShapeLayers();
