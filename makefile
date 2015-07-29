@@ -1,17 +1,20 @@
-.PHONY: clean bin npm tests
+.PHONY: build npm js css clean tests watch;
 
-build: lib npm bin;
+build: js css;
 
+js: lib npm bin; browserify -d ./js/glue.js -o ./bin/main.js;
+bin: ; mkdir -p bin;
 npm: ; npm install;
+lib: ; mkdir -p lib; git submodule init; git submodule update;
 
-bin: ; mkdir -p bin; browserify -d ./js/glue.js -o ./bin/main.js;
+css: bin libcss; libcss/* cat css/* > bin/style.css;
+libcss: ; ./library-css.sh;
 
 tests: test-sort-children test-floating-dialogue;
 test-sort-children: ; browserify -d ./tests/sort-children.js -o ./bin/sort-children.js;
 test-floating-dialogue: ; browserify -d ./tests/floating-dialogue.js -o ./bin/floating-dialogue.js;
 
-lib: ; mkdir -p lib; git submodule init; git submodule update;
+clean: ; rm -rf bin libcss;
 
-clean: ; rm -rf ./bin/*
-
-watch: ; mkdir -p bin; watchify -d js/glue.js -o bin/main.js;
+# Runs in parallel using the '&' operator.
+watch: bin libcss; watchify -d js/glue.js -o bin/main.js & catw libcss/* css/* -o bin/style.css -v;

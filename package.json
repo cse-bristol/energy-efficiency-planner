@@ -8,6 +8,11 @@
 	"type": "git",
 	"url": "git://github.com/cse-bristol/energy-efficiency-planner.git"
     },
+
+    "defDependencies": {
+	"browserify": "5.9.1",
+	"catw": "1.0.1"
+    },
     
     "dependencies": {
 	"d3": "3.5.3"

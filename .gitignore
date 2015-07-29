@@ -1,6 +1,3 @@
-temp
-__pycache__
-*.pyc
-data/processed
 bin
+libcss
 node_modules
