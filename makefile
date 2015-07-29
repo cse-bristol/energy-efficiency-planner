@@ -7,7 +7,7 @@ bin: ; mkdir -p bin;
 npm: ; npm install;
 lib: ; mkdir -p lib; git submodule init; git submodule update;
 
-css: bin libcss; libcss/* cat css/* > bin/style.css;
+css: bin libcss; cat libcss/* css/* > bin/style.css;
 libcss: ; ./library-css.sh;
 
 tests: test-sort-children test-floating-dialogue;
