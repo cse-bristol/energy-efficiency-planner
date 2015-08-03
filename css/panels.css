@@ -1,3 +1,8 @@
+.toggle-button.active a {
+    color: #FFF;
+    background: #666;
+}
+
 #top-pane {
     position: absolute;
 
