@@ -68,6 +68,7 @@ var d3 = require("d3"),
 
     menu = require("multiuser-file-menu")(
     	"maps",
+	"map",
     	serialize,
     	deserialize,
     	state.get,
@@ -150,9 +151,7 @@ var d3 = require("d3"),
 	update
     ),
 
-    standardButtonsWithoutAuto = menu.standard.buttonSpec().filter(function(button) {
-	return button.text !== "Auto";
-    });
+    fileMenu = menu.buildMenu(leftPane);
 
 sidePanel.attach(map);
 map.addControl(
@@ -164,13 +163,16 @@ map.addControl(
 }));
 bottomPanel.attach(map);
 
-menu.buildMenu(
-    leftPane,
-    standardButtonsWithoutAuto.concat([
-	viewportButtons.set,
-	viewportButtons.get
-    ]),
-    true
+
+fileMenu.standardButtons.disable(
+    fileMenu.standardButtons.autosaveButton
 );
+
+fileMenu.standardButtons.insertBefore(
+    viewportButtons.set,
+    fileMenu.standardButtons.historyButton
+);
+
+fileMenu.setButtons(fileMenu.standardButtons.ordered);
 
 menu.queryString.fromURL();

@@ -5,7 +5,7 @@
 module.exports = function(setView, getCenter, getZoom, getViewport, makeButton, update) {
     return {
 	set: makeButton(
-	    "Set Home",
+	    "Set Viewpoint",
 	    null,
 	    function() {
 		getViewport().set(
