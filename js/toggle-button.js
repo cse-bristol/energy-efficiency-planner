@@ -20,9 +20,11 @@ module.exports = leaflet.Control.extend({
 	this._container = leaflet.DomUtil.create('div', 'toggle-button leaflet-bar');
         this._container.title = "Toggles the layers control.";
 
-	var link = leaflet.DomUtil.create('a', this.options.className, this._container);
-        link.href = "#";
-	this.linkContent(link);
+	leaflet.DomUtil.addClass(this._container, this.options.classname);
+
+	this.link = leaflet.DomUtil.create('a', this.options.classname + "-link", this._container);
+        this.link.href = "#";
+	this.linkContent(this.link);
 
 	leaflet.DomEvent
 	    .on(this._container, 'dblclick', leaflet.DomEvent.stop)

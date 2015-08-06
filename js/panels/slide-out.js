@@ -12,10 +12,10 @@ var d3 = require("d3"),
 /*
  The left pane will be contracted when the right pane is visible, and expanded when it is hidden.
  */
-module.exports = function(mainPane, slidingPane, buttonText, visibleByDefault) {
+module.exports = function(mainPane, slidingPane, className, buttonText, visibleByDefault) {
     var buttonClass = toggleButtonClass.extend({
 	options: {
-	    classname: "layers-control-button",
+	    classname: className,
 	    enabled: visibleByDefault
 	},
 	activate: function() {
@@ -53,6 +53,10 @@ module.exports = function(mainPane, slidingPane, buttonText, visibleByDefault) {
 
 	attach: function(map) {
 	    map.addControl(button);
+	},
+
+	control: function() {
+	    return button.link;
 	}
     };
 };

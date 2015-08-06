@@ -1,3 +1,20 @@
+.layer-control-button {
+    width: 43px !important;
+    margin-right: -1px !important;
+    border-right: none;
+}
+
+.layer-control-button a.layer-control-button-link {
+    width: 100%;
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.layer-count {
+    float: right;
+    padding-right: 0.1em;
+}
+
 .layer-control {
     background: white;
     

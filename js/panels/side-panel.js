@@ -20,6 +20,7 @@ module.exports = function(leftPane, rightPane, onSetState, errors) {
 	leftPane,
 	rightPane
 	    .classed("layer-control", true),
+	"layer-control-button",
 	"L",
 	true
     ),
@@ -34,7 +35,9 @@ module.exports = function(leftPane, rightPane, onSetState, errors) {
 	    ],
 	    allTab,
 	    errors
-	);
+	),
+
+	layerCount;
 
     return {
 	save: function() {
@@ -81,6 +84,20 @@ module.exports = function(leftPane, rightPane, onSetState, errors) {
 
 	attach: function(map) {
 	    slideOut.attach(map);
+
+	    layerCount = d3.select(
+		slideOut.control()
+	    ).append("span")
+		.classed("layer-count", true);
+	},
+
+	update: function(state) {
+	    if (layerCount) {
+
+		layerCount.text(
+		    state.getShapeLayers().names().length + state.getTileLayers().overlays.keys().length || ""
+		);
+	    }
 	}
     };
 };

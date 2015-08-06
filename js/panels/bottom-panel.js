@@ -10,6 +10,7 @@ module.exports = function(topPane, bottomPane, onSetState) {
     var slideOut = slideOutFactory(
 	topPane,
 	bottomPane,
+	"errors-control",
 	"!",
 	false
     );

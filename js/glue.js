@@ -23,6 +23,7 @@ var d3 = require("d3"),
 	.attr("id", "top-right-pane"),
     
     update = function() {
+	sidePanel.update(state);	
 	draw.update();
 	map.update(state.getTileLayers().overlays.values());
     },
