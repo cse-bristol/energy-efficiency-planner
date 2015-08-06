@@ -5,7 +5,7 @@
 var leaflet = require("leaflet"),
     layersFactory = require("./shape-layers/shape-layers-collection.js"),
     tileLayersFactory = require("./tile-layers.js"),
-    viewportFactory = require("../viewport.js"),
+    viewpointFactory = require("../viewpoint.js"),
     helpers = require("../helpers.js"),
     callbacks = helpers.callbackHandler;
 
@@ -16,7 +16,7 @@ module.exports = function(errors, map, sidePanel, bottomPanel, update) {
     var shapeLayers = layersFactory(errors),
 	tileLayers = tileLayersFactory(map.getZoom),
 	baseLayer,
-	viewport = viewportFactory(),
+	viewpoint = viewpointFactory(),
 	onSet = callbacks(),
 	loading = false,
 	
@@ -26,7 +26,7 @@ module.exports = function(errors, map, sidePanel, bottomPanel, update) {
 	    return {
 		shapeLayers: layersFactory(errors),
 		tileLayers: t,
-		viewport: viewportFactory()
+		viewpoint: viewpointFactory()
 	    };
 	};
     
@@ -35,7 +35,7 @@ module.exports = function(errors, map, sidePanel, bottomPanel, update) {
 	    return {
 		shapeLayers: shapeLayers,
 		tileLayers: tileLayers,
-		viewport: viewport
+		viewpoint: viewpoint
 	    };
 	},
 
@@ -47,8 +47,8 @@ module.exports = function(errors, map, sidePanel, bottomPanel, update) {
 	    return tileLayers;
 	},
 
-	getViewport: function() {
-	    return viewport;
+	getViewpoint: function() {
+	    return viewpoint;
 	},
 
 	set: function(state) {
@@ -69,11 +69,11 @@ module.exports = function(errors, map, sidePanel, bottomPanel, update) {
 		    map.addLayer(layer);
 		});
 
-		viewport = state.viewport;
+		viewpoint = state.viewpoint;
 		
 		map.setView(
-		    viewport.coordinates(),
-		    viewport.zoom()
+		    viewpoint.coordinates(),
+		    viewpoint.zoom()
 		);
 
 		onSet(state);

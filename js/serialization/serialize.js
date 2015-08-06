@@ -86,15 +86,15 @@ module.exports = function(serializeShapeLayer, deserializeShapeLayer, deserializ
 	    
 	},
 
-	serializeViewport = function(viewport) {
+	serializeViewpoint = function(viewpoint) {
 	    return {
-		coordinates: [viewport.lat(), viewport.lng()],
-		zoom: viewport.zoom()
+		coordinates: [viewpoint.lat(), viewpoint.lng()],
+		zoom: viewpoint.zoom()
 	    };
 	},
 
-	deserializeViewport = function(viewport, serialized) {
-	    viewport.set(
+	deserializeViewpoint = function(viewpoint, serialized) {
+	    viewpoint.set(
 		leaflet.latLng(serialized.coordinates),
 		serialized.zoom
 	    );
@@ -106,14 +106,14 @@ module.exports = function(serializeShapeLayer, deserializeShapeLayer, deserializ
 		shapeLayers: serializeShapeLayers(state.shapeLayers),
 		shapeLayerOrder: state.shapeLayers.getOrder(),
 		tileLayers: serializeTileLayers(state.tileLayers),
-		viewport: serializeViewport(state.viewport),
+		viewpoint: serializeViewpoint(state.viewpoint),
 		sidePanel: sidePanel.save(),
 		bottomPanel: bottomPanel.save()		
 	    };
 	},
 
-	deserializeViewport: deserializeViewport,
-	serializeViewport: serializeViewport,
+	deserializeViewpoint: deserializeViewpoint,
+	serializeViewpoint: serializeViewpoint,
 
 	deserialize: function(serialized) {
 	    var state = freshState();
@@ -138,8 +138,8 @@ module.exports = function(serializeShapeLayer, deserializeShapeLayer, deserializ
 		state.shapeLayers.setOrder(serialized.shapeLayerOrder);
 	    }
 
-	    if (serialized.viewport) {
-		deserializeViewport(state.viewport, serialized.viewport);
+	    if (serialized.viewpoint) {
+		deserializeViewpoint(state.viewpoint, serialized.viewpoint);
 	    }
 
 	    return state;

@@ -14,7 +14,8 @@ var leaflet = require("leaflet"),
 module.exports = function() {
     var coordinates = leaflet.latLng(0, 0),
 	zoom = 2,
-	onChange = callbacks();
+	onChange = callbacks(),
+	setManually = false;
 
     return {
 	onChange: onChange.add,
@@ -30,6 +31,9 @@ module.exports = function() {
 
 	    coordinates = c;
 	    zoom = z;
+
+	    setManually = true;
+	    
 	    onChange();
 	},
 
@@ -47,6 +51,10 @@ module.exports = function() {
 
 	zoom: function() {
 	    return zoom;
+	},
+
+	setManually: function() {
+	    return setManually;
 	}
     };
 };

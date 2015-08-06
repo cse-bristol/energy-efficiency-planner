@@ -23,7 +23,8 @@ var d3 = require("d3"),
 	.attr("id", "top-right-pane"),
     
     update = function() {
-	sidePanel.update(state);	
+	viewpointButtons.update();
+	sidePanel.update(state);
 	draw.update();
 	map.update(state.getTileLayers().overlays.values());
     },
@@ -144,11 +145,11 @@ var d3 = require("d3"),
 	state.fresh
     ),    
     
-    viewportButtons = require("./viewport-buttons.js")(
+    viewpointButtons = require("./viewpoint-buttons.js")(
 	map.setView,
 	map.getCenter,
 	map.getZoom,
-	state.getViewport,
+	state.getViewpoint,
 	menuModule.spec.button,
 	update
     ),
@@ -173,12 +174,14 @@ map.addControl(
 
 bottomPanel.attach(map);
 
+map.addControl(viewpointButtons.get);
+
 fileMenu.standardButtons.disable(
     fileMenu.standardButtons.autosaveButton
 );
 
 fileMenu.standardButtons.insertBefore(
-    viewportButtons.set,
+    viewpointButtons.set,
     fileMenu.standardButtons.historyButton
 );
 
