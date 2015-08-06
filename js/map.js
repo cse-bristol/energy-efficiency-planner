@@ -5,7 +5,6 @@
 var d3 = require("d3"),
     _ = require("lodash"),
     leaflet = require("leaflet"),
-    geocoder = require("leaflet-control-geocoder"),
     zoombox = require("../node_modules/leaflet-zoombox/L.Control.ZoomBox.min.js"),
     
     log2 = function(n) {
@@ -55,13 +54,6 @@ module.exports = function(container) {
 
     map.setView(leaflet.latLng(0, 0), 2);
 
-    map.addControl(
-	new geocoder({
-	    email: "research@cse.org.uk",
-	    collapsed: false
-	})
-    );
-    
     return {
 	zoomTo: function(bbox) {
 	    map.fitBounds([

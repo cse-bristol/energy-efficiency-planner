@@ -1,0 +1,25 @@
+.leaflet-control-geocoder {
+    background-color: black;
+    display: inline-block;
+    margin: 0;
+    padding: 0.38em 0.5em;
+    width: auto !important;
+    pointer-events: all;
+}
+
+.leaflet-control-geocoder input {
+    padding: 0 0 0 26px;
+    background-color: white;
+    background-image: url(images/geocoder.png);
+    background-repeat: no-repeat;
+    background-position: left;
+    font-size: 100%;
+}
+
+.leaflet-control-geocoder-icon {
+    display: none !important;
+}
+
+.leaflet-control-geocoder-alternatives li:hover {
+    color: white;
+}

@@ -38,6 +38,7 @@ var d3 = require("d3"),
     progress = require("./progress.js")(body),
 
     map = require("./map.js")(leftPane),
+    geocoder = require("./geocoder.js")(map),
 
     bottomPanel = require("./panels/bottom-panel.js")(
 	topPane,
@@ -66,7 +67,7 @@ var d3 = require("d3"),
 
     shapeLayerFactory = require("./state/shape-layers/shape-layer.js")(errors, resultsTables.createData, legend.shapeCreate),
 
-    menu = require("multiuser-file-menu")(
+    menuModule = require("multiuser-file-menu")(
     	"maps",
 	"map",
     	serialize,
@@ -86,8 +87,8 @@ var d3 = require("d3"),
     ),
     
     fetchLayers = require("./state/shape-layers/fetch-layers.js")(
-	menu.backend.load,
-	menu.backend.loadSnapshot,
+	menuModule.backend.load,
+	menuModule.backend.loadSnapshot,
 	shapeLayerSerialization.onDeserializeLayer,
 	progress,
 	errors
@@ -118,7 +119,7 @@ var d3 = require("d3"),
 	shapeLayerFactory,
 	state.onSet,
 	map.zoomTo,
-	menu.backend.search,
+	menuModule.backend.search,
 	errors,
 	update
     ),
@@ -147,11 +148,13 @@ var d3 = require("d3"),
 	map.getCenter,
 	map.getZoom,
 	state.getViewport,
-	menu.spec.button,
+	menuModule.spec.button,
 	update
     ),
 
-    fileMenu = menu.buildMenu(leftPane);
+    fileMenu = menuModule.buildMenu(leftPane);
+
+geocoder.insertInContainer(fileMenu.container.menuBar.node());
 
 sidePanel.attach(map);
 map.addControl(
@@ -162,7 +165,6 @@ map.addControl(
     position: "topright"
 }));
 bottomPanel.attach(map);
-
 
 fileMenu.standardButtons.disable(
     fileMenu.standardButtons.autosaveButton
@@ -175,4 +177,4 @@ fileMenu.standardButtons.insertBefore(
 
 fileMenu.setButtons(fileMenu.standardButtons.ordered);
 
-menu.queryString.fromURL();
+menuModule.queryString.fromURL();
