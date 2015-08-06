@@ -16,12 +16,12 @@
     
     "dependencies": {
 	"d3": "3.5.3"
-	,"topojson": "1.6.18"
+	,"topojson": "1.6.19"
 	,"leaflet": "0.7.3"
-	,"leaflet-control-geocoder": "1.0.0"
+	,"leaflet-control-geocoder": "1.2.1"
 	,"leaflet-zoombox": "0.1.0"
-	,"proj4": "2.2.2"
-	,"lodash": "3.10.0"
+	,"proj4": "2.3.6"
+	,"lodash": "3.10.1"
 	
 	,"js-shapefile-to-geojson--": "git://github.com/GlennS/js-shapefile-to-geojson.git"
 	,"multiuser-file-menu": "git://github.com/cse-bristol/multiuser-file-menu#design"
