@@ -18,7 +18,7 @@ module.exports = leaflet.Control.extend({
     includes: leaflet.Mixin.Events,
     onAdd: function(map) {
 	this._container = leaflet.DomUtil.create('div', 'toggle-button leaflet-bar');
-        this._container.title = "Toggles the layers control.";
+        this._container.title = "Toggles a panel.";
 
 	leaflet.DomUtil.addClass(this._container, this.options.classname);
 

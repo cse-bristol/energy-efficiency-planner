@@ -153,6 +153,9 @@ var d3 = require("d3"),
 	update
     ),
 
+    fitBoundsControlClass = require("./fit-bounds-control.js")(state.getShapeLayers, state.getTileLayers, map),
+    fitBoundsControl = new fitBoundsControlClass(),
+
     fileMenu = menuModule.buildMenu(leftPane);
 
 geocoder.insertInContainer(fileMenu);
@@ -162,9 +165,12 @@ map.addControl(
     leaflet.control.zoom({
 	position: "topright"
     })
+).addControl(
+    new fitBoundsControlClass()
 ).addControl(leaflet.control.zoomBox({
     position: "topright"
 }));
+
 bottomPanel.attach(map);
 
 fileMenu.standardButtons.disable(
