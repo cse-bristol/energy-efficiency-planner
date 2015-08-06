@@ -154,7 +154,7 @@ var d3 = require("d3"),
 
     fileMenu = menuModule.buildMenu(leftPane);
 
-geocoder.insertInContainer(fileMenu.container.menuBar.node());
+geocoder.insertInContainer(fileMenu);
 
 sidePanel.attach(map);
 map.addControl(
