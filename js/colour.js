@@ -2,8 +2,7 @@
 
 /*global module, require*/
 
-var d3 = require("d3"),
-    blank = "#D0D0D0";
+var d3 = require("d3");
 
 var categoricalScale = function(data, colour) {
     var scale = d3.scale.category20();
