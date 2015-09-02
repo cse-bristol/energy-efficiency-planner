@@ -7,7 +7,7 @@ bin: ; mkdir -p bin;
 npm: ; npm install;
 lib: ; mkdir -p lib; git submodule init; git submodule update;
 
-css: bin libcss; cat libcss/* css/* > bin/style.css;
+css: bin libcss; cat `find -L libcss css -name '*.css'` > bin/style.css;
 libcss: ; ./library-css.sh;
 
 images: ; ln -s -f -T ../node_modules/leaflet-control-geocoder/images bin/images;
@@ -19,4 +19,4 @@ test-floating-dialogue: ; browserify -d ./tests/floating-dialogue.js -o ./bin/fl
 clean: ; rm -rf bin libcss;
 
 # Runs in parallel using the '&' operator.
-watch: bin libcss; watchify -d js/glue.js -o bin/main.js & catw libcss/* css/* -o bin/style.css -v;
+watch: bin libcss; watchify -d js/glue.js -o bin/main.js & catw `find -L libcss css -name '*.css'` -o bin/style.css -v;
