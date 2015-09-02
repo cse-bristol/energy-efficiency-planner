@@ -10,6 +10,7 @@
 var d3 = require("d3"),
     _ = require("lodash"),
     leaflet = require("leaflet"),
+    zoombox = require("../node_modules/leaflet-zoombox/L.Control.ZoomBox.min.js"),
 
     body = d3.select("body"),
     topPane = body.append("div")
