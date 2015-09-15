@@ -12,7 +12,7 @@ var dropFactory = require("./file-drop.js"),
 /*
  Hooks up the various file import parts to each other.
  */
-module.exports = function(body, importControlDiv, focusUpload, state, shapeLayerFactory, saveLayerGeometry, errors, progress, update) {
+module.exports = function(body, importControlDiv, focusUpload, focusActive, zoomTo, state, shapeLayerFactory, saveLayerGeometry, errors, progress, update) {
     importControlDiv.append("form")
 	.append("input")
 	.attr("type", "file")
@@ -36,6 +36,12 @@ module.exports = function(body, importControlDiv, focusUpload, state, shapeLayer
 	    var layer = shapeLayerFactory(name, geometry, bbox);
 	    state.getShapeLayers().add(layer);
 	    saveLayerGeometry(layer);
+	    focusActive();
+
+	    if (layer.boundingbox) {
+	    	zoomTo(layer.boundingbox());
+	    }
+
 	    update();
 	},
 

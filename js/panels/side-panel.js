@@ -69,6 +69,11 @@ module.exports = function(leftPane, rightPane, onSetState, errors) {
 	    return tabs.get(activeTab);
 	},
 
+	focusActive: function() {
+	    slideOut.setVisibility(true);
+	    tabs.setCurrentTab(activeTab);
+	},
+
 	base: function() {
 	    return tabs.get(baseTab);
 	},

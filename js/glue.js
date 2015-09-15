@@ -101,13 +101,15 @@ var d3 = require("d3"),
 	body,
 	sidePanel.upload(),
 	sidePanel.focusUpload,
+	sidePanel.focusActive,
+	map.zoomTo,
 	state,
 	shapeLayerFactory,
 	fetchLayers.save,
 	errors,
 	progress,
 	update
-    ),    
+    ),
 
     layerControl = require("./layer-control/layer-control.js")(
 	sidePanel.all(),
