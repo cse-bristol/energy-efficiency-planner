@@ -16,7 +16,8 @@ module.exports = function(container, getShapeLayers, update) {
 	    sticky: true,
 	    bringToFront: true,
 	    findSpace: true,
-	    lockToScreen: true
+	    lockToScreen: true,
+	    initialVisibility: false
 	}
     ),
 
