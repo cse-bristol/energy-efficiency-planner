@@ -31,12 +31,15 @@
 
 .tabs {
     border-bottom: 1px solid grey;
+    float: left;
+    width: 100%;
+    margin-bottom: 0.5em;
 }
 
 .tab {
     padding: 0.5em;
     cursor: pointer;
-    display: inline-block;
+    float: left;
 }
 
 .tab.enabled {
