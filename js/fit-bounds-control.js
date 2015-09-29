@@ -43,7 +43,7 @@ module.exports = function(getShapeLayers, getTileLayers, map) {
 
 	    this.link = leaflet.DomUtil.create('a', this.options.classname + "-link", this._container);
             this.link.href = "#";
-	    this.link.innerHTML = "F";
+	    this.link.innerHTML = "a";
 
 	    leaflet.DomEvent
 		.on(this._container, 'dblclick', leaflet.DomEvent.stop)
