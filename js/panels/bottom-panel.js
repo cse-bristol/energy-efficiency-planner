@@ -11,7 +11,7 @@ module.exports = function(topPane, bottomPane, onSetState) {
 	topPane,
 	bottomPane,
 	"errors-control",
-	"!",
+	"X",
 	false
     );
     

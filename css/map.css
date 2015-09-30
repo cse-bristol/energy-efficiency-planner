@@ -1,9 +1,12 @@
 body {
     margin: 0;
     padding: 0;
-    font-family: Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
     overflow: hidden;
+	font-family: 'fira_sansbook';
+	color: #282828;
 }
+
+
 
 #map {
     width: 100%;

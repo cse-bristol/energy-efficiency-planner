@@ -1,6 +1,6 @@
 .toggle-button.active a {
     color: #FFF;
-    background: #666;
+    background: #282828;
 }
 
 #top-pane {
@@ -45,14 +45,14 @@
 }
 
 #top-left-pane.contracted {
-    width: 85%;
+    width: 80%;
 }
 
 #top-right-pane {
     position: absolute;
 
-    right: -15%;
-    width: 15%;
+    right: -20%;
+    width: 20%;
     transition: right 0.3s;    
 
     top: 0;

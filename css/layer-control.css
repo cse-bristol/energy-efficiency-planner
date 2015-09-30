@@ -1,23 +1,37 @@
 .layer-control-button {
-    width: 43px !important;
+    width: 54px !important;
     margin-right: -1px !important;
     border-right: none;
+	background-color: white;
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
 }
 
 .layer-control-button a.layer-control-button-link {
     width: 100%;
     border-bottom-right-radius: 0;
     border-top-right-radius: 0;
+	font-family: 'steep-icons';
+	font-style: normal;
+	font-weight: normal;
+	font-size: 16px;
+	background-color: white;
+	color: #282828;
+	text-align: left;
+	padding-left: 10px;
+	padding-right: 10px;
+	box-sizing: border-box;
 }
 
 .layer-count {
+	font-family: 'fira_sansregular';
+	font-size: 13px;
     float: right;
     padding-right: 0.1em;
 }
 
 .layer-control {
     background: white;
-    
     box-sizing: border-box;
     padding-left: 0.5em;
     padding-right: 0.5em;
@@ -31,23 +45,35 @@
 
 .tabs {
     border-bottom: 1px solid grey;
-    float: left;
-    width: 100%;
-    margin-bottom: 0.5em;
 }
 
 .tab {
     padding: 0.5em;
     cursor: pointer;
-    float: left;
+    display: inline-block;
+	font-family: 'fira_sansregular';
+}
+
+.tab:hover {
+    color: #08b030;
 }
 
 .tab.enabled {
-    color: green;
+    color: #08b030;
 }
 
 #Upload-tab {
     float: right;
+}
+
+#Upload-tab::before {
+	font-family: 'steep-icons';
+	font-style: normal;
+	font-weight: normal;
+	font-size: 14px;
+	content:'\0031';
+	color: #999;
+	margin-right: 5px;
 }
 
 .tab-content {
@@ -161,20 +187,76 @@ input.opacity-slider {
     border: 1px solid black;
 }
 
+
 #All-tab-content .search-result {
-    background-color: orange;
+	padding: 5px 25px 5px 30px;
+	position: relative;
+    cursor: pointer;
+    text-align: left;
     overflow: hidden;
     whitespace: nowrap;
     text-overflow: ellipsis;
+
 }
+
+#All-tab-content .search-result::before {
+	display: block;
+	content: '\2022'; /* disc bullet */
+	font-size: 80px;
+	position: absolute;
+	top: 15px;
+	left: 0;
+	color: #bbb;
+	line-height: 0;
+}
+
+#All-tab-content .search-result:hover {
+	color: #08b030;
+}
+
+#All-tab-content .search-result.enabled::before {
+	color: #08b030;
+}
+
+#All-tab-content .search-result.enabled::after {
+	display: block;
+	content: '\0030'; /* tick */
+	font-size: 12px;
+	position: absolute;
+	top: 16px;
+	left: 7px;
+	color: white;
+	line-height: 0;
+	font-family: 'steep-icons';
+	font-style: normal;
+	font-weight: normal;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	color: white;
+}
+
+#All-tab-content .search-result-fabricated {
+    background-color: pink;
+}
+
 
 #All-tab-content .search-result.built-in-tile {
-    border: 2px solid pink;
 }
 
-#All-tab-content .search-result.enabled {
-    background-color: green;
+#All-tab-content input.search {
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	-webkit-box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.2);
+	-moz-box-shadow:    0px 2px 2px 0px rgba(0, 0, 0, 0.2);
+	box-shadow:         0px 2px 2px 0px rgba(0, 0, 0, 0.2);	
+	padding: 0.5em;
+	margin: 1em 0;
+	width: 100%;
+	font-size: 14px;
+	box-sizing: border-box;
 }
+
+
 
 .drag-reorder {
     cursor: move;

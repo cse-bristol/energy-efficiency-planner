@@ -101,6 +101,7 @@ module.exports = function(container, getTileLayers, getShapeLayers, fetchShapeLa
 	searchBox = container.append("input")
 	    .attr("type", "text")
 	    .attr("placeholder", "Find")
+	    .attr("class", "search")
 	    .on("input", doSearch),
 
 	searchResults = container.append("div");
