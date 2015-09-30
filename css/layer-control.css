@@ -256,8 +256,12 @@ input.opacity-slider {
 	box-sizing: border-box;
 }
 
-
-
 .drag-reorder {
     cursor: move;
+}
+
+@media print {
+    .layer-control {
+	display: none;
+    }
 }
