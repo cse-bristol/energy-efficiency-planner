@@ -36,7 +36,10 @@ module.exports = function(container, getTileLayers, getShapeLayers, fetchShapeLa
 					    type: shape
 					};
 				    })
-				)
+				),
+				function(d, i) {
+				    return d.type + '-' + d.name;
+				}
 			    );
 
 		    results.exit().remove();
