@@ -4,6 +4,8 @@ body {
     overflow: hidden;
 	font-family: 'fira_sansbook';
 	color: #282828;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 

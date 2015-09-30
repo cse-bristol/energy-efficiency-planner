@@ -3,8 +3,8 @@
 /*global module, require*/
 
 var d3 = require("d3"),
-    expand = "«",
-    contract = "»";
+    expand = "D",
+    contract = "D";
 
 /*
  Given a d3 selection, add on-click to toggle expand/contract behaviour and a button indicating what will happen.
