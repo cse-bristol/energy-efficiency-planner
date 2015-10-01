@@ -33,22 +33,23 @@
 .layer-control {
     background: white;
     box-sizing: border-box;
-    padding-left: 0.5em;
-    padding-right: 0.5em;
+    padding-left: 20px;
+    padding-right: 20px;
 }
 
 .layer-control h3 {
     margin-top: 0.5em;
     margin-bottom: 0.5em;
-    padding-left: 0.5em;
 }
 
 .tabs {
-    border-bottom: 1px solid grey;
+    border-bottom: 1px solid #ccc;
+	margin-bottom: 20px;
 }
 
 .tab {
-    padding: 0.5em;
+	margin-right: 1em;
+	padding-bottom: 0.5em;
     cursor: pointer;
     display: inline-block;
 	font-family: 'fira_sansregular';
@@ -99,67 +100,120 @@
     border-bottom: none;
 }
 
-.can-expand {
-    max-height: 1em;
-}
-
-.can-expand.expanded {
-    max-height: none;
-}
 
 input.opacity-slider {
-    width: 97%;
+    width: 50%;
+	height: 28px;
 }
 
 .overlay-control {
-    padding: 0.3em;
+	padding: 5px 0 5px 30px;
+	position: relative;
+	border-bottom: 1px solid #ddd;
+	transition: max-height 0.3s;
 }
 
-.overlay-control:hover {
-    color: black;
-    /* Colour chosen to leave the opacity slider visible/usable. */
-    background-color: #E0F0FF;
+.overlay-control.can-expand {
+    max-height: 1.5em;
 }
+
+.overlay-control.expanded {
+    max-height: 5em;
+}
+
+.overlay-control::before {
+	display: block;
+	content: '\2022'; /* disc bullet */
+	font-size: 80px;
+	position: absolute;
+	top: 15px;
+	left: 0;
+	color: #08b030;
+	line-height: 0;
+}
+
+.overlay-control::after {
+	display: block;
+	content: '\0030'; /* tick */
+	font-size: 12px;
+	position: absolute;
+	top: 16px;
+	left: 7px;
+	color: white;
+	line-height: 0;
+	font-family: 'steep-icons';
+	font-style: normal;
+	font-weight: normal;
+	color: white;
+}
+
+
+.overlay-control .expander {
+	position: absolute;
+	top: 13px;
+	right: 0;
+	font-family: 'steep-icons';
+	font-style: normal;
+	font-weight: normal;
+	font-size: 14px;
+	color: #999;
+	cursor: pointer;
+    transition: transform 0.3s, top 0.3s;    
+}
+
+.overlay-control.expanded .expander {
+    -ms-transform: rotate(180deg); /* IE 9 */
+    -webkit-transform: rotate(180deg); /* Chrome, Safari, Opera */
+    transform: rotate(180deg);
+	top: 8px;
+}
+
+
 
 .layer-name {
     overflow: hidden;
     text-overflow: ellipsis;
-    display: inline-block;
+    display: block;
     white-space: nowrap;
     /* Leave some space for the expander. */
-    width: calc(100% - 0.7em);
+	padding-right: 20px;
     cursor: pointer;
+	margin-bottom: 1em;
 }
 
 .shape-layer-name:hover {
     font-weight: bold;
 }
 
-.expander {
-    display: inline-block;
-    cursor: pointer;
-    vertical-align: top;
-}
 
-.close-layer {
+.overlay-control .open-button,
+.overlay-control .open-button.element-hidden,
+.overlay-control .close-layer {
+	color: white;
+	background-color: #282828;
     display: inline-block;
-    width: 1em;
-    height: 1em;
-    background-color: black;
-    color: white;
-    margin-left: 0.3em;
-    font-size: large;
-    padding: 0.2em;
+	width: 28px;
+	height: 28px;
+	line-height: 28px;
+    margin-left: 10px;
     text-align: center;
     vertical-align: top;
+	cursor: pointer;
+	border-radius: 3px;
+	-webkit-box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.2);
+	-moz-box-shadow:    0px 2px 2px 0px rgba(0, 0, 0, 0.2);
+	box-shadow:         0px 2px 2px 0px rgba(0, 0, 0, 0.2);
 }
 
-.overlay-control .open-button {
-    margin-left: 0.3em;
-    width: 1em;
-    vertical-align: top;
-    display: inline-block;
-    font-size: large;
+.overlay-control .open-button.element-hidden,
+.overlay-control .close-layer {
+	background-color: #eee;
+	color: #282828;
+}
+
+.overlay-control .open-button.element-hidden:hover,
+.overlay-control .close-layer:hover {
+	background-color: #ddd;
 }
 
 .map-example {
@@ -189,7 +243,7 @@ input.opacity-slider {
 
 
 #All-tab-content .search-result {
-	padding: 5px 25px 5px 30px;
+	padding: 5px 0 5px 30px;
 	position: relative;
     cursor: pointer;
     text-align: left;
@@ -250,7 +304,7 @@ input.opacity-slider {
 	-moz-box-shadow:    0px 2px 2px 0px rgba(0, 0, 0, 0.2);
 	box-shadow:         0px 2px 2px 0px rgba(0, 0, 0, 0.2);	
 	padding: 0.5em;
-	margin: 1em 0;
+	margin-bottom: 20px;
 	width: 100%;
 	font-size: 14px;
 	box-sizing: border-box;
