@@ -24,6 +24,10 @@ var d3 = require("d3"),
 	.attr("id", "top-right-pane"),
     
     update = function() {
+	map.setView(
+	    state.getViewpoint().coordinates(),
+	    state.getViewpoint().zoom()
+	);
 	viewpointButtons.update();
 	sidePanel.update(state);
 	draw.update();
@@ -191,6 +195,6 @@ fileMenu.standardButtons.insertBefore(
 fileMenu.setButtons(fileMenu.standardButtons.ordered);
 
 require('./expose-viewpoint.js')(map, serialization.serializeViewpoint);
+require('./query-string-viewpoint.js')(menuModule.queryString, state.onSet, state.getViewpoint, serialization.deserializeViewpoint, errors.warnUser);
 
 menuModule.queryString.fromURL();
-

@@ -71,11 +71,6 @@ module.exports = function(errors, map, sidePanel, bottomPanel, update) {
 
 		viewpoint = state.viewpoint;
 		
-		map.setView(
-		    viewpoint.coordinates(),
-		    viewpoint.zoom()
-		);
-
 		onSet(state);
 		update();
 	    } finally {
