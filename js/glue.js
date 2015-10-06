@@ -146,8 +146,8 @@ var d3 = require("d3"),
 	sidePanel,
 	bottomPanel,
 	state.fresh
-    ),    
-    
+    ),
+
     viewpointButtons = require("./viewpoint-buttons.js")(
 	map.setView,
 	map.getCenter,
@@ -190,4 +190,7 @@ fileMenu.standardButtons.insertBefore(
 
 fileMenu.setButtons(fileMenu.standardButtons.ordered);
 
+require('./expose-viewpoint.js')(map, serialization.serializeViewpoint);
+
 menuModule.queryString.fromURL();
+
