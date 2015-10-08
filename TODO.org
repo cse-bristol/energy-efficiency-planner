@@ -1,0 +1,58 @@
+* Bugs
+** Shape file Projection
+There were some projection problems with the Florence shapefiles in the Steep project.
+
+I made a [[https://github.com/proj4js/proj4js/pull/119][pull request]], but it was never accepted.
+
+* Layer Customization
+** Outline Shapes
+It may be inappropriate to fill some shapes. We should offer the option to draw just the outline.
+
+** Point Sizes
+It might be useful to scale point sizes based on some attribute.
+
+This might lead to a lot of extra clutter in the UI.
+
+* Layer Management
+Currently it is only possible to add layers, and every layer added to a map is automatically saved to the database.
+
+We may need mechanisms to:
++ Upload to the server (prompt as part of save).
++ Delete
++ Rename
++ Organise (e.g. tag and search for tag, or find layers by user)
++ Version?
+
+We need to consider:
++ Privacy
++ Licensing
+
+* Raster File Support
+We would like to be able to import a raster file format - probably GeoTiff - using the import tool.
+
+These could be interpreted as points as as adjacent tessellated quadrilaterals.
+
+*** Implementation Details
+Zoe has some heat map data in tiff format.
+
+.lyr a layer file. Doesn't contain any actual data, but references the data and gives some rendering instructions. It appears to include the coordinate system.
+.tif
+.tif.aux.xml is auxiliary data. See PAMDataset. It can include projection information, but Zoe's one doesn't.
+.tif.ovr overview files are references to raster pyramids (progressively reduced detail). Alternatively, it might be for overlaying text, icons etc.?
+
+There is TIFFlib, but it has removed support for some useful things.
+
+* Plan Energy Interventions
+We give you a toolbox, where each tool puts some thing on the map.
+
+Add energy saving or generating technologies to the map to form an energy plan.
+ + Calculate cost and energy savings/production of your planned interventions.
+ + Examine and modify the assumptions behind the calculations.
+ + View the progress of a plan over time.
+ + Compare different versions of a plan.
+
+Types of intervention:
+ + Drawing a building outline
+ + Placing a solar panel
+ + Placing a wind turbines
+ + Placing some other (custom) technology
