@@ -6,20 +6,20 @@
 }
 
 .tile-legend {
-    padding: 0.5em;
+    padding: 10px;
 }
 
 .legend-label {
-    padding: 0.5em;
-    font-size: 14px;
+	font-size: 14px;
     font-weight: bold;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+	margin-bottom: 1em;
+	padding-right: 25px;
 }
 
 .legend-chart {
-    padding-left: 0.4em;
 }
 
 .legend-chart rect.highlight {

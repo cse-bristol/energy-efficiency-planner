@@ -8,7 +8,7 @@
 }
 
 .leaflet-control-geocoder input {
-    padding: 5px 0 6px 26px;
+    padding: 5px 26px 6px 26px;
     background-color: white;
     background-image: url(images/geocoder.png);
     background-repeat: no-repeat;
@@ -23,6 +23,20 @@
     display: none !important;
 }
 
+.leaflet-control-geocoder-alternatives li {
+	border-bottom: 1px solid #666;
+	padding: 12px 26px;
+}
+
 .leaflet-control-geocoder-alternatives li:hover {
     color: white;
+	background-color: #444;
+}
+
+.leaflet-control-geocoder-address-context {
+	color: #999;
+}
+
+.leaflet-control-geocoder-alternatives {
+	width: 300px;
 }

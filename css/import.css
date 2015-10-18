@@ -19,7 +19,22 @@
 }
 
 .file-import fieldset select {
-    margin-right: 0.5em;
+	width: 100%;
+	font-size: 14px;
+	box-sizing: border-box;
+}
+
+.file-import fieldset input,
+.file-import fieldset textarea {
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	-webkit-box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.2);
+	-moz-box-shadow:    0px 2px 2px 0px rgba(0, 0, 0, 0.2);
+	box-shadow:         0px 2px 2px 0px rgba(0, 0, 0, 0.2);	
+	padding: 0.5em;
+	width: 100%;
+	font-size: 14px;
+	box-sizing: border-box;
 }
 
 .file-import button {
@@ -38,14 +53,15 @@
 	-o-transition: background-color .2s linear;
 	-ms-transition: background-color .2s linear;
 	transition: background-color .2s linear;
+	border: 0;
 }
 
 .file-import .cancel-file-import {
-	background-color: #d6eec7;
+	background-color: #eee;
 }
 
 .file-import .cancel-file-import:hover {
-	background-color: #ccc;
+	background-color: #ddd;
 }
 
 
@@ -54,15 +70,16 @@
 }
 
 .file-import .confirm-file-import:hover {
-	background-color: #08b030;
+	background-color: #90d565;
 }
 
 
 
 .coordinate-system-search {
     display: block;
-    margin-bottom: 0.1em;
-    width: 99%
+    margin-bottom: 0.5em;
+    width: 100%;
+	box-sizing: border-box;
 }
 
 .srid-search-results {

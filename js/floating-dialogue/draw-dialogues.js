@@ -505,7 +505,7 @@ module.exports = function(container, getDataById, redraw, typeId, options, drawD
 		var newCloseButtons = newDialogues
 			.append("span")
 			.classed("close-button", true)
-			.html("X");
+			.html("P");
 
 		newCloseButtons.on("click", function(d, i) {
 		    var data = getDataById(d.id);
