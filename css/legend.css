@@ -2,7 +2,6 @@
     top: 3em;
     background-color: white;
     z-index: 10;
-    background-color: #F0F0F0;
     overflow: hidden;
 }
 
@@ -12,7 +11,7 @@
 
 .legend-label {
     padding: 0.5em;
-    font-size: small;
+    font-size: 14px;
     font-weight: bold;
     overflow: hidden;
     white-space: nowrap;
@@ -28,5 +27,5 @@
 }
 
 .legend-chart text {
-    font-size: xx-small;
+    font-size: 12px;
 }

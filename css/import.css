@@ -5,13 +5,59 @@
 }
 
 .file-import {
-    padding-bottom: 0.5em;
-    margin: 0.5em;
+    margin: 1em 0;
+}
+
+.file-import fieldset {
+	border: 0;
+	padding: 0;
+	margin: 0 0 1em 0;
+}
+
+.file-import fieldset legend {
+	font-family: 'fira_sanssemibold';
 }
 
 .file-import fieldset select {
     margin-right: 0.5em;
 }
+
+.file-import button {
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	-webkit-box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.4);
+	-moz-box-shadow:    0px 2px 2px 0px rgba(0, 0, 0, 0.4);
+	box-shadow:         0px 2px 2px 0px rgba(0, 0, 0, 0.4);
+	font-family: 'fira_sanssemibold';
+	font-size: 14px;
+	padding: 10px 25px;
+	line-height: 1;
+	-webkit-transition: background-color .2s linear;
+	-moz-transition: background-color .2s linear;
+	-o-transition: background-color .2s linear;
+	-ms-transition: background-color .2s linear;
+	transition: background-color .2s linear;
+}
+
+.file-import .cancel-file-import {
+	background-color: #d6eec7;
+}
+
+.file-import .cancel-file-import:hover {
+	background-color: #ccc;
+}
+
+
+.file-import .confirm-file-import {
+	background-color: #d6eec7;
+}
+
+.file-import .confirm-file-import:hover {
+	background-color: #08b030;
+}
+
+
 
 .coordinate-system-search {
     display: block;
