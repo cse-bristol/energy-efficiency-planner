@@ -45,5 +45,5 @@ Serve using any web server, for example using python3 on a Debian system:
   sudo python3 -m http.server 80 &
 #+END_SRC
 
-** TODO Future Plans
-http://tools.smartsteep.eu/wiki/ToDo
+** Future Plans
+See [[file:TODO.org][TODO.org]].
