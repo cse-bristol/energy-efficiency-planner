@@ -123,7 +123,7 @@ module.exports = function(updateTileLegendButtons, updateShapeLegendButtons, upd
 
 	    newShapes.append("div")
 		.classed("close-layer", true)
-		.text("X")
+		.text("P")
 		.on("click", function(d, i) {
 		    var layers = getShapeLayers();
 		    layers.remove(

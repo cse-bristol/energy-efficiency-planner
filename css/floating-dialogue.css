@@ -23,6 +23,7 @@
     top: 0;
 	border-radius: 5px;
 	box-shadow: 0 0 7px 0 rgba(0,0,0,0.6);
+	padding: 10px;
 }
 
 .floating-dialogue.element-hidden {

@@ -19,7 +19,7 @@ module.exports = function(container, getTileLayers, getShapeLayers, onSetState) 
 	drawLegends = drawLegendsFactory(getTileLayers, getShapeLayers),
 
 	drawButtonContent = function(buttons, newButtons) {
-	    newButtons.text("K");
+	    newButtons.text("7");
 	},
 	
 	shapeDialogues = dialogueFactory(

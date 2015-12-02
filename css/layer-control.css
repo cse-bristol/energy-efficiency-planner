@@ -118,7 +118,7 @@ input.opacity-slider {
 }
 
 .overlay-control.expanded {
-    max-height: 5em;
+    max-height: 6em;
 }
 
 .overlay-control::before {
@@ -150,7 +150,7 @@ input.opacity-slider {
 
 .overlay-control .expander {
 	position: absolute;
-	top: 13px;
+	top: 8px;
 	right: 0;
 	font-family: 'steep-icons';
 	font-style: normal;
@@ -159,13 +159,16 @@ input.opacity-slider {
 	color: #999;
 	cursor: pointer;
     transition: transform 0.3s, top 0.3s;    
-}
-
-.overlay-control.expanded .expander {
     -ms-transform: rotate(180deg); /* IE 9 */
     -webkit-transform: rotate(180deg); /* Chrome, Safari, Opera */
     transform: rotate(180deg);
-	top: 8px;
+}
+
+.overlay-control.expanded .expander {
+    -ms-transform: rotate(0deg); /* IE 9 */
+    -webkit-transform: rotate(0deg); /* Chrome, Safari, Opera */
+    transform: rotate(0deg);
+	top: 13px;
 }
 
 
@@ -209,6 +212,16 @@ input.opacity-slider {
 .overlay-control .close-layer {
 	background-color: #eee;
 	color: #282828;
+}
+
+.overlay-control .close-layer,
+.overlay-control .open-button.shape-legend-button {
+	font-family: 'steep-icons';
+	font-size: 14px;
+}
+
+.overlay-control .open-button.results-button {
+	font-size: 24px;
 }
 
 .overlay-control .open-button.element-hidden:hover,
