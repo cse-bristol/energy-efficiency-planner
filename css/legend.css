@@ -1,24 +1,19 @@
 .legend {
+    left: 1em;
     top: 5em;
     background-color: white;
     z-index: 10;
     overflow: hidden;
 }
 
-.tile-legend {
-}
-
 .legend-label {
-	font-size: 14px;
+    font-size: 14px;
     font-weight: bold;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-	margin-bottom: 1em;
-	padding-right: 25px;
-}
-
-.legend-chart {
+    margin-bottom: 1em;
+    padding-right: 25px;
 }
 
 .legend-chart rect.highlight {
