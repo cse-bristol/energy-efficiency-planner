@@ -1,3 +1,7 @@
+.toggle-button a {
+    font-family: steep-icons;
+}
+
 .toggle-button.active a {
     color: #FFF;
     background: #282828;
